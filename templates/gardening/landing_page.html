@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load compress %}
+
+{% block links %}
+	<!-- Syntax is backwards, "not debug" = DEBUG -->
+	{% if not debug %}
+		<link href='http://fonts.googleapis.com/css?family=Muli:400,300italic' rel='stylesheet' type='text/css'>
+		<link type="text/css"
+			  rel='stylesheet/less'
+			  href='{% static "less/landing_page.less"%}'
+		/>
+		<script src="{% static 'js/less.min.js' %}" type="text/javascript"></script>
+	{% else %}
+		{% compress css %}
+			<link type="text/less" rel='stylesheet' 
+			      href='{% static "less/landing_page.less"%}'
+			/>
+		{% endcompress %}
+	{% endif %}
+{% endblock %}
+
+{% block body %}
+	<div class='top_img'>
+		<div class='sub_bar'>
+			<button class='header'>About</button>
+			<button class='header'>Login</button>
+		</div>
+		<h2> Community Garden:</h2>
+		<p>Connecting home gardens to green thumbs</p>
+	</div>
+	<form class="sign_in" method="POST" action="/">
+		<h3>SIGN IN:</h3>
+		{% csrf_token %}
+		<ul>
+			{{ signinform.as_ul }}
+			<li><input type='submit' value='Sign In'/></li>
+		</ul>
+		<p id="error_msg">{{ error_message }}</p>
+	</form>
+	
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}
