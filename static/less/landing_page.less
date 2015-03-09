@@ -1,3 +1,6 @@
+@inoffensive-green: #CAE6B5;
+@tablet-size: 768px;
+
 
 // Universal Attributes
 * {
@@ -13,18 +16,20 @@ ul {
 
 body {
 	overflow-x: hidden;
-	background-color: #99FF99;
+	background-color: @inoffensive-green;
 
-	.sub_bar {
+	.top_img {
+		h2 {
+			margin-left: 1%;
+		}
+		.sub_bar {
 			@media screen {
-				width: 10%;
+				width: 11%;
 				height: 25px;
 			};
-			@media (max-width: 1200px) {
-				height: 50px;
-			}
-			@media (max-width: 765px) {
+			@media (max-width: @tablet-size) {
 				width: 20%;
+				height: 50px;
 			};
 			position: absolute;
 			top: 0px;
@@ -47,9 +52,7 @@ body {
 			button.header:active {
 				border: none
 			}
-	}
-
-	.top_img {
+		}
 		p {
 			position: absolute;
 			top: 60%;
@@ -68,12 +71,12 @@ body {
 		font-size: 32px
 	}
 
-	.sign_in {
+	.account_form {
 		display:inline-block;
 		@media screen {
 			width: 40%;
 		}
-		@media (max-width: 768px) {
+		@media (max-width: @tablet-size) {
 			width: 80%;
 		}
 		float: left;
@@ -95,13 +98,30 @@ body {
 					width: 25%;
 				}
 			}
+
 			li:last-child {
 				margin-top: 10px;
 			}
+
+		}
+		.error_msg {
+			color: #FF0000 - #222;
 		}
 	}
 
-	#error_msg {
-		color: red - #222;
+	.text_blurb {
+		display: inline-block;
+		white-space: normal;
+		float: left;
+		height: 400px;
+		padding: 0 1%;
+		@media screen {
+			width: 40%;
+		}
+		@media (max-width: @tablet-size) {
+			width: 100%;
+		}
 	}
+
+	
 }

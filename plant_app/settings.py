@@ -21,6 +21,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 GARDENING_DIR = os.path.join(BASE_DIR, "gardening")
 TEMPLATE_DIR = os.path.join(BASE_DIR, "templates")
 TEMPLATE_DIRS = (os.path.join(TEMPLATE_DIR, "gardening"),)
+LOGIN_URL = '/'
 
 if DEBUG:
     ALLOWED_HOSTS = ["*",]

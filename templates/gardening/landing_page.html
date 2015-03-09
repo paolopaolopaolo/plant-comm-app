@@ -2,16 +2,25 @@
 {% load staticfiles %}
 {% load compress %}
 
+{% block title %}
+	<title>GreenThumbs: Home Gardeners</title>
+{% endblock %}
+
 {% block links %}
+	<!-- Load Muli Font -->
+	<link href='http://fonts.googleapis.com/css?family=Muli:400,300italic'
+		  rel='stylesheet'
+		  type='text/css'/>
 	<!-- Syntax is backwards, "not debug" = DEBUG -->
 	{% if not debug %}
-		<link href='http://fonts.googleapis.com/css?family=Muli:400,300italic' rel='stylesheet' type='text/css'>
+		<!-- DEVELOPMENT STYLING -->
 		<link type="text/css"
 			  rel='stylesheet/less'
 			  href='{% static "less/landing_page.less"%}'
 		/>
 		<script src="{% static 'js/less.min.js' %}" type="text/javascript"></script>
 	{% else %}
+		<!-- PRODUCTION STYLING -->
 		{% compress css %}
 			<link type="text/less" rel='stylesheet' 
 			      href='{% static "less/landing_page.less"%}'
@@ -20,26 +29,43 @@
 	{% endif %}
 {% endblock %}
 
-{% block body %}
+{% block main_content %}
 	<div class='top_img'>
 		<div class='sub_bar'>
 			<button class='header'>About</button>
-			<button class='header'>Login</button>
+			<button id='swap_forms' class='header'>Login</button>
 		</div>
-		<h2> Community Garden:</h2>
+		<h2>Community Garden:</h2>
 		<p>Connecting home gardens to green thumbs</p>
 	</div>
-	<form class="sign_in" method="POST" action="/">
-		<h3>SIGN IN:</h3>
+	<form id="signup" class="account_form" method="POST" action="/">
+		<h3>SIGN UP:</h3>
 		{% csrf_token %}
 		<ul>
 			{{ signinform.as_ul }}
-			<li><input type='submit' value='Sign In'/></li>
+			<li><input type='submit' value='Sign Up'/></li>
 		</ul>
-		<p id="error_msg">{{ error_message }}</p>
+		<p class="error_msg">{{ error_message }}</p>
 	</form>
-	
+	<form id="login" class="account_form" method="POST" action="/">
+		<h3>LOG IN:</h3>
+		{% csrf_token %}
+		<ul>
+			{{ loginform.as_ul }}
+			<li><input type='submit' value='Log In'/></li>
+		</ul>
+		<p class="error_msg">{{ error_message }}</p>
+	</form>
+	<div class='text_blurb'>
+		<h2>Welcome to Community Garden</h2>
+		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+	</div>	
 {% endblock %}
 
 {% block scripts %}
+	{% compress js %}
+		<script src='{% static "js/jquery-1.11.1.min.js" %}'></script>
+		<script src='{% static "js/cached_UI.js" %}'></script>
+		<script src='{% static "js/landing_page.js" %}'></script>
+	{% endcompress %}
 {% endblock %}
