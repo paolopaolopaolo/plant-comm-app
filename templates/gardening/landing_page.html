@@ -3,7 +3,7 @@
 {% load compress %}
 
 {% block title %}
-	<title>GreenThumbs: Home Gardeners</title>
+	<title>Community Gardens: Green thumbs for Home Gardens</title>
 {% endblock %}
 
 {% block links %}
@@ -65,6 +65,7 @@
 {% block scripts %}
 	{% compress js %}
 		<script src='{% static "js/jquery-1.11.1.min.js" %}'></script>
+		<script src='{% static "js/jquery.cookie.min.js" %}'></script>
 		<script src='{% static "js/cached_UI.js" %}'></script>
 		<script src='{% static "js/landing_page.js" %}'></script>
 	{% endcompress %}

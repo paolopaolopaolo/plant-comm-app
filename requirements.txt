@@ -1,0 +1,8 @@
+Django==1.7
+Pillow==2.7.0
+django-appconf==1.0.1
+django-compressor==1.4
+django-simple-email-confirmation==0.12
+djangorestframework==3.1.0
+mysql-python==1.2.5
+six==1.9.0

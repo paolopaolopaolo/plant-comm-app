@@ -20,11 +20,31 @@ except ImportError:
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 GARDENING_DIR = os.path.join(BASE_DIR, "gardening")
 TEMPLATE_DIR = os.path.join(BASE_DIR, "templates")
-TEMPLATE_DIRS = (os.path.join(TEMPLATE_DIR, "gardening"),)
+TEMPLATE_DIRS = (
+                    os.path.join(TEMPLATE_DIR, "gardening"),
+                    os.path.join(BASE_DIR, "static", "js", "backbone", "profile_page"),
+                )
+
 LOGIN_URL = '/'
 
+# Formattable Zipcode API URL
+ZIPCODE_API_URL = ''.join([
+    "https://www.zipcodeapi.com/rest/",
+    "%s/",
+    "distance.json/",
+    "%s/",
+    "%s/",
+    "<units>"])
+
+
+    # Allowed hosts
 if DEBUG:
     ALLOWED_HOSTS = ["*",]
+    with open(os.path.join(BASE_DIR, "ZIP_CODE_API.txt"), "rb") as zipcode:
+        ZIPCODE_API_KEY = zipcode.read()
+
+else:
+    pass
     
 
 # Quick-start development settings - unsuitable for production
@@ -45,6 +65,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'compressor',
     'simple_email_confirmation',
+    'rest_framework',
     'gardening',
 )
 
@@ -117,3 +138,4 @@ STATIC_URL = '/static/'
 
 if DEBUG:
     STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static')
+    MEDIA_ROOT = os.path.join(STATIC_ROOT, "media")

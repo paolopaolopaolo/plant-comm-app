@@ -1,0 +1,359 @@
+// Colors and sizes
+@inoffensive-green: #CAE6B5;
+@inoffensive-brown: #E3E6B5;
+@tablet-size: 768px;
+
+//----- Universal Attributes -----//
+* {
+	font-family: "Muli", garamond, sans-serif;
+}
+
+h2 {
+	font-size: 36px;
+}
+
+.close {
+	background: none;
+	border: none;
+	float: right;
+	cursor: pointer;
+}
+.close:hover {
+	color: blue;
+	box-shadow: inset 2px, 2px, 2px black;
+}
+
+.hidden {
+	display: none!important;
+}
+
+//----- Mixins -----//
+
+// Center aligned
+
+.center() {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+// Panel characteristics
+.panel( @width: 100%;
+		@min-height: 400px;
+		@back-color: transparent;
+		@margin-bottom: 5px;) {
+	text-align: left;
+	margin-bottom: @margin-bottom;
+	padding-left: 5px;
+	width: @width;
+	min-height: @min-height;
+	background-color: @back-color;
+	.center();
+}
+
+// Clearfix Hack
+.clearfix() {
+	display: inline-block;
+	:after {
+	     visibility: hidden;
+	     display: block;
+	     font-size: 0;
+	     content: " ";
+	     clear: both;
+	     height: 0;
+	 }
+}
+
+
+// ----- Top Level Styling ----- //
+
+body {
+	position: relative;
+	overflow-x: hidden;
+	background-color: @inoffensive-green;
+	margin: 0;
+	
+	.profile_content {
+		.center();
+		.clearfix();
+		.panel(@back-color: @inoffensive-brown);
+		padding-top: 10px;
+		padding-bottom: 10px;
+		a {
+			position:relative;
+			float: left;
+			margin-left: 2%;
+			margin-bottom: 2%;
+		}
+		h2, p {
+				display: inline-block;
+				margin: 20px 0 0 0px;
+		}
+		.thumb_wrapper {
+			clear: both;
+			@media screen {
+				position: relative;
+				margin-left: 20px;
+				border-radius: 5px 5px 0 0;
+				float: left;
+				clear: both;
+				background-color: #FFFFFF - #111;
+				width: 24%;
+				height: 320px;
+				display: inline-block;
+			}
+			@media (max-width: @tablet-size) {
+				width: 83%;
+			}
+			#profilepic_thumb {
+				border-radius: inherit;
+				position: relative;
+				top: 8px;
+				left: 3%;
+				width: 94%;
+				height: 86%;
+			}
+		}
+		#toggle_edits {
+			@media screen {
+				float: right;
+				margin-right: 10%;
+				cursor: pointer;
+				color: blue;
+				font-weight: underline;
+			}
+			@media (max-width: @tablet-size) {
+				display: block;
+				float: left;
+			}
+		}
+		#toggle_edits:hover {
+			color: green;
+		}
+		#profile_form {
+			@media screen {
+				width: 40%;
+			}
+			@media (max-width: @tablet-size) {
+				width: 80%;
+				margin-top: 20px;
+			}
+			white-space: pre-line;
+			word-wrap: break-word;
+			overflow: hidden;
+			border-radius: 5px;
+			float: left;
+			position: relative;
+			padding: 5px 0px 5px 15px;
+			background-color: @inoffensive-brown + #111;
+			margin-left: 20px;
+			box-shadow: inset 2px 2px 4px @inoffensive-brown + #222; 
+			ul {	
+				width: 100%;
+				margin-bottom: 10px;
+				list-style-type: none;
+				padding: 0;
+				li {
+					@media screen {
+						position: relative;
+						width: 38%;
+						float: left;
+						display: inline-block;
+						margin-bottom: 10px;
+						margin-right: 20px;
+					}
+					@media (max-width: @tablet-size) {
+						width: 92%;
+						display: block;
+					}
+				}
+				li:first-child, li:last-child {
+					width: 96%;
+					display: block;
+				}
+				a {
+					display:none;
+				}
+				label {
+					font-size: 16px;
+					font-weight: bold;
+					display: inline-block;
+					width: 100%;
+					// vertical-align: middle;
+				}
+				input, select, textarea {
+					position: relative;
+					display: inline-block;
+					// vertical-align: middle;
+					width: 100%;
+					
+					border-radius: 5px;
+					float: left;
+				}
+				#id_available {
+					display: inline-block;
+					width: 20px;
+				}
+				// #id_available::after {
+				// 	content: "I can help people with their home gardens!";
+				// 	color: black;
+				// }
+			}
+		}
+	}
+	.plant_content {
+		h2 {
+			text-align: center;
+		}
+		.clearfix();
+		.panel(@back-color: @inoffensive-brown - #222);
+		#add_plant {
+			@media screen {
+				background-color: @inoffensive-brown;
+				border-radius: 10px;
+				opacity: 0.8; 
+				border: none;
+				width: 62%;
+				left: 19%;
+				position: relative;
+				cursor: pointer;
+				margin-bottom: 12px;
+				font-size: 24px;
+			} 
+			@media (max-width: @tablet-size) {
+				left: 9%;
+				width: 82%;
+				font-size: 20px;
+			}
+		}
+		#add_plant:hover {
+			background-color: @inoffensive-brown + #111;
+		}
+	}
+}
+
+//--- Template Styling ---//
+.plant_form {
+	.center();
+	position: relative;
+	border-radius: 5px;
+	margin-bottom: 20px;
+	background-color: @inoffensive-brown + #111;
+	padding: 1%;
+
+	@media screen {
+		width: 60%;
+	}
+	@media (max-width: @tablet-size) {
+		width: 90%;
+	}
+
+	p {
+		clear: left;
+		float: left;
+		display: inline-block;
+		@media screen {
+			width: 60%;
+		}
+		@media (max-width: @tablet-size) {
+			width: 90%;
+		} 
+		input, textarea {
+			float: left;
+			width: 100%;
+			margin-bottom: 10px;
+		}
+	}
+
+	.toggle_plant_edit {
+		float: left;
+		cursor: pointer;
+		color: blue;
+		font-weight: underline;
+		margin-bottom: 10px;
+	}
+
+	.toggle_plant_edit:hover {
+		color: green;
+	}
+
+	.thumb_wrapper_p {
+		@media screen {
+			position: relative;
+			background-color: @inoffensive-brown + #222;
+			border-radius: 5px 5px 0 0;
+			white-space: nowrap;
+			overflow: hidden;
+			display: block;
+			height: 320px;
+			width: 30%;
+			float: right;
+			clear: right;
+		}
+		@media (max-width: @tablet-size) {
+			width: 99%;
+			right: 1%;
+		}
+		input {
+			  display: none;
+		}
+		// input:after {
+		// 	display: none;
+		// }
+		img {
+			border-radius: 5px;
+			display: inline-block;
+			position: relative;
+			left: 2%;
+			top: 5px;
+			width: 96%;
+			height: 80%;
+			margin-left: 1%;
+			margin-right: 2%;
+		}
+		.img_button {
+			z-index: 50;
+			position: absolute;
+			display: block;
+			top: 83%;
+			cursor: pointer;
+			border: none;
+			border-radius: 5px;
+			background-color: #FFFFFF;
+			color: #909090;
+			opacity: 0.8;
+			font-weight: bold;
+			width: 47%;
+			@media (max-width: @tablet-size) {
+				height: 40px;
+			}
+		}
+
+		.img_button:hover {
+			background-color: #FFFFFF - #111;
+		}
+		
+		.img_left {
+			left: 2%;
+			margin-bottom: 5px;
+		}
+		.img_right {
+			right: 2%;
+			margin-bottom: 5px;
+		}
+		.delete_img {
+			top: 2%;
+			right: 2%;
+		}
+		.fake_button {
+			top: 92%;
+			opacity: 1.0;
+			height: 22px;
+			width: 99%;
+		}
+		.fake_button {
+			background-color: #FFFFFF - #111;
+		}
+
+	}
+
+}

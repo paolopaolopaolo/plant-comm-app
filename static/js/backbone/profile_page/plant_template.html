@@ -1,0 +1,28 @@
+<!-- Template for Plant Model/Collections -->
+{% verbatim %}
+	<div id='plant_form{{id}}' class='plant_form'>
+		<meta name='plant_id' value='{{ id }}'>
+		<a class='toggle_plant_edit'>Edit Plant</a>
+		<div class='thumb_wrapper_p'>
+			<img class='plantpic_thumb'/>
+		</div>
+		<button class='close deletePlant'>&times;</button>
+		<p>
+			<label for='id_species_{{ id }}'>Species:</label>
+			<input id='id_species_{{ id }}' name='species' type='text' value='{{ species }}'/>
+		</p>
+		<p>
+			<label for='id_quantity_{{ id }}'>Quantity:</label>
+			<input id='id_quantity_{{ id }}' name='quantity' type='text' value='{{ quantity }}'/>
+		</p>
+		<p>
+			<label for='id_information_{{ id }}'>Information:</label>
+			<textarea maxlength='700'
+					  cols='40'
+					  rows='10'
+					  id='id_information_{{ id }}'
+					  name='information'
+					  value="{{information}}">{{information}}</textarea>
+		</p>
+	</div>
+{% endverbatim %}

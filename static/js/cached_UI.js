@@ -1,22 +1,22 @@
 // Cached Variables and Functions
 
+
+
 // An encapsulated LandingPage object
 // Carries all the required interactivity
 // for the landing page 
 function LandingPage($) {
-	// Cached variable
-	var FORM_TOGGLE,
-	    TOGGLE_READY;
+	"use strict";
 
-	FORM_TOGGLE = true;
-	TOGGLE_READY = true;
+	// Cached FORM_TOGGLE variable
+	var FORM_TOGGLE = true;
 
 	// Set jQuery instance to noConflict
 	$ = $.noConflict(true);
 
 	// jQuery plugin, _show, that removes dynamic
 	// styling after calling show function
-		$.fn._show = function () {
+	$.fn._show = function () {
 		var $this = this;
 		$this.show({ 
 			complete: function () {
@@ -29,20 +29,18 @@ function LandingPage($) {
 	// signup and login forms, given a 
 	function toggleForm(formval) {
 		"use strict";
+		// Initialize Variables
 		var $top_form,
 			$bottom_form,
 			$button,
 			button_label;
-
 		// Set entities (swap button, and the forms)
 		$button = $('#swap_forms');
 		$top_form = $("#signup");
 		$bottom_form = $("#login");
-
 		// Hide both forms
 		$top_form.hide();
 		$bottom_form.hide();
-		
 		// Choose which form to show based
 		// on formval boolean
 		if (formval) {
@@ -52,14 +50,35 @@ function LandingPage($) {
 			$top_form._show();
 			button_label = "Login";
 		}
-
 		// Rename Button
 		$button.html(button_label);
-		
 		//Don't reenable click events until after 500ms
 		setTimeout(function () {
 			enableFormToggle();
 		}, 500);
+	}
+
+	// Saves FORM TOGGLE on submission
+	function saveToggleOnSubmit() {
+		"use strict";
+		// Set one-time submit handler
+		$("form").one("submit", function (event) {
+			// Initialize expiry time
+			var expiry;
+			// Prevent default submission 
+			event.preventDefault();
+			// Set form_toggle as cookie
+			// with expiry date as ~5 seconds
+			expiry = new Date();
+			expiry.setTime(expiry.getTime() + 5000);
+			$.cookie(
+				'form_toggle',
+				FORM_TOGGLE.toString(),
+				{ expires: expiry }
+			);
+			// Submit form
+			$(this).submit();
+		});
 	}
 
 	// Set up onetime click event that toggles forms
@@ -81,15 +100,28 @@ function LandingPage($) {
 	// Initialize Form Toggle
 	function initializeFormToggle() {
 		"use strict";
+		// Set FORM_TOGGLE based on any existing cookies
+		if ($.cookie('form_toggle') !== "undefined") {
+			if ($.cookie('form_toggle') === "false") {
+				FORM_TOGGLE = false;
+			} else {
+				FORM_TOGGLE = true;
+			}
+		}
+		// Set up page based on Form_Toggle
+		if (FORM_TOGGLE) {
+			$("#login").hide();
+			$("#swap_forms").html("Login");
+		} else {
+			$("#signup").hide();
+			$("#swap_forms").html("Sign Up");
+		}
+		// Click handlers and image effect functions
 		enableFormToggle();
-		$('#login').hide();
 		fadeOutError();
+		saveToggleOnSubmit();
 	}
 
 	// Alias a public init function
 	this.init = initializeFormToggle;
-}
-
-
-
-
+};

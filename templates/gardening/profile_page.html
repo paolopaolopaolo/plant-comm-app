@@ -6,11 +6,157 @@
 	<title>{{ user }}'s Gardening Profile</title>
 {% endblock %}
 
+
+
 {% block links %}
+	<!-- Load Muli Font and Font Awesome from CDN-->
+	{% compress css %}
+		<link href='http://fonts.googleapis.com/css?family=Muli:400,300italic'
+			  rel='stylesheet'
+			  type='text/css'/>
+		<link rel="stylesheet" 
+			  href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"/>
+	{% endcompress %}
+	<!-- Syntax is backwards, "not debug" = DEBUG -->
+	{% if not debug %}
+		<!-- DEVELOPMENT STYLING -->
+		<link type="text/css"
+			  rel='stylesheet/less'
+			  href='{% static "less/profile_page.less"%}'
+		/>
+		<script src="{% static 'js/less.min.js' %}" type="text/javascript"></script>
+	{% else %}
+		<!-- PRODUCTION STYLING -->
+		{% compress css %}
+			<link type="text/less" rel='stylesheet' 
+			      href='{% static "less/profile_page.less"%}'
+			/>
+		{% endcompress %}
+	{% endif %}
+	<!-- Pre-load data (Bootstrapped data) -->
+	<script type='text/javascript'>
+		var PROFILE_SOURCE, PLANT_SOURCE, PLANT_IMG_SOURCE;
+		{% autoescape off %}
+			PLANT_SOURCE = {{ plant_objects }};
+			PROFILE_SOURCE = {{ gardener_object }};
+			PLANT_IMG_SOURCE = {{ plant_img_objects }};
+		{% endautoescape %}
+	</script>
 {% endblock %}
 
 {% block main_content %}
+	<div class='profile_content'>
+		<a href='/feed'>Home</a><a>&emsp;|&emsp;</a><a href='/logout'>Logout</a>
+		<div class='thumb_wrapper'>
+		{% if profile_pic %}
+			<img id='profilepic_thumb' src='{{domain}}media/{{profile_pic.url}}' />
+		{% else %}
+			<img id='profilepic_thumb'/>
+		{% endif %}
+		</div>
+		<form id='profile_form' enctype="multipart/form-data" method="POST">
+			<h2>{{ user }}'s Profile</h2>&nbsp;&nbsp;<p>Saved!</p>
+			<a id='toggle_edits' tabindex="1">Edit Profile</a>
+			{% csrf_token %}
+			<ul>
+				{{ profile_form.as_ul }}
+			</ul>
+		</form>
+	</div>
+	<div class='plant_content'>
+		<!-- Plant content header -->
+		<h2>{{ user }}'s Plants</h2>
+		<div class='plant_content_actuel'>
+			<button id='add_plant'>
+				<i class="fa fa-pagelines"></i> 
+					Add a new plant 
+				<i class="fa fa-pagelines"></i>
+			</button>
+		</div>
+	</div>
 {% endblock %}
 
 {% block scripts %}
+	{% compress js %}
+		<script src='{% static "js/jquery-1.11.1.min.js" %}'></script>
+		<script src='{% static "js/jquery.cookie.min.js" %}'></script>
+		<!-- Underscore and Backbone.js -->
+		<script src='{% static "js/underscore.js" %}'></script>
+		<script src='{% static "js/backbone.js" %}'></script>
+		<!-- Backbone MVC -->
+		<!-- AJAX and Backbone.sync settings -->
+		<script src='{% static "js/backbone/profile_page/sync.js" %}'></script>
+		<!-- Backbone Models -->
+		<script src='{% static "js/backbone/profile_page/models/ProfilePageModels.js" %}'>
+		</script>
+		<!-- Backbone Collections -->
+		<script src='{% static "js/backbone/profile_page/collections/PlantCollection.js" %}'>
+		</script>
+		<script src='{% static "js/backbone/profile_page/collections/PlantImgCollection.js" %}'>
+		</script>
+		<!-- Backbone Views -->
+		<script src='{% static "js/backbone/profile_page/views/PlantImgView.js" %}'>
+		</script>
+		<script src='{% static "js/backbone/profile_page/views/PlantView.js" %}'>
+		</script>
+		<script src='{% static "js/backbone/profile_page/views/ProfileView.js" %}'>
+		</script>
+		<!-- Top Level Backbone View -->
+		<script src='{% static "js/backbone/profile_page/views/ProfilePageView.js" %}'>
+		</script>
+	{% endcompress %}
+{% endblock %}
+
+{% block backbone_templates %}
+	{% verbatim %}
+		<!--Plant Form Template-->
+		<script id='plant_form_template' type='text/html' class='hidden'>
+			<div id='plant_form{{ id }}' class='plant_form'>
+				<input type='hidden' name='plant_id' value='{{ id }}'>
+				<a class='toggle_plant_edit'>Edit Plant</a>
+				<button class='close deletePlant' alt='Delete plant'>&times; Delete Plant</button>
+				<div id='twp{{ id }}' class='thumb_wrapper_p'>	
+					<button class='delete_img img_button hidden' aria-label='Delete picture'>
+						<i class="fa fa-times-circle"></i> Delete <i class="fa fa-picture-o"></i>
+					</button>
+					<button class='dir_button img_left img_button' aria-label='Slide pictures left'>
+						<i class="fa fa-arrow-circle-left"></i>
+					</button>
+					<button class='dir_button img_right img_button' aria-label='Slide pictures right'>
+						<i class="fa fa-arrow-circle-right"></i>
+					</button>
+					<button class='fake_button img_button' aria-label='Add picture'>
+						<i class="fa fa-picture-o"></i>
+						&emsp;Add photos of this plant&emsp;
+						<i class="fa fa-picture-o"></i>
+					</button>
+					<input id='pic_add{{ id }}' name='image_add' type='file'/>
+				</div>
+				<p>
+					<label for='id_species_{{ id }}'>Species:</label>
+					<input id='id_species_{{ id }}' name='species' type='text' value='{{ species }}'/>
+				</p>
+				<p>
+					<label for='id_quantity_{{ id }}'>Quantity:</label>
+					<input id='id_quantity_{{ id }}' name='quantity' type='text' value='{{ quantity }}'/>
+				</p>
+				<p>
+					<label for='id_information_{{ id }}'>Information (700 characters max):</label>
+					<textarea maxlength='700'
+							  cols='40'
+							  rows='10'
+							  id='id_information_{{ id }}'
+							  name='information'
+							  value="{{ information }}">{{ information }}</textarea>
+				</p>
+			</div>
+		</script>
+
+		<!--Plant Image Template -->
+		<script id='plantpic_thumb_template' type='text/html' class='hidden'>
+			<img id='ppt{{ id }}' class='plantpic_thumb' src='{{ imageURL }}'/>
+		</script>
+
+	{% endverbatim %}
+
 {% endblock %}

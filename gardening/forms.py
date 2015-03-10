@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
+from gardening.models import STATE_ABBREVS
+
 
 class SignUpForm(forms.Form):
 
@@ -94,15 +96,63 @@ class LogInForm(forms.Form):
 	def auth_user(self):
 		username = None
 		print "login_is_email: %s" % self.login_is_email
+		print "email: %s" % self.email
 		if self.login_is_email:
-			user = User.objects.get(email = self.email)
+			user = User.objects.get(email = self.email.lower())
 			username = user.username
 		else:
-			username = self.cleaned_data["uname_email"]
+			username = self.cleaned_data["uname_email"].lower()
 		return authenticate(
 				username = username,
 				password = self.cleaned_data["password"]
 			)
 
 class ProfileForm(forms.Form):
-	pass
+	
+	available = forms.BooleanField(label = "Available to garden",
+								   required = False)
+	
+	first_name = forms.CharField(max_length = 100,
+								 label = "First name:",
+								 required = False)
+
+	last_name = forms.CharField(max_length = 100,
+								label = "Last name:",
+								required = False)
+
+	profilepic = forms.ImageField(label = "Profile picture:",
+								  required = False)
+	
+
+	city = forms.CharField(max_length = 100,
+						   label = "City:",
+						   required = False)
+
+	state = forms.ChoiceField(label = "State:",
+							  choices = STATE_ABBREVS,
+							  required = False)
+
+	zipcode = forms.CharField(max_length=5,
+							  label = "Zipcode:",
+							  required = False,
+							  widget = forms.widgets.NumberInput)
+
+	text_blurb = forms.CharField(max_length = 700,
+								 label = "About Me (700 character max):",
+								 widget = forms.widgets.Textarea,
+								 required = False)
+
+class PlantForm(forms.Form):
+	species = forms.CharField(max_length = 200,
+							  label = 'Species:',
+							  required = False)
+	information = forms.CharField(max_length = 700,
+								  label = 'Information (700 character max):',
+								  widget = forms.widgets.Textarea,
+								  required = False)
+	quantity = forms.IntegerField(label = 'Number of plants',
+								  required = False,
+								  widget = forms.widgets.NumberInput)
+
+class PlantImageForm(forms.Form):
+	image_add = forms.ImageField(label='plant_picture')
