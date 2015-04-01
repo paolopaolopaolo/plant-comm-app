@@ -68,11 +68,10 @@ var PlantImgView = Backbone.View.extend({
 			this.$el.find('.dir_button')
 					.removeClass('hidden');
 		}
-		// if (this.collection.length < 1) {
-		// 	this.$el.find('.delete_img')
-		// 			.addClass('hidden');
-
-		// }
+		if (this.collection.length < 1 || !ppv) {
+			this.$el.find('.delete_img')
+					.addClass('hidden');
+		} 
 		if (this.curr_idx > this.collection.length - 1) {
 			this.moveLeft();
 		}
@@ -170,7 +169,7 @@ var PlantImgView = Backbone.View.extend({
 		this.collection.each(_.bind(function (model) {
 			this.render(model);
 		}, this));
-
+		this.toggleArrowDisplay();
 		this.listenTo(this.collection, 'remove', this.destroyImg);
 		this.listenTo(this.collection, 'add', this.render);
 

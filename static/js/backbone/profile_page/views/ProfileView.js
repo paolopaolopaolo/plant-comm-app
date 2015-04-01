@@ -2,8 +2,7 @@ var ProfileView = Backbone.View.extend({
 
 	// Cached toggle value for toggling text editing
 	FORM_TOGGLE: true,
-
-	pagestart: true,
+	cancel_render: false,
 
 	// Set target element
 	el: '#profile_form',
@@ -57,6 +56,7 @@ var ProfileView = Backbone.View.extend({
 	// Handles text changes
 	saveText: function (event) {
 		"use strict";
+		console.log('saveText called');
 		var $currentValue, result;
 		// Initialize result object
 		result = {};
@@ -72,47 +72,73 @@ var ProfileView = Backbone.View.extend({
 	// Handles img changes with its own AJAX call
 	saveImg: function (event) {
 		// Hoist variables
-		var xhr_object;
+		console.log('saveImg called');
+		var xhr_object, fake_form;
 		// Create the xhr object to send
 		// method: POST
 		// url: /profile/
+
+		fake_form = document.createElement('form');
+		fake_form.setAttribute('enctype', 'multipart/form-data');
+
 		xhr_object = {
-			'url' : this.$el.attr('action'),
-			'method' : this.$el.attr('method'),
+			'url' : '/profile/gardener/pic',
+			'method' : 'POST',
 			'contentType': false,
 			'processData': false,
-			'data': new FormData(this.$el[0])
+			'data': new FormData(fake_form)
 		};
-		// Send AJAX POST request; on finish, change the image
-		$.ajax(xhr_object).done(function (response) {
-			$('#profilepic_thumb').attr('src', response['profile_pic']);
-		});
 
+		xhr_object['data'].append('profile_pic', event.target.files[0]);
+
+		// Send AJAX POST request; on finish, change the image
+		$.ajax(xhr_object).done(_.bind(function (response) {
+			this.cancel_render = true;
+			this.model.set({'profile_pic': response['profile_pic']});
+		}, this));
+
+	},
+
+	profilePicRender: function (model) {
+		var url_to_render;
+		console.log('ppRender called!');
+		if (model.attributes['profile_pic'].indexOf('http') === 0) {
+			$('#profilepic_thumb').attr('src', model.attributes['profile_pic']);
+		} else {
+			url_to_render = [ window.location.protocol,
+							  "//",
+							  window.location.hostname,
+							  (window.location.port ? ":" + window.location.port : ""),
+							  '/media/',
+							  model.attributes['profile_pic']].join('');
+			console.log(url_to_render);
+			$('#profilepic_thumb').attr('src', url_to_render);
+		}
 	},
 
 	// Just find the appropriate inputs and replace them with server-generated
 	// values
-	render: function () {
+	render: function (model) {
 		var key, response;
-		response = this.model.attributes;
-		console.log(this.model.attributes);
-		this.model.save(response);
-		if (!this.pagestart) {
+		if (!this.cancel_render) {
+			response = this.model.attributes;
+			console.log(this.model.attributes);
+			this.model.save(response);
+			
 			$('.profile_content p').fadeIn();
-		}
-		// For each item in the model, set
-		// the corresponding input to the model's value
-		for (key in response) {	
-			if (key !== 'available') {
-				this.attrToInput(key).val(response[key]);
-			} else {
-				this.attrToInput(key).prop('checked', response[key]);
+			
+			// For each item in the model, set
+			// the corresponding input to the model's value
+			for (key in response) {	
+				if (key !== 'available' && key !== 'profile_pic') {
+					this.attrToInput(key).val(response[key]);
+				} else if( key === 'available') {
+					this.attrToInput(key).prop('checked', response[key]);
+				}
 			}
-		}
-		if (!this.pagestart) {
 			$('.profile_content p').fadeOut();
 		}
-		this.pagestart = false;
+		this.cancel_render = false;
 		return this;
 	},
 
@@ -139,7 +165,7 @@ var ProfileView = Backbone.View.extend({
 	// DB whenever something changes.
 	getFromOthers: function (milli) {
 		setInterval(_.bind(function () {
-			this.pagestart = true;
+			console.log('ProfileView fetch');
 			this.model.fetch();
 		}, this), milli);
 	},
@@ -151,12 +177,13 @@ var ProfileView = Backbone.View.extend({
 		// Set up new model
 		this.model = new Gardener(PROFILE_SOURCE);
 		// Render the model
-		this.render();
+		this.render(this.model);
 
 		// Set interval to ask for changes
 		this.getFromOthers(5000);
 
 		// set event listener for model saving/re-rendering
 		this.listenTo(this.model, "change", this.render);
+		this.listenTo(this.model, "change:profile_pic", this.profilePicRender);
 	}
 });

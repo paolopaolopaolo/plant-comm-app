@@ -6,17 +6,15 @@ from gardening.models import *
 from django.contrib.auth.models import User
 from django.forms import widgets
 
-class UserSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = User
-		fields = ('id',)
 
 class GardenerSerializer(serializers.ModelSerializer):
+	profile_pic = serializers.CharField(allow_blank = True, required = False)
 	class Meta:
 		model = Gardener
 		fields = ( 'id',
 				   'first_name',
 				   'last_name',
+				   'profile_pic',
 				   'text_blurb',
 				   'city',
 				   'state',

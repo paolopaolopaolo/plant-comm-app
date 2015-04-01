@@ -158,7 +158,8 @@ class ProfilePage(APIView):
 					'state': self.gardener.state,
 					'zipcode': self.gardener.zipcode,
 					'text_blurb': self.gardener.text_blurb,
-					'available': self.gardener.available
+					'available': self.gardener.available,
+					'profile_pic': self.gardener.profile_pic.url,
 				}
 
 	# Returns plant data as a list of dictionaries/BOOTSTRAPPING
@@ -247,6 +248,32 @@ class FeedPage(View):
 
 # Profile Page REST APIs
 
+def setProfilePic(method):
+	def wrapper(*args, **kwargs):
+		self = args[0]
+		request = args[1]
+		gardener = Gardener.objects.get(id = kwargs['id'])
+		# data_to_set = {
+		# 	'id': gardener.id,
+		# 	'first_name': gardener.first_name,
+		# 	'last_name': gardener.last_name,
+		# 	'city': gardener.city,
+		# 	'state': gardener.state,
+		# 	'zipcode': gardener.zipcode,
+		#	'profile_pic': os.path.join(settings.DOMAIN,
+		# 								'media',
+		# 								gardener.profile_pic.url)
+		# }
+		data_to_set = model_to_dict(gardener)
+		data_to_set['profile_pic'] = os.path.join(settings.DOMAIN,
+												  'media',
+												  gardener.profile_pic.url)
+		self.data = data_to_set
+		print self.data
+		return method(*args, **kwargs)
+	return wrapper
+
+
 # Handle gardener data in profile page API
 class GardenerAPI( mixins.RetrieveModelMixin,
 				   mixins.CreateModelMixin,
@@ -261,11 +288,29 @@ class GardenerAPI( mixins.RetrieveModelMixin,
 	def dispatch(self, *args, **kwargs):
 		return super(GardenerAPI, self).dispatch(*args, **kwargs)
 
+	# @setProfilePic
 	def get(self, request, *args, **kwargs):
 		return self.retrieve(self, request, *args, **kwargs)
 
 	def post(self, request, *args, **kwargs):
 		self.data = request.data
+		print request.data
+		print request.POST
+		if kwargs['id'] == 'pic':
+			# get gardener instance
+			user = User.objects.get(username = request.user)
+			gardener = Gardener.objects.get(user = user)
+			# use profile form
+			profile_form = ProfileForm(request.POST, request.FILES)
+			if profile_form.is_valid():
+				gardener.profile_pic = profile_form.cleaned_data['profile_pic']
+				gardener.save()
+				response = json.dumps({'profile_pic': os.path.join(settings.DOMAIN,
+																   'media',
+																   gardener.profile_pic.url)})
+				return HttpResponse(response, content_type='application/json')
+			
+			
 		return self.create(self, request, *args, **kwargs)
 
 	def put(self, request, *args, **kwargs):

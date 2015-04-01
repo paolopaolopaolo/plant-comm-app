@@ -120,10 +120,9 @@ class ProfileForm(forms.Form):
 								label = "Last name:",
 								required = False)
 
-	profilepic = forms.ImageField(label = "Profile picture:",
+	profile_pic = forms.ImageField(label = "Profile picture:",
 								  required = False)
 	
-
 	city = forms.CharField(max_length = 100,
 						   label = "City:",
 						   required = False)
