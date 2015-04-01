@@ -9,6 +9,8 @@ from django.forms import widgets
 
 class GardenerSerializer(serializers.ModelSerializer):
 	profile_pic = serializers.CharField(allow_blank = True, required = False)
+	first_name = serializers.CharField(allow_blank = True, required = False)
+	last_name = serializers.CharField(allow_blank = True, required = False)
 	class Meta:
 		model = Gardener
 		fields = ( 'id',
