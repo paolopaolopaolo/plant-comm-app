@@ -2,6 +2,8 @@ from django.db import models
 # from django.contrib.auth.models import AbstractUser, PermissionsMixin, Group
 from django.contrib.auth.models import User
 from simple_email_confirmation import SimpleEmailConfirmationUserMixin
+from django.db.models.signals import post_delete
+from django.dispatch.dispatcher import receiver
 from django.conf import settings
 import os
 
@@ -167,3 +169,13 @@ class Job(models.Model):
     periodic = models.BooleanField(default=False)
     start_date = models.DateField()
     end_date = models.DateField()
+
+@receiver(post_delete, sender=Gardener)
+def profile_pic_delete(sender, instance, **kwargs):
+    instance.profile_pic.delete(False)
+
+
+@receiver(post_delete, sender=PlantImg)
+def plant_image_delete(sender, instance, **kwargs):
+    instance.image.delete(False)
+    instance.thumbnail.delete(False)

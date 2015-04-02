@@ -1,0 +1,81 @@
+{% extends "page_template.html" %}
+{% load staticfiles %}
+
+<!-- Page Title -->
+{% block t %}
+	<title>Neighborhood Garden Feed</title>
+{% endblock %}
+
+<!-- CSS Styling -->
+{% block css %}
+	<link href='{% static "css/jquery-ui.min.css" %}' rel='stylesheet' type='text/css'/>
+{% endblock %}
+
+<!-- DEVELOPMENT STYLING BRANCH -->
+<!-- LESS Link has these attributes: -->
+<!-- type="text/css" rel='stylesheet/less' href='{% static "file.less"%}'-->
+{% block less_styling_browser_compile %}
+	<link type="text/css" rel='stylesheet/less' href='{% static "less/feed_page.less"%}' />
+	<script src="{% static 'js/less.min.js' %}" type="text/javascript"></script>
+{% endblock %}
+
+<!-- PRODUCTION STYLING BRANCH -->
+<!-- LESS Link has these attributes: -->
+<!-- type="text/less" rel='stylesheet' href='{% static "file.less"%}'-->
+{% block less_styling_pre_compile %}
+	<link type="text/less" rel='stylesheet' href='{% static "less/feed_page.less"%}'/>
+{% endblock %}
+
+<!-- Script tag with Bootstrapped values -->
+{% block bootstrap_vars %}
+	var OTHER_GARDENERS;
+	
+	OTHER_GARDENERS = {{other_gardeners}};
+{% endblock %}
+
+<!-- Main content -->
+{% block mc %}
+	<div class='topbar'>
+		<h1><strong>Garden Feed</strong></h1>
+		<button id='settings'>
+			<i class="fa fa-cog"></i>
+			&emsp;Settings
+		</button>
+		<ul id='settings-list'>
+			<li><a href='../profile'>&emsp;Profile</a></li>
+			<li><a href='../logout'>&emsp;Logout</a></li>
+		</ul>
+	</div>
+	<div class='content-body'>
+	</div>
+{% endblock %}
+
+<!-- Backbone templates -->
+{% block bt %}
+{% endblock%}
+
+<!-- jQuery and jQuery libraries -->
+{% block jQuery_libs %}
+	<script src='{% static "js/jquery-1.11.1.min.js" %}'></script>
+	<script src='{% static "js/jquery.cookie.min.js" %}'></script>
+	<script src='{% static "js/jquery-ui/jquery-ui.min.js" %}'></script>
+{% endblock %}
+
+<!-- Underscore and Backbone.js -->
+{% block __and_Backbone %}
+	<script src='{% static "js/underscore.js" %}'></script>
+	<script src='{% static "js/backbone.js" %}'></script>
+{% endblock %}
+	
+{% block backbone_MVC %}
+	<!-- AJAX and Backbone.sync settings -->
+
+	<!-- Backbone Models -->
+			
+	<!-- Backbone Collections -->
+			
+	<!-- Backbone Views -->
+			
+	<!-- Top Level Backbone View -->
+	<script src='{% static "js/backbone/feed_page/views/FeedPageView.js" %}'></script>
+{% endblock %}

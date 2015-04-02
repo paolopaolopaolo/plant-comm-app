@@ -54,10 +54,13 @@ var PlantImgView = Backbone.View.extend({
 	},
 
 	delImg: function () {
-		var img_to_delete;
-		img_to_delete = this.collection.last(this.collection.length)
-					   .reverse()[this.curr_idx];
-		this.collection.remove(img_to_delete);
+		var img_to_delete, confirmation;
+		confirmation = confirm('Delete plant image?');
+		if (confirmation) {
+			img_to_delete = this.collection.last(this.collection.length)
+						   .reverse()[this.curr_idx];
+			this.collection.remove(img_to_delete);
+		}
 	},
 
 	toggleArrowDisplay: function () {

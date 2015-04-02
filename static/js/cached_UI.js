@@ -21,6 +21,7 @@ function LandingPage($) {
 		$this.show({ 
 			complete: function () {
 				$this.removeAttr('style');
+				$this.find('ul').removeAttr('style');
 			} 
 		});
 	};
@@ -111,9 +112,11 @@ function LandingPage($) {
 		// Set up page based on Form_Toggle
 		if (FORM_TOGGLE) {
 			$("#login").hide();
+			$("#signup")._show();
 			$("#swap_forms").html("Login");
 		} else {
 			$("#signup").hide();
+			$("#login")._show();
 			$("#swap_forms").html("Sign Up");
 		}
 		// Click handlers and image effect functions
