@@ -7,6 +7,7 @@ var PlantView = Backbone.View.extend({
 
 	template: _.template($('#plant_form_template').html()),
 
+
 	// These events will affect composition of this.collection
 	events: {
 		"click .toggle_plant_edit": "toggleEditable",
@@ -82,8 +83,10 @@ var PlantView = Backbone.View.extend({
  		this.FORM_TOGGLE[current_id] = !this.FORM_TOGGLE[current_id];
  		if (!this.FORM_TOGGLE[current_id]) {
   			this.editConditions(current_id, $targetForm);
+  			// clearInterval(this.refresh_form);
  		} else {
  			this.initialConditions(current_id);
+ 			// this.refreshFormInterval();
  		}
 	},
 
@@ -135,7 +138,7 @@ var PlantView = Backbone.View.extend({
 	// This refreshes everything after 10 seconds 
 	refreshFormInterval: function () {
 		"use strict";
-		setInterval(_.bind(function () {
+		this.refresh_form = setInterval(_.bind(function () {
 							console.log('plant view fetch');
 							this.collection.fetch();
 						   }, this), 5000);

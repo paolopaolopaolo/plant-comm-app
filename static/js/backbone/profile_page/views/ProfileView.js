@@ -3,6 +3,7 @@ var ProfileView = Backbone.View.extend({
 	// Cached toggle value for toggling text editing
 	FORM_TOGGLE: true,
 	cancel_render: false,
+	refetchInterval: undefined,
 
 	// Set target element
 	el: '#profile_form',
@@ -39,7 +40,11 @@ var ProfileView = Backbone.View.extend({
 	toggleEditable: function () {
  		if (!this.FORM_TOGGLE) {
   			this.initialConditions();
+  			console.log('attributes post toggle');
+  			console.log(this.model.attributes);
+  			this.model.set(this.model.attributes, {silent: true});
   			this.model.save(this.model.attributes);
+  			this.getFromOthers(5000);
  		} else {
   			this.$el.find('input, textarea').removeAttr('readonly');
   			this.$el.find('input').removeAttr('disabled');
@@ -48,6 +53,7 @@ var ProfileView = Backbone.View.extend({
   			this.$el.find('li').removeAttr('style');
   			this.$el.find('label').removeAttr('style');
   			$('#toggle_edits').html('Save Profile');
+  			clearInterval(this.refetchInterval);
  		}
  		this.FORM_TOGGLE = !this.FORM_TOGGLE;
 	},
@@ -102,7 +108,7 @@ var ProfileView = Backbone.View.extend({
 	profilePicRender: function (model) {
 		var url_to_render;
 		console.log('ppRender called!');
-		if (model.attributes['profile_pic'].indexOf('http') === 0) {
+		if (model.attributes['profile_pic'].indexOf('http') > -1) {
 			$('#profilepic_thumb').attr('src', model.attributes['profile_pic']);
 		} else {
 			url_to_render = [ window.location.protocol,
@@ -164,7 +170,7 @@ var ProfileView = Backbone.View.extend({
 	// An interval function that repeatedly fetches from the 
 	// DB whenever something changes.
 	getFromOthers: function (milli) {
-		setInterval(_.bind(function () {
+		this.refetchInterval = setInterval(_.bind(function () {
 			console.log('ProfileView fetch');
 			this.model.fetch();
 		}, this), milli);
@@ -178,9 +184,10 @@ var ProfileView = Backbone.View.extend({
 		this.model = new Gardener(PROFILE_SOURCE);
 		// Render the model
 		this.render(this.model);
+		this.profilePicRender(this.model);
 
 		// Set interval to ask for changes
-		this.getFromOthers(5000);
+		// this.getFromOthers(5000);
 
 		// set event listener for model saving/re-rendering
 		this.listenTo(this.model, "change", this.render);

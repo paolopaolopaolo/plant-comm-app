@@ -1,17 +1,22 @@
 @inoffensive-green: #CAE6B5;
 @tablet-size: 768px;
 
+// Mixins
+.list_style_none() {
+	list-style-type: none;
+	list-style: none;
+	list-style-image: url(data:0);
+}
 // Universal Attributes
 * {
 	font-family: "Muli", garamond, sans-serif;
 }
 
 ul {
-	list-style-type: none;
+	.list_style_none();
 	padding: 0;
 	width: 100%;
 }
-
 
 body {
 	overflow-x: hidden;
@@ -31,7 +36,7 @@ body {
 				height: 50px;
 			};
 			position: absolute;
-			top: 0px;
+			top: 40px;
 			right: 0px;
 			float: right;
 			background-color: transparent;
@@ -60,7 +65,7 @@ body {
 		border: none;
 		white-space: pre-wrap;
 		position: relative;
-		top: -10px;
+		top: -40px;
 		left: -1%;
 		width: 103%;
 		height: 400px;
@@ -81,6 +86,7 @@ body {
 		float: left;
 		margin-left: 10%;
 		ul {
+			.list_style_none();
 			li {
 				display: inline-block;
 				line-height: 24px;

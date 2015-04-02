@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load compress %}
+
+	{% block title %}
+		{% block t %}
+		{% endblock %}
+	{% endblock %}
+	
+	{% block links %}
+		<!-- Load Muli Font and Font Awesome from CDN-->
+		{% compress css %}
+			<link href='http://fonts.googleapis.com/css?family=Muli:400,300italic'
+			  rel='stylesheet'
+			  type='text/css'/>
+			<link rel="stylesheet" 
+			  href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"/>
+			{% block css %}
+			{% endblock %}
+		{% endcompress %}
+		{% if not debug %}
+				{% block less_styling_browser_compile %}
+				{% endblock %}
+			
+		{% else %}
+			{% compress css %}
+				{% block less_styling_pre_compile %}
+				{% endblock %}
+			{% endcompress%}
+		{% endif %}
+		
+		<script type="text/javascript">
+			{% autoescape off %}
+				{% block bootstrap_vars %}
+				{% endblock %}
+			{% endautoescape %}
+		</script>
+	{% endblock %}
+
+	<!-- Everything Within Body Tags -->	
+	{% block main_content %}
+		{% block mc %}
+		{% endblock %}
+	{% endblock %}
+
+	<!-- Backbone Templates -->	
+	{% block backbone_templates %}
+		{% block bt %}
+		{% endblock%}
+	{% endblock %}
+
+	{% block scripts %}
+		{% compress js %}
+			<!-- jQuery and jQuery libraries -->
+			{% block jQuery_libs %}
+			{% endblock %}
+			<!-- Underscore and Backbone.js -->
+			{% block __and_Backbone %}
+			{% endblock %}
+			<!-- Backbone MVC -->
+			{% block backbone_MVC %}
+			{% endblock %}
+		{% endcompress %}
+	{% endblock %}

@@ -41,7 +41,7 @@
 	<form id="signup" class="account_form" method="POST" action="/">
 		<h3>SIGN UP:</h3>
 		{% csrf_token %}
-		<ul>
+		<ul style='display:none'>
 			{{ signinform.as_ul }}
 			<li><input type='submit' value='Sign Up'/></li>
 		</ul>
@@ -50,7 +50,7 @@
 	<form id="login" class="account_form" method="POST" action="/">
 		<h3>LOG IN:</h3>
 		{% csrf_token %}
-		<ul>
+		<ul style='display:none'>
 			{{ loginform.as_ul }}
 			<li><input type='submit' value='Log In'/></li>
 		</ul>

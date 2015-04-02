@@ -21,9 +21,9 @@ var PlantImg = Backbone.Model.extend({
 	url: function () {
 		return  [this.urlRoot, this.attributes.id].join('');
 	},
-	destroy: function () {
-		this.set({'plant': this.attributes['id']}, {silent: true});
-		this.unset('imageURL', {silent: true});
-		return Backbone.Model.prototype.destroy.apply(this);
-	},
+	// destroy: function () {
+	// 	this.set({'plantimg': this.attributes['id']}, {silent: true});
+	// 	this.unset('imageURL', {silent: true});
+	// 	return Backbone.Model.prototype.destroy.apply(this);
+	// },
 });
