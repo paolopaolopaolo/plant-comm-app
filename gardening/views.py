@@ -76,17 +76,25 @@ def setApiPlant(method):
 # Decorator: sets queryset to be a 
 # new view that adds plant information
 # to the gardener
-def setGardenerPlantQueryset(limit = None):
+def setGardenerPlantQueryset(limit = None, preFilter = None):
 	def wrapper0(method):
 		def wrapper1(*args, **kwargs):
 			self = args[0]
 			request = args[1]
+
 			def filterMethod(queryset_member):
 				return not (self.gardener.id == queryset_member.id)
-			if limit is None or len(Gardener.objects.all()) < limit:
-				self.queryset = filter(filterMethod, Gardener.objects.all())
+
+			if preFilter is not None:
+				gardeners = preFilter(Gardener.objects.all())
+
 			else:
-				self.queryset = filter(filterMethod, (Gardener.objects.all()))[0: limit]
+				gardeners = Gardener.objects.all()
+
+			if limit is None or len(gardeners) < limit:
+				self.queryset = filter(filterMethod, gardeners)
+			else:
+				self.queryset = filter(filterMethod, gardeners)[0: limit]
 			for model in self.queryset:
 				model.plants = []
 				for plant in Plant.objects.filter(user = model.id):
@@ -185,17 +193,21 @@ class ProfilePage(APIView):
 
 	# Returns User data as a dictionary/BOOTSTRAPPING  
 	def RETURN_USER_DATA(self):
-		return {
+		result = {
 					'id': self.gardener.id,
-					'first_name': self.gardener.first_name,
-					'last_name': self.gardener.last_name,
+					'first_name': self.user.first_name,
+					'last_name': self.user.last_name,
 					'city': self.gardener.city,
 					'state': self.gardener.state,
 					'zipcode': self.gardener.zipcode,
 					'text_blurb': self.gardener.text_blurb,
 					'available': self.gardener.available,
-					'profile_pic': self.gardener.profile_pic.url,
 				}
+		try:
+			result['profile_pic'] = self.gardener.profile_pic.url
+		except ValueError:
+			result['profile_pic'] = ""
+		return result
 
 	# Returns plant data as a list of dictionaries/BOOTSTRAPPING
 	def RETURN_PLANT_DATA(self, img = False, _id = None):
@@ -248,6 +260,8 @@ class ProfilePage(APIView):
 	@set_user
 	# Bootstrap the data
 	def get(self, request, _id = None):
+		print 'test: RETURN_USER_DATA'
+		print self.RETURN_USER_DATA()
 		# Populate the template context with user and gardener objects and forms
 		self.context['user'] = request.user.first_name
 		# Populate the script above the fold with the appropriate contexts
@@ -286,7 +300,10 @@ class FeedPage(APIView):
 		# This is a triple for-loop. Although it is ugly and not at all optimized,
 		# it gets the job done
 		for model in other_gardeners:
-			model['profile_pic'] = model['profile_pic'].url
+			try:
+				model['profile_pic'] = model['profile_pic'].url
+			except ValueError:
+				model['profile_pic'] = ''
 			model['plants'] = []
 			for plant in Plant.objects.filter(user = model['id']):
 				plant_images = PlantImg.objects.filter(plant = plant.id)
@@ -315,10 +332,6 @@ class FeedPage(APIView):
 	# Bootstrapping values to show in context
 	@set_user
 	def get(self, request, *args, **kwargs):
-		# query_dict = [model_to_dict(item) for item in self.queryset]
-		# print query_dict
-		# other_gardeners = GardenerPlantSerializer(data = query_dict)
-		# if other_gardeners.is_valid():
 		self.context['other_gardeners'] = self.RETURN_OTHER_GARDENERS(5)
 		return render(request, 'feed_page.html', self.context)
 
@@ -338,23 +351,23 @@ class GardenerAPI( mixins.RetrieveModelMixin,
 	def dispatch(self, *args, **kwargs):
 		return super(GardenerAPI, self).dispatch(*args, **kwargs)
 
+	@setApiUser
 	def get(self, request, *args, **kwargs):
 		return self.retrieve(self, request, *args, **kwargs)
 
 	@set_user
 	def post(self, request, *args, **kwargs):
 		self.data = request.data
-		print request.data
-		print request.POST
 		if kwargs['id'] == 'pic':
-			# use profile form
+			# use profile form to process profile pics
 			profile_form = ProfileForm(request.POST, request.FILES)
 			if profile_form.is_valid():
 				self.gardener.profile_pic = profile_form.cleaned_data['profile_pic']
 				self.gardener.save()
-				response = json.dumps({'profile_pic': os.path.join(settings.DOMAIN,
-																   'media',
-																   self.gardener.profile_pic.url)})
+				url_target = re.sub(r'\\', '/', os.path.join(settings.DOMAIN,
+											  	'media',
+											  	 self.gardener.profile_pic.url))
+				response = json.dumps({'profile_pic': url_target})
 				return HttpResponse(response, content_type='application/json')
 		return self.create(self, request, *args, **kwargs)
 
@@ -454,8 +467,6 @@ class PlantImgAPI( mixins.CreateModelMixin,
 
 ### Feed Page APIs ###
 
-
-
 # Condenses all the information about
 # other gardeners 
 class OtherGardenerAPI( mixins.RetrieveModelMixin,
@@ -465,13 +476,32 @@ class OtherGardenerAPI( mixins.RetrieveModelMixin,
 	lookup_field = 'id'
 	serializer_class = GardenerPlantSerializer
 
+	def retrieve(self, request, *args, **kwargs):
+		data = filter(lambda x: x.id == int(kwargs['id']), self.queryset)[0]
+		thing = self.serializer_class(data = model_to_dict(data))
+		print model_to_dict(data)
+		print thing.is_valid()
+		print thing.validated_data
+
+
 	@set_user
-	@setGardenerPlantQueryset(2)
+	@setGardenerPlantQueryset(5)
 	def get(self, request, *args, **kwargs):
-		# if 'id' not in kwargs:
-		print self.queryset
-		return self.list(self, request, *args, **kwargs)
-		# return self.retrieve(self, request, *args, **kwargs)
+		if kwargs['id'] is None:
+			return self.list(self, request, *args, **kwargs)
+		return self.retrieve(self, request, *args, **kwargs)
+
+class CompoundGardenerPlant():
+	available = False
+	profile_pic = ""
+	text_blurb = ""
+	id = None
+	first_name = ""
+	last_name = ""
+	city = ""
+	state = ""
+	zipcode = None
+	plants = []
 
 
 class JobSetAPI(View):

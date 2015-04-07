@@ -11,7 +11,7 @@ urlpatterns = patterns('',
 
     url(r'^admin/', include(admin.site.urls)),
     url(r'^$', LandingPage.as_view(), name="landing"),
-    url(r'^profile/gardener/(?P<id>[0-9]+|pic)$', GardenerAPI.as_view(), name='GardenerAPI'),
+    url(r'^profile/gardener/(?P<id>[0-9]+|pic){0,1}$', GardenerAPI.as_view(), name='GardenerAPI'),
     url(r'^profile/plant/(?P<id>[0-9]+){0,1}$', PlantAPI.as_view(), name='PlantAPI'),
     url(r'^profile/plantimg/(?P<id>[0-9]+){0,1}$', PlantImgAPI.as_view(), name='PlantImgAPI'),
     url(r'^profile/(?P<_id>[0-9]+|new){0,1}$', ProfilePage.as_view(), name="profile"),

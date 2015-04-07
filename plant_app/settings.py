@@ -51,7 +51,7 @@ else:
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-with open(os.path.join(BASE_DIR, "secret_key.txt") ,'rb') as secret_key:
+with open(os.path.join(BASE_DIR, "SECRET_KEY.txt") ,'rb') as secret_key:
     SECRET_KEY = secret_key.read()
 
 # Application definition
