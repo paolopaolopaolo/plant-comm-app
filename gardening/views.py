@@ -96,6 +96,7 @@ def setGardenerPlantQueryset(limit = None, preFilter = None):
 			else:
 				self.queryset = filter(filterMethod, gardeners)[0: limit]
 			for model in self.queryset:
+				model.username = model.user.username
 				model.plants = []
 				for plant in Plant.objects.filter(user = model.id):
 					result_obj = {}
@@ -277,7 +278,8 @@ class ProfilePage(APIView):
 		# Return the rendered page
 		return render(request, "profile_page.html", self.context)
 
-# Feed Page, no-op for now 
+
+# Feed Page: View gardeners/gardens in the area
 class FeedPage(APIView):
 	context = {'domain': settings.DOMAIN}
 
@@ -300,6 +302,8 @@ class FeedPage(APIView):
 		# This is a triple for-loop. Although it is ugly and not at all optimized,
 		# it gets the job done
 		for model in other_gardeners:
+			user_obj = User.objects.get(id = model['user'])
+			model['username'] = user_obj.username
 			try:
 				model['profile_pic'] = model['profile_pic'].url
 			except ValueError:
@@ -364,9 +368,8 @@ class GardenerAPI( mixins.RetrieveModelMixin,
 			if profile_form.is_valid():
 				self.gardener.profile_pic = profile_form.cleaned_data['profile_pic']
 				self.gardener.save()
-				url_target = re.sub(r'\\', '/', os.path.join(settings.DOMAIN,
-											  	'media',
-											  	 self.gardener.profile_pic.url))
+				print self.gardener.profile_pic.url
+				url_target = self.gardener.profile_pic.url
 				response = json.dumps({'profile_pic': url_target})
 				return HttpResponse(response, content_type='application/json')
 		return self.create(self, request, *args, **kwargs)

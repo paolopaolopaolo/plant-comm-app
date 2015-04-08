@@ -1,3 +1,9 @@
+// // Set template settings in Underscore to 
+// // register Mustache.js-style templating
+// _.templateSettings = {
+//   			interpolate: /\{\{(.+?)\}\}/g,
+// 		};
+
 var FeedPageView = Backbone.View.extend({
 
 	// Variables //
@@ -12,6 +18,7 @@ var FeedPageView = Backbone.View.extend({
 
 	// Utility: Convert css/px to integer
 	convertInt: function (str) {
+		"use strict";
 		return parseInt(str.replace(/px/g, ''), 10);
 	},
 
@@ -27,8 +34,6 @@ var FeedPageView = Backbone.View.extend({
 		var orig_height, orig_min_height;
 		orig_height = this.convertInt($('#settings-list').css('height'));
 		orig_min_height = 52;
-
-		console.log(orig_min_height);
 
 		if (this.SETTINGS_TOGGLE) {
 			// Store original height
@@ -61,8 +66,8 @@ var FeedPageView = Backbone.View.extend({
 	initialize: function () {
 		"use strict";
 		// Settings button UI
+		this.ogview = new OGView();
 		this.showSettings();
-		console.dir(OTHER_GARDENERS);
 	}
 
 });

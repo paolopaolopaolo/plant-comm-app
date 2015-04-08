@@ -47,11 +47,25 @@
 		</ul>
 	</div>
 	<div class='content-body'>
+		<div id='og_content'>
+			<h1><strong>Gardeners</strong></h1>
+			
+		</div>
 	</div>
 {% endblock %}
 
 <!-- Backbone templates -->
 {% block bt %}
+	{% verbatim %}
+		<script id='other_gardener_template' type='text/html'>
+			<div id='gardener_box{{ id }}' class='gardener_box' >
+				<h2 id='gardener_name{{ id }}' class='gardener_name'>
+					{{ username }}
+				</h2>
+				<p>{{ first_name }}&nbsp;{{ last_name }}</p>
+			</div
+		</script>
+	{% endverbatim %}
 {% endblock%}
 
 <!-- jQuery and jQuery libraries -->
@@ -62,18 +76,18 @@
 {% endblock %}
 
 <!-- Underscore and Backbone.js -->
-{% block __and_Backbone %}
+{% block underscore_and_Backbone %}
 	<script src='{% static "js/underscore.js" %}'></script>
 	<script src='{% static "js/backbone.js" %}'></script>
 {% endblock %}
 	
 {% block backbone_MVC %}
 	<!-- AJAX and Backbone.sync settings -->
-
+	<script src='{% static "js/backbone/profile_page/sync.js" %}'></script>
 	<!-- Backbone Models -->
 	<script src='{% static "js/backbone/feed_page/models/FeedPageModels.js" %}'></script>		
 	<!-- Backbone Collections -->
-			
+	<script src='{% static "js/backbone/feed_page/collections/OtherGardeners.js" %}'></script>
 	<!-- Backbone Views -->
 	<script src='{% static "js/backbone/feed_page/views/OGView.js" %}'></script>
 	<!-- Top Level Backbone View -->

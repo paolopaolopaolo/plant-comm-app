@@ -28,7 +28,7 @@ body {
 	height: 0;
 } 
 
-/** **/
+/** Fixed Topbar styling **/
 .topbar {
 	z-index: 1000;
 	position: fixed;
@@ -42,7 +42,6 @@ body {
 		display: inline-block;
 		margin: 0.67em;
 		width: 40%;
-		// word-wrap: break-word;
 	}
 	button {
 		@media screen {
@@ -112,7 +111,6 @@ body {
 }
 
 .content-body {
-
 	min-height: 500px;
 	width: 90%;
 	margin-top: 82px;
@@ -121,4 +119,31 @@ body {
 	position: relative;
 	background-color: @content_body_color;
 	padding: 20px 10px;
+}
+
+/* Template Styling*/
+
+#og_content {
+	@media screen {
+		width: 98%;
+		padding: 1%;
+		min-height: 200px;
+		background-color: @content_body_color - #211;
+		border-radius: 5px;
+		box-shadow: black 1px 1px 6px inset;
+	}
+	@media (max-width: 768px) {
+		margin-top: 8%;
+	}
+	p {
+		margin: 0 10px;
+	}
+	.gardener_box{
+		margin: 10px 0;
+		padding: 10px;
+		.gardener_name {
+			margin: 0;
+		}
+	}
+
 }
