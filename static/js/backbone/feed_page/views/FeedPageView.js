@@ -1,8 +1,3 @@
-// // Set template settings in Underscore to 
-// // register Mustache.js-style templating
-// _.templateSettings = {
-//   			interpolate: /\{\{(.+?)\}\}/g,
-// 		};
 
 var FeedPageView = Backbone.View.extend({
 
