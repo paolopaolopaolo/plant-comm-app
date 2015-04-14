@@ -28,8 +28,8 @@
 
 <!-- Script tag with Bootstrapped values -->
 {% block bootstrap_vars %}
-	var OTHER_GARDENERS;
-	
+	var DOMAIN, OTHER_GARDENERS;
+	DOMAIN = "{{ domain }}";
 	OTHER_GARDENERS = {{other_gardeners}};
 {% endblock %}
 
@@ -39,7 +39,7 @@
 		<h1><strong>Garden Feed</strong></h1>
 		<button id='settings'>
 			<i class="fa fa-cog"></i>
-			&emsp;Settings
+			Settings
 		</button>
 		<ul id='settings-list'>
 			<li><a href='../profile'>&emsp;Profile</a></li>
@@ -49,7 +49,7 @@
 	<div class='content-body'>
 		<div id='og_content'>
 			<h1><strong>Gardeners</strong></h1>
-			
+			<span id='refreshGardeners'><i class="fa fa-refresh"></i></span>
 		</div>
 	</div>
 {% endblock %}
@@ -58,13 +58,44 @@
 {% block bt %}
 	{% verbatim %}
 		<script id='other_gardener_template' type='text/html'>
-			<div id='gardener_box{{ id }}' class='gardener_box' >
+			<div id='gardener_box{{ id }}' class='gardener_box clearfix' >
 				<h2 id='gardener_name{{ id }}' class='gardener_name'>
 					{{ username }}
 				</h2>
-				<p>{{ first_name }}&nbsp;{{ last_name }}</p>
-			</div
+				<p>{{ first_name }}&nbsp;{{ last_name }}&nbsp;({{ city }},&nbsp;{{ state }})</p>
+				<img class='og-profilepic' src='{{ profile_pic }}'/>
+				<div class='og-aboutme og-partition'>
+					<h3>About {{ first_name }}</h3>
+					<span>
+						{{ text_blurb }}
+						<br>
+						<br>
+						I am <span class='availability'>{{avail}} available</span> to care for gardens.
+					</span>
+				</div>
+				<h3 class='plant_header'>{{first_name}}&rsquor;s Plants</h3>
+				<div id='og-plants{{ id }}' class='og-plants og-partition'>
+				</div>
+			</div>
 		</script>
+		<script id='other_gardener_plant_template' type='text/html'>
+			<div id='plant_box{{ id }}' class='plant_box'>
+				<div id='plant_info{{ id }}' class='plant_info'>
+					<h4>Species:</h4>
+					<p>{{ species }}</p>
+					<h4>Quantity</h4>
+					<p>{{ quantity }}</p>
+					<h4>Information:</h4>
+					<p>{{ information }}</p>
+				</div>
+				<div id='plant_img{{ id }}' class='plant_info plant_imgs'>
+				</div>
+			</div>
+		</script>
+		<script id='plant_image_template' type='text/html'>
+			<img class='plantimg_sprites' src='{{ imageURL }}'/>
+		</script>
+
 	{% endverbatim %}
 {% endblock%}
 

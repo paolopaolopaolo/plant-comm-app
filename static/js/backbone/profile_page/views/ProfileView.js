@@ -132,10 +132,16 @@ var ProfileView = Backbone.View.extend({
 			for (key in response) {	
 				if (key !== 'available' && key !== 'profile_pic') {
 					this.attrToInput(key).val(response[key]);
+					if (key === 'first_name') {
+						this.$el.find('h2')
+								.html(response[key]+ "'s Profile");
+						$('title').html(response[key] + "'s Gardening Profile");
+					}
 				} else if( key === 'available') {
 					this.attrToInput(key).prop('checked', response[key]);
 				}
 			}
+
 			$('.profile_content p').fadeOut();
 		}
 		this.cancel_render = false;

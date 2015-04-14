@@ -196,6 +196,7 @@ class ProfilePage(APIView):
 	def RETURN_USER_DATA(self):
 		result = {
 					'id': self.gardener.id,
+					'username': self.user.username,
 					'first_name': self.user.first_name,
 					'last_name': self.user.last_name,
 					'city': self.gardener.city,
@@ -374,8 +375,16 @@ class GardenerAPI( mixins.RetrieveModelMixin,
 				return HttpResponse(response, content_type='application/json')
 		return self.create(self, request, *args, **kwargs)
 
+	@set_user
 	def put(self, request, *args, **kwargs):
 		self.data = request.data
+		if "first_name" in self.data:
+			self.user.first_name = self.data["first_name"]
+		if "last_name" in self.data:
+			self.user.last_name = self.data["last_name"]
+		if "username" in self.data:
+			self.user.username = self.data["username"]
+		self.user.save()
 		return self.update(self, request, *args, **kwargs)
 
 
