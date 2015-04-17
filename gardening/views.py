@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.utils.datastructures import MultiValueDictKeyError
 from django.contrib.auth import login, authenticate, logout
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseServerError
 from django.views.generic import View, TemplateView
 from gardening.forms import *
 from gardening.models import *
@@ -12,6 +12,7 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from rest_framework.views import APIView
 from django.forms.models import model_to_dict
+from django.db import IntegrityError
 
 from rest_framework import mixins
 from rest_framework import generics
@@ -390,7 +391,11 @@ class GardenerAPI( mixins.RetrieveModelMixin,
 			self.user.last_name = self.data["last_name"]
 		if "username" in self.data:
 			self.user.username = self.data["username"]
-		self.user.save()
+		try:
+			self.user.save()
+		except IntegrityError:
+			response = {'username': 'Username already taken.'}
+			return HttpResponseServerError(json.dumps(response), content_type='application/json')
 		return self.update(self, request, *args, **kwargs)
 
 

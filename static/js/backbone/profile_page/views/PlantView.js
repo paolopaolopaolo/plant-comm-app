@@ -79,13 +79,23 @@ var PlantView = Backbone.View.extend({
 		$targetForm = $(event.currentTarget).parent();
 		// Obtain the current id
 		current_id = this.getID($(event.currentTarget));
+		// Toggle the FORM_TOGGLE value for the id
  		this.FORM_TOGGLE[current_id] = !this.FORM_TOGGLE[current_id];
+ 		// FORM_TOGGLE = False: Form is open for editing
  		if (!this.FORM_TOGGLE[current_id]) {
   			this.editConditions(current_id, $targetForm);
-  			// clearInterval(this.refresh_form);
+  			// This plant's images will not re-update during editing
+  			clearInterval(ppv.plant_image_views[current_id]
+  							 .plantimginterval);
+  			// This plant's information will not re-update during editing
+  			clearInterval(this.refresh_form);
+  		// FORM_TOGGLE = True: Form is closed to editing
  		} else {
  			this.initialConditions(current_id);
- 			// this.refreshFormInterval();
+ 			// Re-instate interval updates for the plant text and images
+ 			this.refreshFormInterval();
+ 			ppv.plant_image_views[current_id]
+  			   .intervalFetch(10000);
  		}
 	},
 
@@ -101,14 +111,18 @@ var PlantView = Backbone.View.extend({
 		}
 
 		$targetForm.find('input[type="text"], input[type="number"], textarea')
-  					   .removeAttr('readonly')
-  					   .removeAttr('disabled')
-  					   .removeAttr('style');
-		$targetForm.find('.toggle_plant_edit').html('Save Plant');
-		$targetForm.find('.deletePlant').removeClass('hidden');
-		$targetForm.find('.fake_button').removeClass('hidden');
+  				   .removeAttr('readonly')
+  				   .removeAttr('disabled')
+  				   .removeAttr('style');
+		$targetForm.find('.toggle_plant_edit')
+				   .html('Save Plant');
+		$targetForm.find('.deletePlant')
+				   .removeClass('hidden');
+		$targetForm.find('.fake_button')
+				   .removeClass('hidden');
 		if ($targetForm.find('.plantpic_thumb').length > 0) {
-			$targetForm.find('.delete_img').removeClass('hidden');
+			$targetForm.find('.delete_img')
+					   .removeClass('hidden');
 		}
 	},
 
@@ -119,13 +133,14 @@ var PlantView = Backbone.View.extend({
 		$current_form = this.$el.find('#plant_form' + current_id.toString());
 
 		$current_form.find('input[type="text"], input[type="number"], textarea')
-					 .css({
-						'background-color':'transparent',
-						'border': 'none'
-						})
 					 .attr({
 						'readonly': 'readonly',
 						'disabled': 'disabled'
+					 })
+					 .css({
+						'background-color':'transparent',
+						'border': 'none',
+						'color': 'black',
 					 });
 		$current_form.find('.toggle_plant_edit').html('Edit Plant');
 		$current_form.find('input[type="file"]').addClass('hidden');
@@ -140,32 +155,54 @@ var PlantView = Backbone.View.extend({
 		this.refresh_form = setInterval(_.bind(function () {
 							console.log('plant view fetch');
 							this.collection.fetch();
-						   }, this), 5000);
+						   }, this), 10000);
 	},
 
+	_error_msg: function (str) {
+		return [	"<span class='error_msg'",
+	 					"style='color:red;font-size:12px;'>",
+	 					str,
+	 					"Fix this before continuing.",
+	 					"</span>"].join(" ");
+	 },
 	
 	// Saves the model in response to changes
 	changePlant: function (model) {
 		"use strict";
 		var _id = model.attributes['id'],
 			changed = model.changed,
-			property;
+			property,
+			quantity_selector = ["#id_quantity", _id.toString()].join("_");
 
 		model.save(changed)
+			 .error(_.bind(function (response) {
+			 		console.log(response);
+				 	if (_.has(response.responseJSON, 'quantity')) {
+				 		$(quantity_selector).addClass('invalid_input');
+				 		if ($(quantity_selector).next(".error_msg").length === 0) {
+				 			$(quantity_selector).after(
+				 				this._error_msg(response.responseJSON['quantity'])
+				 			);
+				 		}
+				 	}
+				 }, this))
 			 .done(_.bind(function () {
-			 				var $targetform;
-			 				$targetform = this.$el.find('#plant_form' + _id.toString());
-			 				for (property in changed) {
-			 					if (changed.hasOwnProperty([property])) {
-			 						if (property === 'information') {
-					 					$targetform.find('textarea[name="' + property + '"]')
-					 							   .val(changed[property]);
-			 						}
-				 					$targetform.find('input[name="' + property + '"]')
-				 							   .val(changed[property]);
-				 					}
-			 				}
-			 			}, this));
+	 				var $targetform;
+			 		$(quantity_selector).removeClass('invalid_input');
+			 		$(quantity_selector).next('.error_msg').detach();
+	 				$targetform = this.$el.find('#plant_form' + _id.toString());
+	 				for (property in changed) {
+	 					if (changed.hasOwnProperty([property])) {
+	 						if (property === 'information') {
+			 					$targetform.find('textarea[name="' + property + '"]')
+			 							   .val(changed[property]);
+	 						}
+		 					$targetform.find('input[name="' + property + '"]')
+		 							   .val(changed[property]);
+		 					}
+	 				}
+	 			}, this));
+
 	},
 
 	// Saves the model in response to adding the model to collection
@@ -200,8 +237,9 @@ var PlantView = Backbone.View.extend({
 			 });
 	},
 
-	initialize: function () {
+	initialize: function (attrs, opts) {
 		"use strict";
+		this.parent_view = attrs['parent_view'];
 		// Hide Templates
 		$(".plant_form").hide();
 		$('#plantpic_thumb_template').hide();

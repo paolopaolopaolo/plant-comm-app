@@ -94,6 +94,7 @@ def plant_path(instance, filename):
 # Authentication and some other attributes
 class Gardener(models.Model, SimpleEmailConfirmationUserMixin):
     user = models.OneToOneField(User)
+    username = models.CharField(max_length = 50, default = "")
     first_name = models.CharField(max_length = 50, default = "")
     last_name = models.CharField(max_length = 50, default = "")
     profile_pic = models.ImageField(upload_to = profile_path, null = True)

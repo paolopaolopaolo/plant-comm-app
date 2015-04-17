@@ -5,6 +5,8 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from gardening.models import STATE_ABBREVS
 
+import re
+
 
 class SignUpForm(forms.Form):
 
@@ -47,25 +49,25 @@ class SignUpForm(forms.Form):
 
 
 	first_name = forms.CharField(max_length=100,
-								 label="First name:",
+								 label="First name",
 								 required=True)
 
 	last_name = forms.CharField(max_length=100,
-								label="Last name:")
+								label="Last name")
 
 	username = forms.CharField(max_length=100,
-								label="Username:",
+								label="Username",
 								required=True)
 
-	email = forms.EmailField(label="Email:", required=True)
+	email = forms.EmailField(label="Email", required=True)
 
-	password = forms.CharField(label="Password:",
+	password = forms.CharField(label="Password",
 							   min_length=8,
 							   widget=forms.widgets.PasswordInput,
 							   required=True)
 
 	confirm_password = forms.CharField(
-						label="Confirm Password:",
+						label="Confirm Password",
 						min_length=8,
 						widget=forms.widgets.PasswordInput,
 						required=True)
@@ -86,10 +88,10 @@ class LogInForm(forms.Form):
 
 
 	uname_email = forms.CharField(
-							label='Email or Username:',
+							label='Email or Username',
 							required=True)
 	password = forms.CharField(
-						label="Password:",
+						label="Password",
 						widget=forms.widgets.PasswordInput,
 						required=True)
 
@@ -108,7 +110,12 @@ class LogInForm(forms.Form):
 			)
 
 class ProfileForm(forms.Form):
-	
+
+	def clean(self):
+		cleaned_data = super(ProfileForm, self).clean()
+		if re.search(r'\d{5}', cleaned_data.get('zipcode')) is None:
+			raise ValueError
+
 	available = forms.BooleanField(label = "Available to garden",
 								   required = False)
 
@@ -135,7 +142,7 @@ class ProfileForm(forms.Form):
 							  choices = STATE_ABBREVS,
 							  required = False)
 
-	zipcode = forms.CharField(max_length=5,
+	zipcode = forms.CharField(max_length = 5,
 							  label = "Zipcode",
 							  required = False,
 							  widget = forms.widgets.NumberInput)

@@ -141,4 +141,9 @@ if COMPRESS_ENABLED:
          ('text/less', 'lessc {infile} {outfile}'),
         )
     COMPRESS_ROOT = os.path.join(STATIC_ROOT, 'COMPRESS')
+    COMPRESS_CSS_FILTERS = [
+                                'compressor.filters.css_default.CssAbsoluteFilter',
+                                'compressor.filters.cssmin.CSSMinFilter'
+                            ]
+
     

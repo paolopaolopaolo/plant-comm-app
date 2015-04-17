@@ -1,9 +1,12 @@
 var PlantImgView = Backbone.View.extend({
 
+	start_drag: undefined,
+	end_drag: undefined,
 	current_pos: 0,
 	curr_width: 0,
 	curr_idx: 0,
 	startup: true,
+	plantimginterval: undefined,
 
 	template: _.template($('#plantpic_thumb_template').html()),
 
@@ -13,6 +16,25 @@ var PlantImgView = Backbone.View.extend({
 		"click .img_left": "moveLeft",
 		"click .img_right": "moveRight",
 		"click .delete_img": "delImg",
+		'touchstart .plantpic_thumb': '_recordStartDrag',
+		'touchend .plantpic_thumb': '_recordEndDragAndCalculate',
+	},
+
+	_recordStartDrag: function (event) {
+		this.start_drag = event.originalEvent.changedTouches[0]['clientX'];
+	},
+
+	_recordEndDragAndCalculate: function (event) {
+		var diff;
+		this.end_drag = event.originalEvent.changedTouches[0]['clientX'];
+		diff = this.end_drag - this.start_drag;
+		if (Math.pow(diff, 2) >= 25) {
+			if (diff > 0) {
+				this.moveLeft();
+			} else if (diff < 0){
+				this.moveRight();
+			}
+		}
 	},
 
 	addImg: function (event) {
@@ -62,8 +84,8 @@ var PlantImgView = Backbone.View.extend({
 		var img_to_delete, confirmation;
 		confirmation = confirm('Delete plant image?');
 		if (confirmation) {
-			img_to_delete = this.collection.last(this.collection.length)
-						   .reverse()[this.curr_idx];
+			img_to_delete = this.collection
+								.last(this.collection.length)[this.curr_idx];
 			this.collection.remove(img_to_delete);
 		}
 	},
@@ -114,67 +136,91 @@ var PlantImgView = Backbone.View.extend({
 	// by)
 	findWidth: function () {
 		this.curr_width = parseInt(this.$el.css('width').replace(/px/g, ""), 10);
+		this.margin_r = 5;
 	},
 
-	// Move plant pictures left
-	moveLeft: function () {
+	_setPosition: function (left_or_right) {
 		var current_width;
 		// establish current width
 		this.findWidth();
 		current_width = this.curr_width;
-		// Set current position to always subtract
-		this.current_pos = this.current_pos - current_width;
-		if (this.current_pos < 0 && this.collection.length > 0) {
-			this.current_pos = current_width * (this.collection.length - 1);
-		} else if (this.collection.length < 1) {
-			this.current_pos = 0;
+		 // + (this.margin_r);
+		// Set current position based on left_or_right
+		if (left_or_right === 'left') {
+			this.current_pos = this.current_pos - current_width;
+			// make position wrap around
+			if (this.current_pos < 0 && this.collection.length > 0) {
+				this.current_pos = current_width * (this.collection.length - 1);
+			} else if (this.collection.length < 1) {
+				this.current_pos = 0;
+			}
+		} else if (left_or_right === 'right') {
+			this.current_pos = this.current_pos + current_width;
+			if (this.current_pos > current_width * (this.collection.length - 1) ) {
+				this.current_pos = 0;
+			}
+
 		}
-		
+	},
+
+	_moveToPosition: function () {
 		this.$el.find(".plantpic_thumb").animate({
 				"left" :  "-" + this.current_pos.toString() + "px"
 		});	
-		
-		if (this.curr_idx > 0) {
-			this.curr_idx -= 1;
-		} else if (this.curr_idx === 0){
-			if (this.collection.length > 0) {
-				this.curr_idx = this.collection.length - 1;
+	},
+
+	_resetIndex: function (left_or_right) {
+		if (left_or_right === 'left') {
+			if (this.curr_idx > 0) {
+				this.curr_idx -= 1;
+			} else if (this.curr_idx === 0){
+				if (this.collection.length > 0) {
+					this.curr_idx = this.collection.length - 1;
+				}
+			}
+		} else if (left_or_right === 'right') {
+			if (this.curr_idx < this.collection.length - 1) {
+				this.curr_idx += 1;
+			} else {
+				this.curr_idx = 0;
 			}
 		}
-		console.log("current idx:" + this.curr_idx.toString());
-		console.log("current pos:" + this.current_pos.toString());
+		console.log('Current position:');
+		console.log(this.current_pos);
+		console.log('Current index:');
+		console.log(this.curr_idx);
+	},
+
+	//Move plant pictures left
+	moveLeft: function () {
+		this._setPosition('left');
+		this._moveToPosition();
+		this._resetIndex('left');
 	},
 
 	// Move plant pictures right
 	moveRight: function () {
-		var current_width;
-		this.findWidth();
-		current_width = this.curr_width;
-		// Add the current width to the position
-		this.current_pos = this.current_pos + current_width;
-
-		// Upper bound set
-		if (this.current_pos > current_width * (this.collection.length - 1) ) {
-			this.current_pos = 0;
-		}
-		// Current index set
-		if (this.curr_idx < this.collection.length - 1) {
-			this.curr_idx += 1;
-		}  else {
-			this.curr_idx = 0;
-		}
-		// Animate the change in left value
-		this.$el.find(".plantpic_thumb").animate({
-				"left" :  "-" + this.current_pos.toString() + "px"
-		});
-		// Print the current index
-		console.log("current idx:" + this.curr_idx.toString());
-		console.log("current pos:" + this.current_pos.toString());
+		this._setPosition('right');
+		this._moveToPosition();
+		this._resetIndex('right');
 	},
 
+	// Render images
 	render: function (model) {
 		this.toggleArrowDisplay();
-		this.$el.prepend(this.template(model.attributes));
+		if (this.$el.find('.plantpic_thumb').length === 0) {
+			this.$el.prepend(this.template(model.attributes));
+		} else {
+			this.$el.find('.plantpic_thumb')
+					.last()
+					.after(this.template(model.attributes));
+		}
+		// Whenever an image is rendered, set index and position to the last spot
+		// and move to that position
+		this.findWidth();
+		this.curr_idx = this.collection.length - 1;
+		this.current_pos = (this.curr_width) * (this.collection.length - 1);
+		this._moveToPosition();
 	},
 
 	// Once removed from collection
@@ -187,7 +233,10 @@ var PlantImgView = Backbone.View.extend({
 		// console.log(model.url());
 		model.destroy()
 			 .error(_.bind(function () {
-			 	alert('problems deleting image ' + _id.toString());
+			 	// alert('problems deleting image ' + _id.toString());
+			 	this.$el.find(['#ppt', _id.toString()].join(''))
+			 			.detach();
+
 			 }, this))
 			 .done(_.bind(function () {
 			 	this.$el.find(['#ppt', _id.toString()].join(''))
@@ -197,13 +246,14 @@ var PlantImgView = Backbone.View.extend({
 
 	// Periodically fetch images
 	intervalFetch: function (milli) {
-		setInterval(_.bind(function () {
+		this.plantimginterval = setInterval(_.bind(function () {
 			this.collection.fetch();
 		}, this), milli);
 	},
 
 	// Initialize callback behaviors
-	initialize: function (attrs, opts) { 
+	initialize: function (attrs, opts) {
+		var newline_stripped_html; 
 		this.plant_id = attrs['plant_id'];
 		this.collection.each(_.bind(function (model) {
 			this.render(model);
@@ -213,6 +263,7 @@ var PlantImgView = Backbone.View.extend({
 		this.listenTo(this.collection, 'add', this.render);
 		this.curr_idx = 0;
 		this.current_pos = 0;
+		// this._moveToPosition();
 		this.intervalFetch(10000);
 	}
 });

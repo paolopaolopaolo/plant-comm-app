@@ -1,6 +1,6 @@
 var ProfileView = Backbone.View.extend({
 
-	// Cached toggle value for toggling text editing
+	// Cached variables
 	FORM_TOGGLE: true,
 	cancel_render: false,
 	refetchInterval: undefined,
@@ -30,7 +30,7 @@ var ProfileView = Backbone.View.extend({
 			// If the selector is not the checkbox input, set value
 			ResultObj[selector.slice(4)] = this.$el.find(selector).val();
 		} else {
-			// If the selector is the checkbox input, set property
+			// If the selector is the checkbox input, set checked property
 			ResultObj[selector.slice(4)] = this.$el.find(selector)
 												   .prop("checked");
 		}
@@ -41,8 +41,6 @@ var ProfileView = Backbone.View.extend({
 	toggleEditable: function () {
  		if (!this.FORM_TOGGLE) {
   			this.initialConditions();
-  			console.log('attributes post toggle');
-  			console.log(this.model.attributes);
   			this.model.set(this.model.attributes, {silent: true});
   			this.model.save(this.model.attributes);
   			this.getFromOthers(5000);
@@ -50,7 +48,7 @@ var ProfileView = Backbone.View.extend({
   			this.$el.find('input, textarea').removeAttr('readonly');
   			this.$el.find('input').removeAttr('disabled');
   			this.$el.find('select').removeAttr('disabled');
-  			this.$el.find('input, textarea').removeAttr('style');
+  			this.$el.find('input, textarea, select').removeAttr('style');
   			this.$el.find('li').removeAttr('style');
   			this.$el.find('label').removeAttr('style');
   			$('#toggle_edits').html('Save Profile');
@@ -70,10 +68,11 @@ var ProfileView = Backbone.View.extend({
 		// Get event target
 		$currentValue = $(event.currentTarget);
 		result = this.inputToAttr("#" + $currentValue.attr("id"), result);
-		console.log(result);	
 		// Save the model and re-render it on the page
-		this.model.set(result);
-		
+		this.model.set(result);	
+		if (JSON.stringify(this.model.attributes) === JSON.stringify(this.model.previousAttributes())) {
+			this.render(this.model);
+		}
 	},
 
 	// Handles img changes with its own AJAX call
@@ -103,9 +102,9 @@ var ProfileView = Backbone.View.extend({
 			this.cancel_render = true;
 			this.model.set({'profile_pic': response['profile_pic']});
 		}, this));
-
 	},
 
+	// Profile picture rendered
 	profilePicRender: function (model) {
 		var url_to_render;
 		console.log('ppRender called!');
@@ -127,10 +126,50 @@ var ProfileView = Backbone.View.extend({
 	// values
 	render: function (model) {
 		var key, response;
+		// Ignore if cancel_render is true
 		if (!this.cancel_render) {
+			// Set response to the current model attr
 			response = this.model.attributes;
-			console.log(this.model.attributes);
-			this.model.save(response);
+			// Save the model to server
+			this.model.save(response)
+					  .error(_.bind(function (resp) {
+					  		// if there is an error, do the following
+						  	var error_msg;
+						  	function error_msg(str) {
+						  		return [
+		  									'<span class="error_msg"',
+		  									' style="color:red;font-size:12px;">',
+		  									str,
+		  									' Fix this before continuing.'
+						  				].join("");
+						  	}
+						  	// The backend has two possible restrictions
+						  	// on Profile Inputs
+
+						  	// 1) If the zipcode is too long, this resets the zipcode 
+					  		// 	  to be the first five characters
+						  	if (_.has(resp.responseJSON, "zipcode")) {
+						  		this.model.set({'zipcode': $('#id_zipcode').val().slice(0, 5)});
+						  	} 
+						  	// 2) If the username is taken, highlight the username field
+					  		// 	  with background and message
+						  	if (_.has(resp.responseJSON, "username")) {
+						  		$("#id_username").addClass('invalid_input');
+						  		// Limit the number of error messages that can be
+						  		// after the input
+						  		if ($("#id_username").next(".error_msg").length === 0) {
+						  			$("#id_username").after(error_msg(resp.responseJSON["username"]));
+						  		}
+						  	}
+					  	}, this))
+					  .done(_.bind(function () {
+					  	// If input is successful, remove all invalid_input stylings
+					  	$('#id_username').removeClass('invalid_input');
+					  	// Detach all error messages
+					  	this.$el
+					  		.find('.error_msg')
+					  		.detach();
+					  }, this));
 			
 			$('.profile_content p').fadeIn();
 			
@@ -154,22 +193,43 @@ var ProfileView = Backbone.View.extend({
 		return this;
 	},
 
-	// inital conditions
+	// initial conditions
 	initialConditions: function () {
 		// Hide 'Saved!' message
 		$(".profile_content p").hide();
-		// Disable select/checkbox input and make text inputs readonly
-		this.$el.find('select').attr('disabled', 'disabled');
-		this.$el.find('input[type="checkbox"]').attr('disabled', 'disabled');
-		this.$el.find('input, textarea').attr('readonly', 'readonly')
-								   		.css({
-											'background-color':'transparent',
-											'border': 'none',
-										});
-		this.$el.find('input[type="file"]').parent().hide();
-		this.$el.find('label[for="id_profilepic"]').hide();
+		// Disable select input 
+		this.$el
+			.find('select')
+			.attr('disabled', 'disabled');
+
+		// Disable checkboxes
+		this.$el
+			.find('input[type="checkbox"]')
+			.attr('disabled', 'disabled');
+
+		// Make input, text areas, and select fields readonly
+		this.$el
+			.find('input, textarea, select')
+			.attr('readonly', 'readonly')
+	   		.css({
+				'background-color':'transparent',
+				'border': 'none',
+			});
+
+	   	// Hide li wrapper of file input
+		this.$el
+			.find('input[type="file"]')
+			.parent()
+			.hide();
+
+		// Hide the label of the profile pic 
+		this.$el
+			.find('label[for="id_profilepic"]')
+			.hide();
+
 		// Toggle button says "Edit Profile"
 		$('#toggle_edits').html('Edit Profile');
+
 		$('#id_profilepic').removeClass(".hideCheckbox");
 	},
 
@@ -188,13 +248,10 @@ var ProfileView = Backbone.View.extend({
 		this.initialConditions();
 		// Set up new model
 		this.model = new Gardener(PROFILE_SOURCE);
-		// Render the model
+		// Render the profile text
 		this.render(this.model);
-		
+		// Render the profile picture
 		this.profilePicRender(this.model);
-
-		// Set interval to ask for changes
-		// this.getFromOthers(5000);
 
 		// set event listener for model saving/re-rendering
 		this.listenTo(this.model, "change", this.render);

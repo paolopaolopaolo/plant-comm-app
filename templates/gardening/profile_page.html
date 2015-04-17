@@ -43,8 +43,17 @@
 {% endblock %}
 
 {% block main_content %}
+	<div class='top-bar'>
+		<div id='menu-wrapper'>
+			<button id='menu-button'>Menu</button>
+			<ul id='top-bar-menu' class='clearfix'>
+				<li><a href='/feed'>Home</a></li>
+				<li><a href='/logout'>Logout</a></li>
+			</ul>
+		</div>
+	</div>
 	<div class='profile_content'>
-		<a href='/feed'>Home</a><a>&emsp;|&emsp;</a><a href='/logout'>Logout</a>
+		
 		<div class='thumb_wrapper'>
 		{% if profile_pic %}
 			<img id='profilepic_thumb' src='{{domain}}media/{{profile_pic.url}}' />
@@ -78,6 +87,7 @@
 	{% compress js %}
 		<script src='{% static "js/jquery-1.11.1.min.js" %}'></script>
 		<script src='{% static "js/jquery.cookie.min.js" %}'></script>
+		<script src='{% static "js/jquery-ui/jquery-ui.min.js" %}'></script>
 		<!-- Underscore and Backbone.js -->
 		<script src='{% static "js/underscore.js" %}'></script>
 		<script src='{% static "js/backbone.js" %}'></script>
@@ -151,9 +161,7 @@
 		</script>
 
 		<!--Plant Image Template -->
-		<script id='plantpic_thumb_template' type='text/html' class='hidden'>
-			<img id='ppt{{ id }}' class='plantpic_thumb' src='{{ imageURL }}'/>
-		</script>
+		<script id='plantpic_thumb_template' type='text/html' class='hidden'><img id='ppt{{ id }}' class='plantpic_thumb' src='{{ imageURL }}'/></script>
 
 	{% endverbatim %}
 
