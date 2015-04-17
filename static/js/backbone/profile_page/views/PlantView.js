@@ -7,7 +7,6 @@ var PlantView = Backbone.View.extend({
 
 	template: _.template($('#plant_form_template').html()),
 
-
 	// These events will affect composition of this.collection
 	events: {
 		"click .toggle_plant_edit": "toggleEditable",

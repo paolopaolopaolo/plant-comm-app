@@ -71,6 +71,7 @@ class CompoundPlantSerializer(serializers.Serializer):
 
 class GardenerPlantSerializer(serializers.Serializer):
 	available = serializers.BooleanField(required = False)
+	username = serializers.CharField(allow_blank = True, required = False)
 	profile_pic = serializers.CharField(allow_blank = True, required = False)
 	text_blurb = serializers.CharField(allow_blank = False)
 	id = serializers.IntegerField(required = False)

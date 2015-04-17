@@ -1,8 +1,11 @@
 @topbar_color : #a7625a;
 @settings_button_color: #FFFFFF;
 @content_body_color: #788384;
+@content_body_color2: @content_body_color + #111;
+@content_body_color3: @content_body_color2 + #111;
 @settings-right: 10%;
 @side_background_color: #FFFFDD;
+@button_width: 136px;
 
 /** Universal settings **/
 html {
@@ -18,17 +21,27 @@ body {
 	font-family: "Muli", garamond, sans-serif;
 }
 
-/** Mixins **/
-.clearfix:after {
-	visibility: hidden;
-	display: block;
-	font-size: 0;
-	content: " ";
-	clear: both;
-	height: 0;
+/** Mixins/Mixin Classes **/
+.clearfix {
+	&:after {
+		visibility: hidden;
+		display: block;
+		font-size: 0;
+		content: " ";
+		clear: both;
+		height: 0;
+	}
 } 
 
-/** **/
+.negative {
+	color: red;
+}
+
+.positive {
+	color: green;
+}
+
+/** Fixed Topbar styling **/
 .topbar {
 	z-index: 1000;
 	position: fixed;
@@ -42,7 +55,6 @@ body {
 		display: inline-block;
 		margin: 0.67em;
 		width: 40%;
-		// word-wrap: break-word;
 	}
 	button {
 		@media screen {
@@ -56,7 +68,8 @@ body {
 			border-radius: 5px;
 			font-size: 24px;
 			margin: 0.67em @settings-right 0.67em 0.67em;
-			width: 20%;
+			width: @button_width;
+			white-space: nowrap;
 		}
 		@media (max-width: 768px) {
 			margin: 0.67em @settings-right - 9% 0.67em 0.67em;
@@ -77,7 +90,7 @@ body {
 			position: absolute;
 			overflow: hidden;
 			min-height: 52px;
-			width: 20%;
+			width: @button_width;
 			border-radius: 0 0 5px 5px;
 			top: 2em;		
 			right: @settings-right;
@@ -112,13 +125,148 @@ body {
 }
 
 .content-body {
+	@media screen {
+		min-height: 545px;
+		width: 90%;
+		margin-top: 82px;
+		margin-left: auto;
+		margin-right: auto;
+		position: relative;
+		background-color: @content_body_color;
+		padding: 20px 0;
+	}
+	@media (max-width: 768px) {
+		width: 95%
+	}
 
-	min-height: 500px;
-	width: 90%;
-	margin-top: 82px;
-	margin-left: auto;
-	margin-right: auto;
-	position: relative;
-	background-color: @content_body_color;
-	padding: 20px 10px;
+}
+
+/* Template Styling*/
+
+#og_content {
+	@media screen {
+		width: 100%;
+		// padding: 1%;
+		min-height: 200px;
+		
+	}
+	@media (max-width: 768px) {
+		margin-top: 8%;
+	}
+	h1 {
+		margin: 5px 15px;
+		display: inline-block;
+	}
+	p {
+		margin: 0 10px;
+	}
+	.gardener_box{
+		// margin: 10px 0;
+		font-size: 14px;
+		padding: 10px;
+		// background-color: @content_body_color - #211;
+		// border-radius: 5px;
+		// box-shadow: black 1px 1px 6px;
+		h3 {
+				margin: 0;
+		}
+		&:nth-child(odd) {
+			background-color: @content_body_color2;
+		}
+		&:nth-child(even) {
+			background-color: @content_body_color3;
+		}
+		.gardener_name {
+			margin: 0 8px;
+		}
+		.plant_header {
+			@media screen {
+				margin-top: 10px;
+			}
+			@media (max-width: 768px) {
+				clear: left;
+				margin-left: 20px;
+			}
+		}
+		.og-profilepic {
+			@media screen {
+				float: left;
+				display: inline-block;
+				width: 22%;
+		  		min-height: 240px;
+		  		margin: 10px 0px 5px 9px;
+		  		border-radius: 5px;
+			}
+			@media (max-width: 768px) {
+				width: 80%;
+				height: 300px;
+			}
+		}
+		.og-aboutme {
+			@media screen {
+				width: 19%;
+			}
+			@media (max-width: 768px) {
+				width: 80%;
+				max-height: 200px; 
+			}
+			span {
+				font-size: 14px;
+			}
+		}
+		.og-plants {
+			h4 {
+				margin: 10px 0 0 0;
+			}
+			@media screen {
+				width: 48%;
+			}
+			@media (max-width: 768px) {
+				width: 96%;
+			}
+			// This covers both the plant img and the plant info
+			.plant_info {
+				.plantimg_sprites {
+					width: 20%;
+					height: 30px;
+					margin-left: 4px;
+					margin-right: -2px;
+					border-radius: 0 0 5px 5px;
+				}
+				.first_plant_img {
+					width: 97%;
+					height: 156px;
+					margin: 10px 0 4px 4px;
+					border-radius: 5px 5px 0 0;
+				}
+				&:nth-child(odd) {
+					clear: left;
+				}
+				&:nth-child(even) {
+					max-height: 250px;
+				}
+				vertical-align: top;
+				// border: 1px red dotted;
+				width: 48%;
+				min-height: 250px;
+				margin-left: 4px;
+				float: left;
+				display: inline-block;
+			}
+		}
+		.og-partition {
+			float: left;
+			// border: 1px red dotted;
+			display: inline-block;
+			height: 250px;
+			margin: 10px 20px;
+			overflow-y: auto;
+		}
+	}
+	#refreshGardeners {
+		cursor: pointer;
+		&:hover {
+			color: white;
+		}
+	}
 }

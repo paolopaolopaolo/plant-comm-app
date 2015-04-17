@@ -111,42 +111,46 @@ class ProfileForm(forms.Form):
 	
 	available = forms.BooleanField(label = "Available to garden",
 								   required = False)
+
+	username = forms.CharField(max_length = 100,
+							   label = "Username",
+							   required = False)
 	
 	first_name = forms.CharField(max_length = 100,
-								 label = "First name:",
+								 label = "First name",
 								 required = False)
 
 	last_name = forms.CharField(max_length = 100,
-								label = "Last name:",
+								label = "Last name",
 								required = False)
 
-	profile_pic = forms.ImageField(label = "Profile picture:",
+	profile_pic = forms.ImageField(label = "Profile picture",
 								  required = False)
 	
 	city = forms.CharField(max_length = 100,
-						   label = "City:",
+						   label = "City",
 						   required = False)
 
-	state = forms.ChoiceField(label = "State:",
+	state = forms.ChoiceField(label = "State",
 							  choices = STATE_ABBREVS,
 							  required = False)
 
 	zipcode = forms.CharField(max_length=5,
-							  label = "Zipcode:",
+							  label = "Zipcode",
 							  required = False,
 							  widget = forms.widgets.NumberInput)
 
 	text_blurb = forms.CharField(max_length = 700,
-								 label = "About Me (700 character max):",
+								 label = "About Me (700 character max)",
 								 widget = forms.widgets.Textarea,
 								 required = False)
 
 class PlantForm(forms.Form):
 	species = forms.CharField(max_length = 200,
-							  label = 'Species:',
+							  label = 'Species',
 							  required = False)
 	information = forms.CharField(max_length = 700,
-								  label = 'Information (700 character max):',
+								  label = 'Information (700 character max)',
 								  widget = forms.widgets.Textarea,
 								  required = False)
 	quantity = forms.IntegerField(label = 'Number of plants',

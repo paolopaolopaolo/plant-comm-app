@@ -96,6 +96,7 @@ def setGardenerPlantQueryset(limit = None, preFilter = None):
 			else:
 				self.queryset = filter(filterMethod, gardeners)[0: limit]
 			for model in self.queryset:
+				model.username = model.user.username
 				model.plants = []
 				for plant in Plant.objects.filter(user = model.id):
 					result_obj = {}
@@ -120,7 +121,8 @@ def setGardenerPlantQueryset(limit = None, preFilter = None):
 class LandingPage(View):
 	context = {
 				"signinform": SignUpForm(),
-				"loginform": LogInForm()
+				"loginform": LogInForm(),
+				"compress_enabled": settings.COMPRESS_ENABLED
 			  }
 
 	# Just pull up the webpage
@@ -185,7 +187,10 @@ class ProfilePage(APIView):
 	gardener = None
 	plants = None
 	cleaned_data = {}
-	context = {'domain':settings.DOMAIN}
+	context = {
+				'domain': settings.DOMAIN,
+				'compress_enabled': settings.COMPRESS_ENABLED
+			  }
 	
 	# Utility, method for sorting by id
 	def sortById(self, arrayItem):
@@ -195,6 +200,7 @@ class ProfilePage(APIView):
 	def RETURN_USER_DATA(self):
 		result = {
 					'id': self.gardener.id,
+					'username': self.user.username,
 					'first_name': self.user.first_name,
 					'last_name': self.user.last_name,
 					'city': self.gardener.city,
@@ -279,7 +285,10 @@ class ProfilePage(APIView):
 
 # Feed Page: View gardeners/gardens in the area
 class FeedPage(APIView):
-	context = {'domain': settings.DOMAIN}
+	context = {
+		'domain': settings.DOMAIN,
+		'compress_enabled': settings.COMPRESS_ENABLED
+	}
 
 	# Limits how many instances in a query get through
 	def bootstrapLimit(self, query_list, limit = None):
@@ -300,6 +309,8 @@ class FeedPage(APIView):
 		# This is a triple for-loop. Although it is ugly and not at all optimized,
 		# it gets the job done
 		for model in other_gardeners:
+			user_obj = User.objects.get(id = model['user'])
+			model['username'] = user_obj.username
 			try:
 				model['profile_pic'] = model['profile_pic'].url
 			except ValueError:
@@ -370,8 +381,16 @@ class GardenerAPI( mixins.RetrieveModelMixin,
 				return HttpResponse(response, content_type='application/json')
 		return self.create(self, request, *args, **kwargs)
 
+	@set_user
 	def put(self, request, *args, **kwargs):
 		self.data = request.data
+		if "first_name" in self.data:
+			self.user.first_name = self.data["first_name"]
+		if "last_name" in self.data:
+			self.user.last_name = self.data["last_name"]
+		if "username" in self.data:
+			self.user.username = self.data["username"]
+		self.user.save()
 		return self.update(self, request, *args, **kwargs)
 
 
@@ -426,10 +445,7 @@ class PlantImgAPI( mixins.CreateModelMixin,
 
 	# Override create function to handle adding images
 	def create(self, request, *args, **kwargs):
-		# test = PlantImgSerializer(data = self.data)
 		serialized_data = PlantImgSerializer(data = self.data)
-		# print "serialized_data is valid:"
-		# print test.is_valid()
 		if serialized_data.is_valid():
 			newplantimg = PlantImg(
 				plant = serialized_data.validated_data['plant'],

@@ -5,6 +5,7 @@ var ProfileView = Backbone.View.extend({
 	cancel_render: false,
 	refetchInterval: undefined,
 
+
 	// Set target element
 	el: '#profile_form',
 
@@ -138,6 +139,11 @@ var ProfileView = Backbone.View.extend({
 			for (key in response) {	
 				if (key !== 'available' && key !== 'profile_pic') {
 					this.attrToInput(key).val(response[key]);
+					if (key === 'first_name') {
+						this.$el.find('h2')
+								.html(response[key]+ "'s Profile");
+						$('title').html(response[key] + "'s Gardening Profile");
+					}
 				} else if( key === 'available') {
 					this.attrToInput(key).prop('checked', response[key]);
 				}
@@ -184,6 +190,7 @@ var ProfileView = Backbone.View.extend({
 		this.model = new Gardener(PROFILE_SOURCE);
 		// Render the model
 		this.render(this.model);
+		
 		this.profilePicRender(this.model);
 
 		// Set interval to ask for changes

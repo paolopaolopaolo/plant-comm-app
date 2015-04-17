@@ -166,10 +166,14 @@ body {
 						width: 92%;
 						display: block;
 					}
-				}
-				li:first-child, li:last-child {
-					width: 96%;
-					display: block;
+					&:first-child, &:last-child {
+						width: 96%;
+						display: block;
+					}
+					&:nth-child(3), &:nth-child(6) {
+						clear: left;
+					}
+
 				}
 				a {
 					display:none;

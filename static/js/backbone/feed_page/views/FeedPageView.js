@@ -62,7 +62,6 @@ var FeedPageView = Backbone.View.extend({
 		// Settings button UI
 		this.ogview = new OGView();
 		this.showSettings();
-		console.dir(OTHER_GARDENERS);
 	}
 
 });
