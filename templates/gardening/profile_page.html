@@ -9,15 +9,15 @@
 
 {% block links %}
 	<!-- Load Muli Font and Font Awesome from CDN-->
-	{% compress css %}
-		<link href='http://fonts.googleapis.com/css?family=Muli:400,300italic'
-			  rel='stylesheet'
-			  type='text/css'/>
-		<link rel="stylesheet" 
-			  href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"/>
-	{% endcompress %}
+
+	<link href='http://fonts.googleapis.com/css?family=Muli:400,300italic'
+		  rel='stylesheet'
+		  type='text/css'/>
+	<link rel="stylesheet" 
+		  href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"/>
+	
 	<!-- Syntax is backwards, "not debug" = DEBUG -->
-	{% if not debug %}
+	{% if not compress_enabled %}
 		<!-- DEVELOPMENT STYLING -->
 		<link type="text/css"
 			  rel='stylesheet/less'

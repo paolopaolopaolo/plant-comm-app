@@ -69,6 +69,7 @@ body {
 			font-size: 24px;
 			margin: 0.67em @settings-right 0.67em 0.67em;
 			width: @button_width;
+			white-space: nowrap;
 		}
 		@media (max-width: 768px) {
 			margin: 0.67em @settings-right - 9% 0.67em 0.67em;
@@ -179,7 +180,13 @@ body {
 			margin: 0 8px;
 		}
 		.plant_header {
-			margin-top: 10px;
+			@media screen {
+				margin-top: 10px;
+			}
+			@media (max-width: 768px) {
+				clear: left;
+				margin-left: 20px;
+			}
 		}
 		.og-profilepic {
 			@media screen {

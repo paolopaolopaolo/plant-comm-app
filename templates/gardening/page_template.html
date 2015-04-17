@@ -9,19 +9,19 @@
 	
 	{% block links %}
 		<!-- Load Muli Font and Font Awesome from CDN-->
+		<link href='http://fonts.googleapis.com/css?family=Muli:400,300italic'
+		  rel='stylesheet'
+		  type='text/css'/>
+		<link rel="stylesheet" 
+		  href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"/>
 		{% compress css %}
-			<link href='http://fonts.googleapis.com/css?family=Muli:400,300italic'
-			  rel='stylesheet'
-			  type='text/css'/>
-			<link rel="stylesheet" 
-			  href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"/>
 			{% block css %}
 			{% endblock %}
 		{% endcompress %}
-		{% if not debug %}
+
+		{% if not compress_enabled %}
 				{% block less_styling_browser_compile %}
 				{% endblock %}
-			
 		{% else %}
 			{% compress css %}
 				{% block less_styling_pre_compile %}

@@ -121,7 +121,8 @@ def setGardenerPlantQueryset(limit = None, preFilter = None):
 class LandingPage(View):
 	context = {
 				"signinform": SignUpForm(),
-				"loginform": LogInForm()
+				"loginform": LogInForm(),
+				"compress_enabled": settings.COMPRESS_ENABLED
 			  }
 
 	# Just pull up the webpage
@@ -186,7 +187,10 @@ class ProfilePage(APIView):
 	gardener = None
 	plants = None
 	cleaned_data = {}
-	context = {'domain':settings.DOMAIN}
+	context = {
+				'domain': settings.DOMAIN,
+				'compress_enabled': settings.COMPRESS_ENABLED
+			  }
 	
 	# Utility, method for sorting by id
 	def sortById(self, arrayItem):
@@ -282,7 +286,10 @@ class ProfilePage(APIView):
 
 # Feed Page: View gardeners/gardens in the area
 class FeedPage(APIView):
-	context = {'domain': settings.DOMAIN}
+	context = {
+		'domain': settings.DOMAIN,
+		'compress_enabled': settings.COMPRESS_ENABLED
+	}
 
 	# Limits how many instances in a query get through
 	def bootstrapLimit(self, query_list, limit = None):

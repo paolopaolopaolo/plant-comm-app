@@ -79,18 +79,6 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-# Django Compressor Settings
-if not DEBUG:
-    COMPRESS_ENABLED = True
-    COMPRESS_OFFLINE = True
-    STATICFILES_FINDERS = (
-        "django.contrib.staticfiles.finders.FileSystemFinder",
-        "django.contrib.staticfiles.finders.AppDirectoriesFinder",
-        'compressor.finders.CompressorFinder',
-        )
-    COMPRESS_PRECOMPILERS = (
-         ('text/less', 'lessc {infile} {outfile}'),
-        )
 
 
 ROOT_URLCONF = 'plant_app.urls'
@@ -139,3 +127,20 @@ STATIC_URL = '/static/'
 if DEBUG:
     STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static')
     MEDIA_ROOT = os.path.join(STATIC_ROOT, "media")
+
+# Django Compressor Settings
+if not DEBUG:
+    COMPRESS_ENABLED = True
+
+if COMPRESS_ENABLED:
+    COMPRESS_OFFLINE = True
+    STATICFILES_FINDERS = (
+        "django.contrib.staticfiles.finders.FileSystemFinder",
+        "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+        'compressor.finders.CompressorFinder',
+        )
+    COMPRESS_PRECOMPILERS = (
+         ('text/less', 'lessc {infile} {outfile}'),
+        )
+    COMPRESS_ROOT = os.path.join(STATIC_ROOT, 'COMPRESS')
+    
