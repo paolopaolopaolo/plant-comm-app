@@ -1,7 +1,6 @@
 from django.db import models
 # from django.contrib.auth.models import AbstractUser, PermissionsMixin, Group
 from django.contrib.auth.models import User
-from simple_email_confirmation import SimpleEmailConfirmationUserMixin
 from django.db.models.signals import post_delete
 from django.dispatch.dispatcher import receiver
 from django.conf import settings
@@ -92,7 +91,7 @@ def plant_path(instance, filename):
 # Create your models here.
 
 # Authentication and some other attributes
-class Gardener(models.Model, SimpleEmailConfirmationUserMixin):
+class Gardener(models.Model):
     user = models.OneToOneField(User)
     username = models.CharField(max_length = 50, default = "")
     first_name = models.CharField(max_length = 50, default = "")

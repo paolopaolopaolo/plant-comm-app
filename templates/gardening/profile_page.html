@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load staticfiles %}
+{% load static from staticfiles %}
 {% load compress %}
 
 {% block title %}
@@ -55,10 +55,10 @@
 	<div class='profile_content'>
 		
 		<div class='thumb_wrapper'>
-		{% if profile_pic %}
+		{% if not profile_pic == "" %}
 			<img id='profilepic_thumb' src='{{domain}}media/{{profile_pic.url}}' />
 		{% else %}
-			<img id='profilepic_thumb'/>
+			<img id='profilepic_thumb' src='{{domain}}static/img/user_blank_image.png'/>
 		{% endif %}
 		</div>
 		<form id='profile_form' enctype="multipart/form-data" method="POST">
@@ -72,7 +72,7 @@
 	</div>
 	<div class='plant_content'>
 		<!-- Plant content header -->
-		<h2>{{ user }}'s Plants</h2>
+		<h2>Your Plants</h2>
 		<div class='plant_content_actuel'>
 			<button id='add_plant'>
 				<i class="fa fa-pagelines"></i> 

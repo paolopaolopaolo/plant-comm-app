@@ -111,14 +111,16 @@ var ProfileView = Backbone.View.extend({
 		if (model.attributes['profile_pic'].indexOf('http') > -1) {
 			$('#profilepic_thumb').attr('src', model.attributes['profile_pic']);
 		} else {
-			url_to_render = [ window.location.protocol,
-							  "//",
-							  window.location.hostname,
-							  (window.location.port ? ":" + window.location.port : ""),
-							  '/media/',
-							  model.attributes['profile_pic']].join('');
-			console.log(url_to_render);
-			$('#profilepic_thumb').attr('src', url_to_render);
+			if (model.attributes['profile_pic'] !== "") {
+				url_to_render = [ window.location.protocol,
+								  "//",
+								  window.location.hostname,
+								  (window.location.port ? ":" + window.location.port : ""),
+								  '/media/',
+								  model.attributes['profile_pic']].join('');
+				console.log(url_to_render);
+				$('#profilepic_thumb').attr('src', url_to_render);
+			}
 		}
 	},
 
@@ -252,7 +254,7 @@ var ProfileView = Backbone.View.extend({
 		this.render(this.model);
 		// Render the profile picture
 		this.profilePicRender(this.model);
-
+	
 		// set event listener for model saving/re-rendering
 		this.listenTo(this.model, "change", this.render);
 		this.listenTo(this.model, "change:profile_pic", this.profilePicRender);

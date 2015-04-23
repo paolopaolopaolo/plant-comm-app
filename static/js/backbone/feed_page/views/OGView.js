@@ -70,12 +70,15 @@ var OGView = Backbone.View.extend({
 
 		// Adjust profilepic src
 		if(!/http[s]+:\/\//.test(context['profile_pic']) && !this.STARTUP) {
-			 context['profile_pic'] = [	
+			alert(context['profile_pic']);
+			context['profile_pic'] = [	
 										DOMAIN,
 										"media/",
 										context['profile_pic'] 
 									  ].join("");
 		}
+
+		
 		// Append to the view the templated context
 		this.$el.append(this.template(context));
 

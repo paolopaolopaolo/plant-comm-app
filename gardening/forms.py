@@ -38,14 +38,18 @@ class SignUpForm(forms.Form):
 				raise forms.ValidationError("Passwords do not match")
 
 		# Enforce Email uniqueness
-		email = cleaned_data["email"]
-		users_with_this_email = User.objects.filter(email = email)
-		if len(users_with_this_email) > 0:
-			self.error_message = "::".join([
-				self.error_message,
-				"More than one user with this email"
-			])
-			raise forms.ValidationError("More than one user with this email")
+		try: 
+			email = cleaned_data["email"]
+			users_with_this_email = User.objects.filter(email = email)
+			if len(users_with_this_email) > 0:
+				self.error_message = "::".join([
+					self.error_message,
+					"More than one user with this email"
+				])
+				raise forms.ValidationError("More than one user with this email")
+		except KeyError:
+			self.error_message = "Email required"
+			raise forms.ValidationError("Email required")
 
 
 	first_name = forms.CharField(max_length=100,
@@ -110,11 +114,6 @@ class LogInForm(forms.Form):
 			)
 
 class ProfileForm(forms.Form):
-
-	def clean(self):
-		cleaned_data = super(ProfileForm, self).clean()
-		if re.search(r'\d{5}', cleaned_data.get('zipcode')) is None:
-			raise ValueError
 
 	available = forms.BooleanField(label = "Available to garden",
 								   required = False)

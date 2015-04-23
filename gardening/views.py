@@ -175,6 +175,7 @@ class LandingPage(View):
 					# Redirect users to feed page
 					login(request, user)
 					return redirect("feed")
+				
 				message = "Invalid Email/Password combination Try again"
 				self.context["error_message"] = message
 				return render(request, "landing_page.html", self.context)

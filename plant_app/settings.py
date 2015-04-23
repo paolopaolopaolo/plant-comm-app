@@ -36,24 +36,6 @@ ZIPCODE_API_URL = ''.join([
     "%s/",
     "<units>"])
 
-
-    # Allowed hosts
-if DEBUG:
-    ALLOWED_HOSTS = ["*",]
-    with open(os.path.join(BASE_DIR, "ZIP_CODE_API.txt"), "rb") as zipcode:
-        ZIPCODE_API_KEY = zipcode.read()
-
-else:
-    pass
-    
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-with open(os.path.join(BASE_DIR, "SECRET_KEY.txt") ,'rb') as secret_key:
-    SECRET_KEY = secret_key.read()
-
 # Application definition
 
 INSTALLED_APPS = (
@@ -64,8 +46,10 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'compressor',
-    'simple_email_confirmation',
+    # 'simple_email_confirmation',
     'rest_framework',
+    'mod_wsgi.server',
+    'storages',
     'gardening',
 )
 
@@ -83,26 +67,6 @@ ROOT_URLCONF = 'plant_app.urls'
 
 WSGI_APPLICATION = 'plant_app.wsgi.application'
 
-# Database
-# https://docs.djangoproject.com/en/1.7/ref/settings/#databases
-if DEBUG:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
-    }
-
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'OPTIONS': {
-                'read_default_file': os.path.join(BASE_DIR, "MySQL.conf"),
-            },
-        }
-    }
-
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
 
@@ -117,19 +81,73 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.7/howto/static-files/
-STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'), )
-STATIC_URL = '/static/'
-
 if DEBUG:
+
+    ALLOWED_HOSTS = ["*",]
+    with open(os.path.join(BASE_DIR, "ZIP_CODE_API.txt"), "rb") as zipcode:
+        ZIPCODE_API_KEY = zipcode.read()
+    with open(os.path.join(BASE_DIR, "SECRET_KEY.txt") ,'rb') as secret_key:
+        SECRET_KEY = secret_key.read()
+
+    STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'), )
+    STATIC_URL = '/static/'
     STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static')
     MEDIA_ROOT = os.path.join(STATIC_ROOT, "media")
+    COMPRESS_ROOT = os.path.join(STATIC_ROOT, "COMPRESS")
+    COMPRESS_URL = STATIC_URL
+
+    # DATABASES = {
+    #     'default': {
+    #         'ENGINE': 'django.db.backends.sqlite3',
+    #         'NAME': 'db'
+    #     }
+    # }
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'OPTIONS': {
+                'read_default_file': os.path.join(BASE_DIR, "MySQL.conf"),
+            },
+        }
+    }
+
+else:
+
+    ALLOWED_HOSTS = [".52.10.231.132."]
+    ZIPCODE_API_KEY = os.environ['ZAP']
+    SECRET_KEY = os.environ['SK']
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ['DB_NAME'],
+            'USER': os.environ['DB_USER'],
+            'PASSWORD': os.environ['DB_PW'],
+            'HOST': os.environ['DB_HOST'],
+            'PORT': os.environ['DB_PORT'],
+        }
+    }
+
+    # AWS Access Keys and Bucket Name
+    AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
+    AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
+    AWS_STORAGE_BUCKET_NAME = os.environ['AWS_STORAGE_BUCKET_NAME']
+    # Create Proper URLS for File Storage
+    AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+    STATICFILES_LOCATION = "static"
+    MEDIAFILES_LOCATION = "media"
+    STATIC_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, STATICFILES_LOCATION)
+    MEDIA_URL =  "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, MEDIAFILES_LOCATION)
+    # Set storage engines to custom Storages, separating static from media
+    STATICFILES_STORAGE = 'gardening.custom_storages.StaticStorage'
+    DEFAULT_FILE_STORAGE = 'gardening.custom_storages.MediaStorage'
+    # Enable compression
+    COMPRESS_ENABLED = True
+    COMPRESS_URL = STATIC_URL
+    COMPRESS_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 
 # Django Compressor Settings
-if not DEBUG:
-    COMPRESS_ENABLED = True
-
 if COMPRESS_ENABLED:
     COMPRESS_OFFLINE = True
     STATICFILES_FINDERS = (
@@ -140,10 +158,10 @@ if COMPRESS_ENABLED:
     COMPRESS_PRECOMPILERS = (
          ('text/less', 'lessc {infile} {outfile}'),
         )
-    COMPRESS_ROOT = os.path.join(STATIC_ROOT, 'COMPRESS')
     COMPRESS_CSS_FILTERS = [
                                 'compressor.filters.css_default.CssAbsoluteFilter',
                                 'compressor.filters.cssmin.CSSMinFilter'
                             ]
+
 
     
