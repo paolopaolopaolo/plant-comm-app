@@ -1,7 +1,6 @@
 var OGView = Backbone.View.extend({
 
 	// Variables
-	STARTUP: true,
 	REFRESHER: undefined,
 	REFRESH_HOLD: undefined,
 
@@ -63,21 +62,9 @@ var OGView = Backbone.View.extend({
 		// and set plants to the plants attribute in each model
 		context = _.clone(model.attributes);
 		plants = context['plants'];
-
 		// Add 'avail' as a parameter that evaluates
 		// to a string that will be added onto the template 
 		context['available'] ? context['avail'] = "": context['avail'] = "NOT";
-
-		// Adjust profilepic src
-		if(!/http[s]+:\/\//.test(context['profile_pic']) && !this.STARTUP) {
-			alert(context['profile_pic']);
-			context['profile_pic'] = [	
-										DOMAIN,
-										"media/",
-										context['profile_pic'] 
-									  ].join("");
-		}
-
 		
 		// Append to the view the templated context
 		this.$el.append(this.template(context));
@@ -135,7 +122,6 @@ var OGView = Backbone.View.extend({
 		this.collection.each(_.bind(function (model) {
 			this._createNewOG(model);
 		} ,this));
-		this.STARTUP = false;
 		
 		// Set event listeners
 		this.listenTo(this.collection, "add", this._createNewOG);

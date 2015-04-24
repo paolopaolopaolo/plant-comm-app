@@ -109,7 +109,8 @@ var ProfileView = Backbone.View.extend({
 		var url_to_render;
 		console.log('ppRender called!');
 		if (model.attributes['profile_pic'].indexOf('http') > -1) {
-			$('#profilepic_thumb').attr('src', model.attributes['profile_pic']);
+			url_to_render = model.attributes['profile_pic'].replace(/https:\/{1}/g, "https://");
+			$('#profilepic_thumb').attr('src', url_to_render);
 		} else {
 			if (model.attributes['profile_pic'] !== "") {
 				url_to_render = [ window.location.protocol,

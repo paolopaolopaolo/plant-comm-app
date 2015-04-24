@@ -20,15 +20,8 @@ class StaticStorage(S3BotoStorage):
 
 class MediaStorage(S3BotoStorage):
     location = "media"
-    def __init__(self, *args, **kwargs):
-        super(MediaStorage, self).__init__(*args, **kwargs)
-        self.local_storage = get_storage_class(
-            "compressor.storage.CompressorFileStorage")()
 
-    def save(self, name, content):
-        name = super(MediaStorage, self).save(name, content)
-        self.local_storage._save(name, content)
-        return name
 
 class CacheStorage(S3BotoStorage):
     location = settings.COMPRESS_LOCATION
+

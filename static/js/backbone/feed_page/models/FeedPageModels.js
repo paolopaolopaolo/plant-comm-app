@@ -8,11 +8,4 @@ var OtherGardener = Backbone.Model.extend({
 		_id = model.attributes['id'];
 		return [this.urlRoot, _id.toString()].join('');
 	},
-	initialize: function () {
-		this.set({'profile_pic': [
-									DOMAIN,
-									"media/",
-									this.attributes['profile_pic']
-								].join("")}, {silent: true});
-	}
 });

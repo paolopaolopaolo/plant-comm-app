@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static from staticfiles %}
+{% load static %}
 {% load compress %}
 
 {% block title %}
@@ -55,11 +55,7 @@
 	<div class='profile_content'>
 		
 		<div class='thumb_wrapper'>
-		{% if not profile_pic == "" %}
-			<img id='profilepic_thumb' src='{{domain}}media/{{profile_pic.url}}' />
-		{% else %}
-			<img id='profilepic_thumb' src='{{domain}}static/img/user_blank_image.png'/>
-		{% endif %}
+			<img id='profilepic_thumb' src='{% static "img/user_blank_image.png" %}'/>
 		</div>
 		<form id='profile_form' enctype="multipart/form-data" method="POST">
 			<h2>{{ user }}'s Profile</h2>&nbsp;&nbsp;<p>Saved!</p>
