@@ -145,6 +145,7 @@ else:
     # Enable compression
     COMPRESS_ENABLED = True
     COMPRESS_URL = STATIC_URL
+    STATIC_ROOT = "/static/"
     COMPRESS_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 
 # Django Compressor Settings
