@@ -16,6 +16,7 @@ try:
 except ImportError:
     DEBUG = False
     TEMPLATE_DEBUG = False
+    DOMAIN = 'http://54.148.204.235/'
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 GARDENING_DIR = os.path.join(BASE_DIR, "gardening")
@@ -81,6 +82,8 @@ USE_L10N = True
 USE_TZ = True
 
 
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'), )
+
 if DEBUG:
 
     ALLOWED_HOSTS = ["*",]
@@ -89,7 +92,6 @@ if DEBUG:
     with open(os.path.join(BASE_DIR, "SECRET_KEY.txt") ,'rb') as secret_key:
         SECRET_KEY = secret_key.read()
 
-    STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'), )
     STATIC_URL = '/static/'
     STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static')
     MEDIA_ROOT = os.path.join(STATIC_ROOT, "media")
@@ -114,7 +116,7 @@ if DEBUG:
 
 else:
 
-    ALLOWED_HOSTS = [".52.10.231.132."]
+    ALLOWED_HOSTS = [".54.148.204.235."]
     ZIPCODE_API_KEY = os.environ['ZAP']
     SECRET_KEY = os.environ['SK']
 
@@ -134,19 +136,21 @@ else:
     AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
     AWS_STORAGE_BUCKET_NAME = os.environ['AWS_STORAGE_BUCKET_NAME']
     # Create Proper URLS for File Storage
+    STATICFILES_STORAGE = 'gardening.custom_storages.StaticStorage'
+    DEFAULT_FILE_STORAGE = 'gardening.custom_storages.MediaStorage'
+    COMPRESS_STORAGE = STATICFILES_STORAGE
     AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
     STATICFILES_LOCATION = "static"
     MEDIAFILES_LOCATION = "media"
+    COMPRESS_LOCATION = "static"
     STATIC_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, STATICFILES_LOCATION)
     MEDIA_URL =  "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, MEDIAFILES_LOCATION)
     # Set storage engines to custom Storages, separating static from media
-    STATICFILES_STORAGE = 'gardening.custom_storages.StaticStorage'
-    DEFAULT_FILE_STORAGE = 'gardening.custom_storages.MediaStorage'
     # Enable compression
     COMPRESS_ENABLED = True
     COMPRESS_URL = STATIC_URL
-    STATIC_ROOT = "/static/"
-    COMPRESS_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+    COMPRESS_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'COMPRESS')
+    STATIC_ROOT = COMPRESS_ROOT
 
 # Django Compressor Settings
 if COMPRESS_ENABLED:
