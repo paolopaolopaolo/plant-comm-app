@@ -13,6 +13,7 @@ from django.conf import settings
 from rest_framework.views import APIView
 from django.forms.models import model_to_dict
 from django.db import IntegrityError
+from django.core.exceptions import SuspiciousOperation
 
 from rest_framework import mixins
 from rest_framework import generics
@@ -107,12 +108,10 @@ def setGardenerPlantQueryset(limit = None, preFilter = None):
 					for plantimg in plantimgs:
 						result_obj['imgs'].append({ 
 									'id': plantimg.id,
-									'imageURL': re.sub(r'\\', '/',os.path.join(
-										settings.DOMAIN,
-										'media',
-										plantimg.image.url
-									))})
+									'imageURL': plantimg.image.url
+									})
 					model.plants.append(result_obj)
+
 			# self.data = self.queryset
 			return method(self, request, *args, **kwargs)
 		return wrapper1
@@ -211,9 +210,12 @@ class ProfilePage(APIView):
 					'text_blurb': self.gardener.text_blurb,
 					'available': self.gardener.available,
 				}
-		try:
-			result['profile_pic'] = self.gardener.profile_pic.url
-		except ValueError:
+		if self.gardener.profile_pic:
+			try:
+				result['profile_pic'] = self.gardener.profile_pic.url
+			except SuspiciousOperation:
+				result['profile_pic'] = self.gardener.profile_pic.name
+		else:
 			result['profile_pic'] = ""
 		return result
 
@@ -241,11 +243,17 @@ class ProfilePage(APIView):
 					}
 					imgs = PlantImg.objects.filter(plant = plant)
 					for img in imgs:
-						target_plant['images'].append({
-										'imageURL': re.sub(r'\\', '/', os.path.join(settings.DOMAIN,
-																'media',
-																img.thumbnail.url)),
-										'id': img.id})
+						if settings.DEBUG:
+							target_plant['images'].append({
+											'imageURL': re.sub(r'\\', '/', os.path.join(settings.DOMAIN,
+																	'media',
+																	img.thumbnail.url)),
+											'id': img.id})
+						else:
+							target_plant['images'].append({
+											'imageURL': img.thumbnail.url,
+											'id': img.id})
+
 					current_plants.append(target_plant)
 			else:
 				# and an _id is specified,
@@ -253,11 +261,17 @@ class ProfilePage(APIView):
 				target_plant = self.plants.get(id = _id)
 				imgs = PlantImg.objects.filter(plant = target_plant)
 				for img in imgs:
-					current_plants.append({
-									'imageURL':os.path.join(settings.DOMAIN,
-												   			'media',
-												   			img.thumbnail.url),
-									'id': img.id})
+					if settings.DEBUG:
+						current_plants.append({
+										'imageURL':os.path.join(settings.DOMAIN,
+													   			'media',
+													   			img.thumbnail.url),
+										'id': img.id})
+					else:
+						current_plants.append({
+										'imageURL':img.thumbnail.url,
+										'id': img.id
+										})
 
 		return current_plants
 
@@ -268,18 +282,19 @@ class ProfilePage(APIView):
 	@set_user
 	# Bootstrap the data
 	def get(self, request, _id = None):
-		print 'test: RETURN_USER_DATA'
-		print self.RETURN_USER_DATA()
 		# Populate the template context with user and gardener objects and forms
 		self.context['user'] = request.user.first_name
 		# Populate the script above the fold with the appropriate contexts
 		self.context['plant_objects'] = json.dumps(sorted(self.RETURN_PLANT_DATA(),
 										 key=self.sortById))
-		self.context['gardener_object'] = json.dumps(self.RETURN_USER_DATA())
+		try:
+			self.context['gardener_object'] = json.dumps(self.RETURN_USER_DATA())
+		except Exception, e:
+			return HttpResponseServerError(str(e.message), content_type='text/plain')
 		self.context['plant_img_objects'] = json.dumps(self.RETURN_PLANT_DATA(img = True))
 		# Pre-render the profile picture
-		if self.gardener.profile_pic is not None:
-			self.context['profile_pic'] = self.gardener.profile_pic
+		if self.gardener.profile_pic:
+			self.context['profile_pic'] = self.gardener.profile_pic.name
 		# Use a Django form for the profile
 		self.context['profile_form'] = ProfileForm()
 		# Return the rendered page
@@ -314,7 +329,7 @@ class FeedPage(APIView):
 			user_obj = User.objects.get(id = model['user'])
 			model['username'] = user_obj.username
 			try:
-				model['profile_pic'] = model['profile_pic'].url
+				model['profile_pic'] = model['profile_pic'].name
 			except ValueError:
 				model['profile_pic'] = ''
 			model['plants'] = []
@@ -322,16 +337,21 @@ class FeedPage(APIView):
 				plant_images = PlantImg.objects.filter(plant = plant.id)
 				images = []
 				for img in plant_images:
-					images.append({
-						'id': img.id,
-						'imageURL': re.sub(r'\\',
-										   '/',
-										   os.path.join(
-										   	settings.DOMAIN,
-										   	'media',
-										   	img.thumbnail.url)
-										   )
-						})
+					if settings.DEBUG:
+						images.append({
+							'id': img.id,
+							'imageURL': re.sub(r'\\',
+											   '/',
+											   os.path.join(
+											   	settings.DOMAIN,
+											   	'media',
+											   	img.thumbnail.url)
+											   )
+							})
+					else:
+						images.append({
+							'id': img.id,
+							'imageURL': img.thumbnail.url})
 				model['plants'].append({
 					'plant': model_to_dict(plant),
 					'imgs': images})
@@ -458,12 +478,19 @@ class PlantImgAPI( mixins.CreateModelMixin,
 				image = self.data['image']
 			)
 			newplantimg.save()
-		response = json.dumps({
-				'id': newplantimg.id,
-				'imageURL': re.sub(r'\\', '/', os.path.join(settings.DOMAIN,
-										 'media',
-										 newplantimg.thumbnail.url))
-			})
+		if settings.DEBUG:
+			response = json.dumps({
+					'id': newplantimg.id,
+					'imageURL': re.sub(r'\\', '/', os.path.join(settings.DOMAIN,
+											 'media',
+											 newplantimg.thumbnail.url))
+				})
+		else:
+			response = json.dumps({
+					'id': newplantimg.id,
+					'imageURL': newplantimg.thumbnail.url
+				})
+
 		return HttpResponse(response, status = 201, content_type='application/json')
 
 

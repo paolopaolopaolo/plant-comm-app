@@ -75,7 +75,7 @@ STATE_ABBREVS = (
 # Sets filepath for profile pics
 def profile_path(instance, filename):
     return os.path.join(
-            "profile_pic",
+            "profilepic",
             instance.user.username,
             filename
         )
