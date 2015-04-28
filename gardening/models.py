@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_delete
 from django.dispatch.dispatcher import receiver
 from django.conf import settings
-import os
+import os, random
 
 from PIL import Image
 from cStringIO import StringIO
@@ -126,7 +126,16 @@ class PlantImg(models.Model):
                                   blank = True,
                                   null = True)
 
+    def randomNumberString(self, integer):
+        result = ""
+        for time in range(0, integer):
+            result = "".join([result, str(random.randrange(10))])
+        return result
+
     def save(self, *args, **kwargs):
+        # Save this photo instance
+        super(PlantImg, self).save(*args, **kwargs)
+
         # Set our max thumbnail size in a tuple (max width, max height)
         THUMBNAIL_SIZE = (245, 275)
 
@@ -154,10 +163,17 @@ class PlantImg(models.Model):
         # Save to the thumbnail field
         suf = SimpleUploadedFile(os.path.split(self.image.name)[-1],
                 temp_handle.read(), content_type='image/png')
+
+
+        suf.name = "".join(suf.name.split(".")[0: -1])
+
+        suf.name = "".join([str(self.id), suf.name, self.randomNumberString(20)])
+
         self.thumbnail.save(suf.name+'.png', suf, save=False)
 
-        # Save this photo instance
+         # Save this photo instance
         super(PlantImg, self).save(*args, **kwargs)
+
 
     def __unicode__(self):
         return "%s: %s" % (unicode(self.plant.user.user.username),  unicode(self.id))

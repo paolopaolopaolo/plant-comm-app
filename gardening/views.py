@@ -285,23 +285,26 @@ class ProfilePage(APIView):
 	@set_user
 	# Bootstrap the data
 	def get(self, request, _id = None):
-		# Populate the template context with user and gardener objects and forms
-		self.context['user'] = request.user.first_name
-		# Populate the script above the fold with the appropriate contexts
-		self.context['plant_objects'] = json.dumps(sorted(self.RETURN_PLANT_DATA(),
-										 key=self.sortById))
 		try:
-			self.context['gardener_object'] = json.dumps(self.RETURN_USER_DATA())
+			# Populate the template context with user and gardener objects and forms
+			self.context['user'] = request.user.first_name
+			# Populate the script above the fold with the appropriate contexts
+			self.context['plant_objects'] = json.dumps(sorted(self.RETURN_PLANT_DATA(),
+											 key=self.sortById))
+			try:
+				self.context['gardener_object'] = json.dumps(self.RETURN_USER_DATA())
+			except Exception, e:
+				return HttpResponseServerError(str(e.message), content_type='text/plain')
+			self.context['plant_img_objects'] = json.dumps(self.RETURN_PLANT_DATA(img = True))
+			# Pre-render the profile picture
+			if self.gardener.profile_pic:
+				self.context['profile_pic'] = self.gardener.profile_pic.name
+			# Use a Django form for the profile
+			self.context['profile_form'] = ProfileForm()
+			# Return the rendered page
+			return render(request, "profile_page.html", self.context)
 		except Exception, e:
-			return HttpResponseServerError(str(e.message), content_type='text/plain')
-		self.context['plant_img_objects'] = json.dumps(self.RETURN_PLANT_DATA(img = True))
-		# Pre-render the profile picture
-		if self.gardener.profile_pic:
-			self.context['profile_pic'] = self.gardener.profile_pic.name
-		# Use a Django form for the profile
-		self.context['profile_form'] = ProfileForm()
-		# Return the rendered page
-		return render(request, "profile_page.html", self.context)
+			return HttpResponseServerError(str(e), content_type='text/plain')
 
 # Feed Page: View gardeners/gardens in the area
 class FeedPage(APIView):
@@ -400,7 +403,6 @@ class GardenerAPI( mixins.RetrieveModelMixin,
 			if profile_form.is_valid():
 				self.gardener.profile_pic = profile_form.cleaned_data['profile_pic']
 				self.gardener.save()
-				print self.gardener.profile_pic.url
 				url_target = self.gardener.profile_pic.url
 				response = json.dumps({'profile_pic': url_target})
 				return HttpResponse(response, content_type='application/json')
@@ -480,22 +482,24 @@ class PlantImgAPI( mixins.CreateModelMixin,
 				plant = serialized_data.validated_data['plant'],
 				image = self.data['image']
 			)
+		try:
 			newplantimg.save()
-		if settings.DEBUG:
-			response = json.dumps({
-					'id': newplantimg.id,
-					'imageURL': re.sub(r'\\', '/', os.path.join(settings.DOMAIN,
-											 'media',
-											 newplantimg.thumbnail.url))
-				})
-		else:
-			response = json.dumps({
-					'id': newplantimg.id,
-					'imageURL': newplantimg.thumbnail.url
-				})
+		except Exception, e:
+			return HttpResponseServerError(str(e), content_type='text/plain')
+		# if settings.DEBUG:
+		# 	response = json.dumps({
+		# 			'id': newplantimg.id,
+		# 			'imageURL': re.sub(r'\\', '/', os.path.join(settings.DOMAIN,
+		# 									 'media',
+		# 									 newplantimg.thumbnail.url))
+		# 		})
+		# else:
+		response = json.dumps({
+				'id': newplantimg.id,
+				'imageURL': newplantimg.thumbnail.url
+			})
 
 		return HttpResponse(response, status = 201, content_type='application/json')
-
 
 	@method_decorator(login_required)
 	def dispatch(self, *args, **kwargs):
@@ -508,7 +512,7 @@ class PlantImgAPI( mixins.CreateModelMixin,
 		# of that plant
 		if 'id' not in self.data:
 			response = self.queryset.filter(plant = kwargs['id'])
-			response = json.dumps([{'id': entry.id, 'imageURL': os.path.join(settings.DOMAIN, 'media', entry.thumbnail.url) } for entry in response])
+			response = json.dumps([{'id': entry.id, 'imageURL': entry.thumbnail.url } for entry in response])
 			return HttpResponse(response, content_type='application/json')
 		return self.retrieve(self, request, *args, **kwargs)
 
