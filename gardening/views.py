@@ -127,7 +127,10 @@ class LandingPage(View):
 
 	# Just pull up the webpage
 	def get(self, request):
-		return render(request, "landing_page.html", self.context)
+		try:
+			return render(request, "landing_page.html", self.context)
+		except Exception, e:
+			return HttpResponseServerError(str(e), content_type='text/plain')
 
 	def post(self, request):
 		# Get form results based on what is in POST
