@@ -16,7 +16,6 @@ try:
 except ImportError:
     DEBUG = False
     TEMPLATE_DEBUG = False
-    DOMAIN = 'http://54.148.204.235/'
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 GARDENING_DIR = os.path.join(BASE_DIR, "gardening")
@@ -80,6 +79,7 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
 
 
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'), )
