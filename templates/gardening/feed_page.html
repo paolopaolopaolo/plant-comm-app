@@ -15,7 +15,6 @@
 <!-- LESS Link has these attributes: -->
 <!-- type="text/css" rel='stylesheet/less' href='{% static "file.less"%}'-->
 {% block less_styling_browser_compile %}
-	<link type="text/css" rel='stylesheet/less' href='{% static "less/feed_page.less"%}' />
 	<script src="{% static 'js/less.min.js' %}" type="text/javascript"></script>
 {% endblock %}
 
@@ -29,8 +28,10 @@
 <!-- Script tag with Bootstrapped values -->
 {% block bootstrap_vars %}
 	var DOMAIN, OTHER_GARDENERS;
+	USER = "{{ user }}"
 	DOMAIN = "{{ domain }}";
-	OTHER_GARDENERS = {{other_gardeners}};
+	OTHER_GARDENERS = {{ other_gardeners }};
+	CONVOS = {{ convos }};
 	DEFAULT_PROFILE_PIC = "https://plantappstorage.s3.amazonaws.com/static/img/user_blank_image.png";
 {% endblock %}
 
@@ -46,18 +47,54 @@
 			<li><a href='../profile'>&emsp;Profile</a></li>
 			<li><a href='../logout'>&emsp;Logout</a></li>
 		</ul>
+		<button class='mail_button'></span>
 	</div>
 	<div class='content-body'>
 		<div id='og_content'>
 			<h1><strong>Gardeners</strong></h1>
 			<span id='refreshGardeners'><i class="fa fa-refresh"></i></span>
 		</div>
+		<div id='chat_wrapper'>
+			<div id='chat_menu'>
+				<button class='close_button'><i class="fa fa-times-circle"></i></button>
+				<h2>Conversations</h2>
+				<ul class='convo_list'>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div id='chat_window'>
 	</div>
 {% endblock %}
 
 <!-- Backbone templates -->
 {% block bt %}
+
 	{% verbatim %}
+		<!-- Chat Window-->
+		<script id='chat_window_template' type='text/html'>
+				<div class='chatHeader'>
+					<b>{{ user}}</b>
+					<button class='close_chat_win command_chat_win'>&times;</button>
+					<button class='minimize_chat_win command_chat_win'>_</button>
+				</div>
+				<div class='chatText'>
+				{{ ["<div class='text_line'>",text.split("</div><div class='text_line'>").slice(2, text.split("</div><div class='text_line'>").length).join("</div><div class='text_line'>"),"</div>"].join("") }}
+				</div>
+				
+					<input type='text' name='user_chat_line' class='user_chat_spec' autofocus/>
+		
+				
+
+		</script>
+		<!-- Chat Menu -->
+		<script id='chat_menu_template' type='text/html'>
+			<li id='convo_line_item{{ id }}' class='convo_line_item'>
+				<input type='hidden' name='convo_id' value='{{ id }}'/>
+				<span class='convo_name'>{{ user }} :</span> {{ text }}
+			</li>
+		</script>
+		<!-- Other Gardener template -->
 		<script id='other_gardener_template' type='text/html'>
 			<div id='gardener_box{{ id }}' class='gardener_box clearfix' >
 				<h2 id='gardener_name{{ id }}' class='gardener_name'>
@@ -73,12 +110,14 @@
 						<br>
 						I am <span class='availability'>{{avail}} available</span> to care for gardens.
 					</span>
+					<button id='contact__{{ id }}' class='contact_gardener'>Contact Me <i class="fa fa-envelope-o"></i></button>
 				</div>
 				<h3 class='plant_header'>{{first_name}}&rsquor;s Plants</h3>
 				<div id='og-plants{{ id }}' class='og-plants og-partition'>
 				</div>
 			</div>
 		</script>
+		<!-- Plant Template (within Other Gardener template)-->
 		<script id='other_gardener_plant_template' type='text/html'>
 			<div id='plant_box{{ id }}' class='plant_box'>
 				<div id='plant_info{{ id }}' class='plant_info'>
@@ -93,10 +132,10 @@
 				</div>
 			</div>
 		</script>
+		<!-- Plant image template (within Plant Template) -->
 		<script id='plant_image_template' type='text/html'>
 			<img class='plantimg_sprites' src='{{ imageURL }}'/>
 		</script>
-
 	{% endverbatim %}
 {% endblock%}
 
@@ -119,9 +158,12 @@
 	<!-- Backbone Models -->
 	<script src='{% static "js/backbone/feed_page/models/FeedPageModels.js" %}'></script>		
 	<!-- Backbone Collections -->
+	<script src='{% static "js/backbone/feed_page/collections/Convos.js" %}'></script>
 	<script src='{% static "js/backbone/feed_page/collections/OtherGardeners.js" %}'></script>
 	<!-- Backbone Views -->
 	<script src='{% static "js/backbone/feed_page/views/OGView.js" %}'></script>
+	<script src='{% static "js/backbone/feed_page/views/ConvoView.js" %}'></script>
+	<script src='{% static "js/backbone/feed_page/views/ChatView.js" %}'></script>
 	<!-- Top Level Backbone View -->
 	<script src='{% static "js/backbone/feed_page/views/FeedPageView.js" %}'></script>
 {% endblock %}

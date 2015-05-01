@@ -5,9 +5,22 @@ var FeedPageView = Backbone.View.extend({
 
 	el: "body",
 
+	maximized_num: 0,
+
 	events: {
 		'click #settings': 'showSettings',
 		'click #settings-list li': 'triggerAnchor',
+		'click .mail_button': 'startupChatView',
+	},
+
+	_countMaximizedChatWindows: function () {
+		var max_chat_win_num;
+
+		max_chat_win_num = _.filter(this.convoview.dialogues, function (dialogue) {
+			return dialogue.open && !dialogue.minimized;
+		}).length;
+
+		return max_chat_win_num;
 	},
 
 	// Utility: Convert css/px to integer
@@ -56,12 +69,91 @@ var FeedPageView = Backbone.View.extend({
 		this.SETTINGS_TOGGLE = !this.SETTINGS_TOGGLE;
 	},
 
+	// Count and start view for Chat View
+	startupChatView: function () {
+		this.$el.find("#chat_wrapper").css({'z-index': '10000000'});
+	},
+
+	showConvoNumber: function () {
+		var new_num, init_button_html;
+		new_num = this.convoview
+					  .collection
+					  .where({seen: false})
+					  .length;
+
+		this.$el.find(".mail_button")
+				.html([
+							'<i class="fa fa-envelope-o"></i>',
+							new_num.toString()
+					  ].join(" "));
+	},
+
+	resetChatTops: function (view, change_count_only) {
+		this.maximized_num = this._countMaximizedChatWindows(); 
+		if (!change_count_only) {
+			if (this.maximized_num < 1) {
+				this.$el.find(".chat_window")
+						.css("top", "0px");
+			} else {
+				view.$el.css('top', '275px');
+			}
+		}
+	},
+
+	closeChatBox: function () {
+		this.$el
+			.find("#chat_wrapper")
+			.css("z-index", "-10000000000");
+	},
+
+	// Function triggered by OGView
+	openNewDialogue: function (user_id) {
+		// Find and filter through the collection
+		// for models where user_id is either user_a or
+		// user_b
+		var filtered_value;
+		filtered_value = this.convoview.collection.find(_.bind(function (model) {
+			return model.attributes['user_a'] === user_id || 
+				   model.attributes['user_b'] === user_id;
+		}, this));
+
+		this.startupChatView();
+		
+		if (filtered_value) {
+			this.convoview.openDialogue(filtered_value.id);
+		} else {
+			this.convoview.openDialogue(user_id);
+		}
+		// _.each(this.convoview.dialogues, _.bind(function (dialogue) {
+		// 	this.resetChatTops(dialogue);
+		// }, this));
+	},
+
 	// Initialize UI for the page
 	initialize: function () {
 		"use strict";
+		var new_convos;
 		// Settings button UI
-		this.ogview = new OGView();
+		this.ogview = new OGView({parent: this});
 		this.showSettings();
+		this.convoview = new ConvoView({parent: this});
+
+		// Make the window draggable
+		this.$el.find("#chat_wrapper").draggable({containment: "parent"});
+
+
+		// Listen to ConvoView's collection changes to update the "new" number 
+		this.listenTo(this.convoview.collection, "add", this.showConvoNumber);
+		this.listenTo(this.convoview.collection, "change", this.showConvoNumber);
+		this.listenTo(this.convoview.collection, "remove", this.showConvoNumber);
+
+		// Listen to Children Views
+		this.listenTo(this.convoview, "closeChatBox", this.closeChatBox);
+		this.listenTo(this.convoview, "resetChatTops", this.resetChatTops);
+		this.listenTo(this.ogview, "openNewDialogue", this.openNewDialogue);
+		
+		this.showConvoNumber();
+
 	}
 
 });

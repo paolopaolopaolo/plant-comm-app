@@ -119,7 +119,6 @@ var ProfileView = Backbone.View.extend({
 								  (window.location.port ? ":" + window.location.port : ""),
 								  '/media/',
 								  model.attributes['profile_pic']].join('');
-				console.log(url_to_render);
 				$('#profilepic_thumb').attr('src', url_to_render);
 			}
 		}

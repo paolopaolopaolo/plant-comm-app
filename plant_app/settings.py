@@ -91,32 +91,33 @@ if DEBUG:
     with open(os.path.join(BASE_DIR, "SECRET_KEY.txt") ,'rb') as secret_key:
         SECRET_KEY = secret_key.read()
 
-    # STATIC_URL = '/static/'
-    # STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static')
-    # MEDIA_ROOT = os.path.join(STATIC_ROOT, "media")
-    # COMPRESS_ROOT = os.path.join(STATIC_ROOT, "COMPRESS")
-    # COMPRESS_URL = STATIC_URL
-
-    # DATABASES = {
-    #     'default': {
-    #         'ENGINE': 'django.db.backends.sqlite3',
-    #         'NAME': 'db'
-    #     }
-    # }
+    STATIC_URL = '/static/'
+    STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static')
+    MEDIA_ROOT = os.path.join(STATIC_ROOT, "media")
+    COMPRESS_ROOT = os.path.join(STATIC_ROOT, "COMPRESS")
+    COMPRESS_URL = STATIC_URL
 
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'OPTIONS': {
-                'read_default_file': os.path.join(BASE_DIR, "MySQL.conf"),
-            },
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': 'db',
+            'CONN_MAX_AGE': None
         }
     }
-    with open(os.path.join(BASE_DIR, "AWS_SETTINGS.txt"), "rb") as AWS_INFORMATION:
-        AWS_INFORMATION = AWS_INFORMATION.read().split("\n")
-        AWS_STORAGE_BUCKET_NAME = AWS_INFORMATION[0]
-        AWS_ACCESS_KEY_ID = AWS_INFORMATION[1]
-        AWS_SECRET_ACCESS_KEY = AWS_INFORMATION[2]
+
+    # DATABASES = {
+    #     'default': {
+    #         'ENGINE': 'django.db.backends.mysql',
+    #         'OPTIONS': {
+    #             'read_default_file': os.path.join(BASE_DIR, "MySQL.conf"),
+    #         },
+    #     }
+    # }
+    # with open(os.path.join(BASE_DIR, "AWS_SETTINGS.txt"), "rb") as AWS_INFORMATION:
+    #     AWS_INFORMATION = AWS_INFORMATION.read().split("\n")
+    #     AWS_STORAGE_BUCKET_NAME = AWS_INFORMATION[0]
+    #     AWS_ACCESS_KEY_ID = AWS_INFORMATION[1]
+    #     AWS_SECRET_ACCESS_KEY = AWS_INFORMATION[2]
 
 else:
     ZIPCODE_API_KEY = os.environ['ZAP']
@@ -130,6 +131,7 @@ else:
             'PASSWORD': os.environ['DB_PW'],
             'HOST': os.environ['DB_HOST'],
             'PORT': os.environ['DB_PORT'],
+            'CONN_MAX_AGE': None,
         }
     }
     # AWS Access Keys and Bucket Name
@@ -150,24 +152,24 @@ ALLOWED_HOSTS = [
                  ".s3-us-west-2.amazonaws.com/plantappstorage.",
                  ]
 
-
-# Create Proper URLS for File Storage
-STATICFILES_STORAGE = 'gardening.custom_storages.StaticStorage'
-DEFAULT_FILE_STORAGE = 'gardening.custom_storages.MediaStorage'
-COMPRESS_STORAGE = STATICFILES_STORAGE
-AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
-STATICFILES_LOCATION = "static"
-MEDIAFILES_LOCATION = "media"
-COMPRESS_LOCATION = "static"
-STATIC_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, STATICFILES_LOCATION)
-MEDIA_URL =  "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, MEDIAFILES_LOCATION)
-# Set storage engines to custom Storages, separating static from media
-# Enable compression
-COMPRESS_ENABLED = True
-COMPRESS_URL = STATIC_URL
-COMPRESS_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'COMPRESS')
-STATIC_ROOT = COMPRESS_ROOT
-MEDIA_ROOT = ''
+if not DEBUG:
+    # Create Proper URLS for File Storage
+    STATICFILES_STORAGE = 'gardening.custom_storages.StaticStorage'
+    DEFAULT_FILE_STORAGE = 'gardening.custom_storages.MediaStorage'
+    COMPRESS_STORAGE = STATICFILES_STORAGE
+    AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+    STATICFILES_LOCATION = "static"
+    MEDIAFILES_LOCATION = "media"
+    COMPRESS_LOCATION = "static"
+    STATIC_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, STATICFILES_LOCATION)
+    MEDIA_URL =  "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, MEDIAFILES_LOCATION)
+    # Set storage engines to custom Storages, separating static from media
+    # Enable compression
+    COMPRESS_ENABLED = True
+    COMPRESS_URL = STATIC_URL
+    COMPRESS_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'COMPRESS')
+    STATIC_ROOT = COMPRESS_ROOT
+    MEDIA_ROOT = ''
 
 # Django Compressor Settings
 if COMPRESS_ENABLED:
@@ -182,8 +184,8 @@ if COMPRESS_ENABLED:
         )
     COMPRESS_CSS_FILTERS = [
                                 'compressor.filters.css_default.CssAbsoluteFilter',
-                                'compressor.filters.cssmin.CSSMinFilter'
                             ]
+                                # 'compressor.filters.cssmin.CSSMinFilter'
 
 
     

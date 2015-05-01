@@ -19,6 +19,8 @@ from rest_framework import mixins
 from rest_framework import generics
 from PIL import Image
 
+from gardening.decorators import *
+
 import json, os, StringIO, re
 
 ## Function based views ##
@@ -28,94 +30,6 @@ import json, os, StringIO, re
 def log_out(request):
 	logout(request)
 	return redirect('landing')
-
-## Decorators ##
-
-# Sets user/gardener/plant objects 
-# for ProfilePage GET method 
-def set_user(method):
-	def setting_user(*args, **kwargs):
-		self = args[0]
-		request = args[1]
-		self.user = User.objects.get(username = request.user)
-		self.gardener = Gardener.objects.get(user = self.user)
-		self.plants = Plant.objects.filter(user = self.gardener)
-		return method(*args, **kwargs)
-	return setting_user
-
-# Sets the user attribute for PlantAPI
-def setApiUser(method):
-	def wrapper(*args, **kwargs):
-		self = args[0]
-		request = args[1]
-		# print request.data
-		data_to_set = request.data.copy()
-		user_to_post = User.objects.get(username = request.user)
-		user_to_post = Gardener.objects.get(user = user_to_post)
-		data_to_set['user'] = user_to_post.id
-		self.data = data_to_set
-		return method(*args, **kwargs)
-	return wrapper
-
-# Sets the plant attribute for PlantImgAPI
-def setApiPlant(method):
-	def wrapper(*args, **kwargs):
-		self = args[0]
-		request = args[1]
-		data_to_set = {}
-		# print 'request.data (line 403):'
-		# print request.data
-		if 'id' in request.data:
-			plant_to_post = Plant.objects.get(id = int(request.data['id']))
-			data_to_set['plant'] = plant_to_post.id
-			data_to_set['image'] = request.data['image']
-		# print 'data_to_set (line 407):'
-		# print data_to_set
-		self.data = data_to_set
-		return method(*args, **kwargs)
-	return wrapper
-
-# Decorator: sets queryset to be a 
-# new view that adds plant information
-# to the gardener
-def setGardenerPlantQueryset(limit = None, preFilter = None):
-	def wrapper0(method):
-		def wrapper1(*args, **kwargs):
-			self = args[0]
-			request = args[1]
-
-			def filterMethod(queryset_member):
-				return not (self.gardener.id == queryset_member.id)
-
-			if preFilter is not None:
-				gardeners = preFilter(Gardener.objects.all())
-
-			else:
-				gardeners = Gardener.objects.all()
-
-			if limit is None or len(gardeners) < limit:
-				self.queryset = filter(filterMethod, gardeners)
-			else:
-				self.queryset = filter(filterMethod, gardeners)[0: limit]
-			for model in self.queryset:
-				model.username = model.user.username
-				model.plants = []
-				for plant in Plant.objects.filter(user = model.id):
-					result_obj = {}
-					result_obj['plant'] = plant
-					result_obj['imgs'] = []
-					plantimgs = PlantImg.objects.filter(plant = plant.id)
-					for plantimg in plantimgs:
-						result_obj['imgs'].append({ 
-									'id': plantimg.id,
-									'imageURL': plantimg.image.url
-									})
-					model.plants.append(result_obj)
-
-			# self.data = self.queryset
-			return method(self, request, *args, **kwargs)
-		return wrapper1
-	return wrapper0
 
 # Landing page (for signing up/logging in)
 class LandingPage(View):
@@ -246,13 +160,6 @@ class ProfilePage(APIView):
 					}
 					imgs = PlantImg.objects.filter(plant = plant)
 					for img in imgs:
-						# if settings.DEBUG:
-						# 	target_plant['images'].append({
-						# 					'imageURL': re.sub(r'\\', '/', os.path.join(settings.DOMAIN,
-						# 											'media',
-						# 											img.thumbnail.url)),
-						# 					'id': img.id})
-						# else:
 						target_plant['images'].append({
 										'imageURL': img.thumbnail.url,
 										'id': img.id})
@@ -264,13 +171,6 @@ class ProfilePage(APIView):
 				target_plant = self.plants.get(id = _id)
 				imgs = PlantImg.objects.filter(plant = target_plant)
 				for img in imgs:
-					# if settings.DEBUG:
-					# 	current_plants.append({
-					# 					'imageURL':os.path.join(settings.DOMAIN,
-					# 								   			'media',
-					# 								   			img.thumbnail.url),
-					# 					'id': img.id})
-					# else:
 					current_plants.append({
 									'imageURL':img.thumbnail.url,
 									'id': img.id
@@ -330,34 +230,32 @@ class FeedPage(APIView):
 				)
 
 		# This is a triple for-loop. Although it is ugly and not at all optimized,
-		# it gets the job done
+		# it gets the job done for now
 		for model in other_gardeners:
+			# Get a user obj to obtain some user attributes
 			user_obj = User.objects.get(id = model['user'])
+			# Set username in model
 			model['username'] = user_obj.username
+			# Reset profile_pic object to just the string/name if possible, 
+			# If no string/name available, set to empty string
 			try:
 				model['profile_pic'] = model['profile_pic'].name
 			except ValueError:
 				model['profile_pic'] = ''
+			# Create a plants attribute (empty list)
 			model['plants'] = []
+			# For each plant in the filter, 
 			for plant in Plant.objects.filter(user = model['id']):
+				# Get all the images of that plant
 				plant_images = PlantImg.objects.filter(plant = plant.id)
 				images = []
+				# For each image in plantimg, add to images array that plant image
 				for img in plant_images:
-					# if settings.DEBUG:
-					# 	images.append({
-					# 		'id': img.id,
-					# 		'imageURL': re.sub(r'\\',
-					# 						   '/',
-					# 						   os.path.join(
-					# 						   	settings.DOMAIN,
-					# 						   	'media',
-					# 						   	img.thumbnail.url)
-					# 						   )
-					# 		})
-					# else:
 					images.append({
 						'id': img.id,
 						'imageURL': img.thumbnail.url})
+				# Add to 'plants' attribute the plant attributes 
+				# and the list of images
 				model['plants'].append({
 					'plant': model_to_dict(plant),
 					'imgs': images})
@@ -370,197 +268,10 @@ class FeedPage(APIView):
 	# @setGardenerPlantQueryset(5)
 	# Bootstrapping values to show in context
 	@set_user
+	@set_user_and_gardener_and_convos
 	def get(self, request, *args, **kwargs):
 		self.context['other_gardeners'] = self.RETURN_OTHER_GARDENERS(5)
+		self.context['convos'] = json.dumps(self.convos)
+		self.context['user'] = request.user
 		return render(request, 'feed_page.html', self.context)
 
-### Profile Page REST APIs ###
-
-# Handle gardener data in profile page API
-class GardenerAPI( mixins.RetrieveModelMixin,
-				   mixins.CreateModelMixin,
-				   mixins.UpdateModelMixin,
-				   generics.GenericAPIView):
-
-	queryset = Gardener.objects.all()
-	serializer_class = GardenerSerializer
-	lookup_field = 'id'
-
-	@method_decorator(login_required)
-	def dispatch(self, *args, **kwargs):
-		return super(GardenerAPI, self).dispatch(*args, **kwargs)
-
-	@setApiUser
-	def get(self, request, *args, **kwargs):
-		return self.retrieve(self, request, *args, **kwargs)
-
-	@set_user
-	def post(self, request, *args, **kwargs):
-		self.data = request.data
-		if kwargs['id'] == 'pic':
-			# use profile form to process profile pics
-			profile_form = ProfileForm(request.POST, request.FILES)
-			if profile_form.is_valid():
-				self.gardener.profile_pic = profile_form.cleaned_data['profile_pic']
-				self.gardener.save()
-				url_target = self.gardener.profile_pic.url
-				response = json.dumps({'profile_pic': url_target})
-				return HttpResponse(response, content_type='application/json')
-		return self.create(self, request, *args, **kwargs)
-
-	@set_user
-	def put(self, request, *args, **kwargs):
-		self.data = request.data
-		if "first_name" in self.data:
-			self.user.first_name = self.data["first_name"]
-		if "last_name" in self.data:
-			self.user.last_name = self.data["last_name"]
-		if "username" in self.data:
-			self.user.username = self.data["username"]
-		try:
-			self.user.save()
-		except IntegrityError:
-			response = {'username': 'Username already taken.'}
-			return HttpResponseServerError(json.dumps(response), content_type='application/json')
-		return self.update(self, request, *args, **kwargs)
-
-
-# Handles plant data		
-class PlantAPI( mixins.RetrieveModelMixin,
-				mixins.CreateModelMixin,
-				mixins.UpdateModelMixin,
-				mixins.DestroyModelMixin,
-				generics.GenericAPIView):
-
-	queryset = Plant.objects.all()
-	serializer_class = PlantSerializer
-	lookup_field = 'id'
-
-	@method_decorator(login_required)
-	def dispatch(self, *args, **kwargs):
-		return super(PlantAPI, self).dispatch(*args, **kwargs)
-
-	@setApiUser
-	def get(self, request, *args, **kwargs):
-		# If url is /profile/plant/(nothing)
-		# return all of the Plant entries 
-		# of that user
-		if 'id' not in self.data:
-			response = self.queryset.filter(user = self.data['user'])
-			response = json.dumps([model_to_dict(entry) for entry in response])
-			return HttpResponse(response, content_type='application/json')
-		# Else, retrieve the appropriate plant
-		return self.retrieve(self, request, *args, **kwargs)
-
-	@setApiUser
-	def post(self, request, *args, **kwargs):
-		return self.create(self, request, *args, **kwargs)
-
-	@setApiUser
-	def put(self, request, *args, **kwargs):
-		return self.update(self, request, *args, **kwargs)
-	
-	@setApiUser
-	def delete(self, request, *args, **kwargs):
-		return self.destroy(self, request, *args, **kwargs)
-
-# Handles plant images
-class PlantImgAPI( mixins.CreateModelMixin,
-				   mixins.DestroyModelMixin,
-				   mixins.RetrieveModelMixin,
-				   generics.GenericAPIView):
-
-	queryset = PlantImg.objects.all()
-	serializer_class = PlantImgSerializer
-	lookup_field = 'id'
-
-	# Override create function to handle adding images
-	def create(self, request, *args, **kwargs):
-		serialized_data = PlantImgSerializer(data = self.data)
-		if serialized_data.is_valid():
-			newplantimg = PlantImg(
-				plant = serialized_data.validated_data['plant'],
-				image = self.data['image']
-			)
-		try:
-			newplantimg.save()
-		except Exception, e:
-			return HttpResponseServerError(str(e), content_type='text/plain')
-		# if settings.DEBUG:
-		# 	response = json.dumps({
-		# 			'id': newplantimg.id,
-		# 			'imageURL': re.sub(r'\\', '/', os.path.join(settings.DOMAIN,
-		# 									 'media',
-		# 									 newplantimg.thumbnail.url))
-		# 		})
-		# else:
-		response = json.dumps({
-				'id': newplantimg.id,
-				'imageURL': newplantimg.thumbnail.url
-			})
-
-		return HttpResponse(response, status = 201, content_type='application/json')
-
-	@method_decorator(login_required)
-	def dispatch(self, *args, **kwargs):
-		return super(PlantImgAPI, self).dispatch(*args, **kwargs)
-
-	@setApiPlant
-	def get(self, request, *args, **kwargs):
-		# If url is /profile/plantimg/(nothing)
-		# return all of the PlantImg entries 
-		# of that plant
-		if 'id' not in self.data:
-			response = self.queryset.filter(plant = kwargs['id'])
-			response = json.dumps([{'id': entry.id, 'imageURL': entry.thumbnail.url } for entry in response])
-			return HttpResponse(response, content_type='application/json')
-		return self.retrieve(self, request, *args, **kwargs)
-
-	@setApiPlant
-	def post(self, request, *args, **kwargs):
-		return self.create(self, request, *args, **kwargs)
-
-	def delete(self, request, *args, **kwargs):
-		return self.destroy(self, request, *args, **kwargs)
-
-### Feed Page APIs ###
-
-# Condenses all the information about
-# other gardeners 
-class OtherGardenerAPI( mixins.RetrieveModelMixin,
-						mixins.ListModelMixin,
-						generics.GenericAPIView):
-	# Primary lookup will be through gardener
-	lookup_field = 'id'
-	serializer_class = GardenerPlantSerializer
-
-	def retrieve(self, request, *args, **kwargs):
-		data = filter(lambda x: x.id == int(kwargs['id']), self.queryset)[0]
-		thing = self.serializer_class(data = model_to_dict(data))
-		print model_to_dict(data)
-		print thing.is_valid()
-		print thing.validated_data
-
-
-	@set_user
-	@setGardenerPlantQueryset(5)
-	def get(self, request, *args, **kwargs):
-		if kwargs['id'] is None:
-			return self.list(self, request, *args, **kwargs)
-		return self.retrieve(self, request, *args, **kwargs)
-
-class CompoundGardenerPlant():
-	available = False
-	profile_pic = ""
-	text_blurb = ""
-	id = None
-	first_name = ""
-	last_name = ""
-	city = ""
-	state = ""
-	zipcode = None
-	plants = []
-
-
-class JobSetAPI(View):
-	pass
