@@ -54,7 +54,7 @@ var OGView = Backbone.View.extend({
 	// This function appends a new view for every
 	// new OG model
 	_createNewOG: function (model) {
-		var context, plants, images, $avail, first_img;
+		var context, plants, images, $avail, first_img, profile_pic;
 
 		first_img = true;
 
@@ -62,6 +62,9 @@ var OGView = Backbone.View.extend({
 		// and set plants to the plants attribute in each model
 		context = _.clone(model.attributes);
 		plants = context['plants'];
+
+		context['profile_pic'] === "" ? context['profile_pic'] = DEFAULT_PROFILE_PIC: undefined;
+
 		// Add 'avail' as a parameter that evaluates
 		// to a string that will be added onto the template 
 		context['available'] ? context['avail'] = "": context['avail'] = "NOT";
