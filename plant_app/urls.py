@@ -3,6 +3,8 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.conf import settings
 from gardening.views import *
+from gardening.chat_api import *
+from gardening.rest_apis import *
 
 urlpatterns = patterns('',
     # Examples:
@@ -18,6 +20,7 @@ urlpatterns = patterns('',
     # url(r'^profile/(?P<_id>[0-9]+)*', ProfilePage.as_view(route="image"), name="profile_image"),
     url(r"^feed/jobset/(?P<id>[0-9]+){0,1}$", JobSetAPI.as_view(), name="JobSetAPI"),
     url(r"^feed/gardener/(?P<id>[0-9]+){0,1}$", OtherGardenerAPI.as_view(), name="OtherGardenerAPI"),
+    url(r"feed/convo/(?P<id>[0-9]+){0,1}$", ChatAPI.as_view(), name="ChatAPI"),
     url(r"^feed/$", FeedPage.as_view(), name="feed"),
     url(r"^logout/", "gardening.views.log_out", name="logout"),
     

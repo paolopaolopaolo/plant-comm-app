@@ -16,6 +16,26 @@ var OGView = Backbone.View.extend({
 	events: {
 		'click #refreshGardeners': 'fetchGardeners',
 		'mouseover .plantimg_sprites:not(.first_plant_img)': 'changeTopImage',
+		'click .contact_gardener': 'openGardenerDialogue',
+	},
+
+	_throttledTrigger : _.debounce(function (event, arg) {
+		this.trigger(event, arg);
+	}, 1000, true),
+
+	// Trigger an open dialogue, passing through
+	// the id of the target user 
+	openGardenerDialogue: function (event) {
+		var target_id, throttled_trig;
+		target_id = $(event.currentTarget).attr('id');
+		target_id = target_id.replace(/contact__/g, "");
+		target_id = parseInt(target_id, 10);
+
+		// throttled_trig = _.debounce(_.bind(function () {
+		// 		this.trigger("openNewDialogue", target_id);
+		// }, this), 3000, true);
+
+		this._throttledTrigger("openNewDialogue", target_id);
 	},
 
 	// Simple function that changes the src of the top image 
@@ -51,6 +71,24 @@ var OGView = Backbone.View.extend({
 		return this
 	},
 
+	_setProfilePic: function (context) {
+		var profile_pic_url;
+
+		if (context['profile_pic'].indexOf('http') < 0) {
+			profile_pic_url = [
+					window.location.protocol,
+					"//",
+					window.location.hostname,
+					(window.location.port ? ":" + window.location.port: ""),
+					"/media/",
+					context['profile_pic']
+			].join("");
+		} else {
+			profile_pic_url = context['profile_pic'];
+		}
+		return profile_pic_url;
+	},
+
 	// This function appends a new view for every
 	// new OG model
 	_createNewOG: function (model) {
@@ -63,7 +101,9 @@ var OGView = Backbone.View.extend({
 		context = _.clone(model.attributes);
 		plants = context['plants'];
 
-		context['profile_pic'] === "" ? context['profile_pic'] = DEFAULT_PROFILE_PIC: undefined;
+		// Set profile pic to default if there is no URL
+		context['profile_pic'] === "" ? context['profile_pic'] = DEFAULT_PROFILE_PIC:
+										context['profile_pic'] = this._setProfilePic(context);
 
 		// Add 'avail' as a parameter that evaluates
 		// to a string that will be added onto the template 
@@ -90,18 +130,15 @@ var OGView = Backbone.View.extend({
 			var $plants_box, $img_box, images;
 
 			$plants_box = $(["#og-plants", context['id'].toString()].join(""));
-			console.log("$plants_box:");
-			console.log($plants_box);
 			$plants_box.append(this.plant_template(plant['plant']));
 
 			$img_box = $plants_box.find("#plant_img" + plant['plant']['id'].toString());
-			console.log("$img_box");
-			console.log($img_box);
 			images = plant['imgs'];
 
 			// Iterate among the plant's images
 			_.each(images, _.bind(function (image) {
 				if (first_img) {
+					image = this._setImageUrl(image);
 					$img_box.append(this.img_template(image));
 					$img_box.children('.plantimg_sprites:first-child')
 							.addClass('first_plant_img');
@@ -114,8 +151,27 @@ var OGView = Backbone.View.extend({
 		}, this));
 	},
 
+	_setImageUrl: function (img_obj) {
+		var img_to_return;
+		img_to_return = _.clone(img_obj);
+		if (img_to_return['imageURL'].indexOf("http") < 0) {
+			img_to_return['imageURL'] = [
+				window.location.protocol,
+				"//",
+				window.location.hostname,
+				(window.location.port ? ":" + window.location.port: ""),
+				"/media/",
+				img_to_return['imageURL']
+			].join("");
+		} 
+		return img_to_return;
+	},
+
 	initialize: function (attrs, opts) {
 		'use strict';
+
+		// Set parent attr to FeedPageView
+		this.parent = attrs['parent'];
 
 		// Initialize collecton
 		this.collection = new OtherGardeners(OTHER_GARDENERS);
@@ -132,9 +188,9 @@ var OGView = Backbone.View.extend({
 		this.listenTo(this.collection, "remove", this.render);
 
 		// Set refresher to refresh automagically every 5 minutes
-		this.REFRESHER = setInterval(function () {
+		this.REFRESHER = setInterval(_.bind(function () {
 			this.fetchGardeners();
-		}, 300000);
+		}, this), 300000);
 	},
 	
 

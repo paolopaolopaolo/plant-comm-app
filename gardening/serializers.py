@@ -6,6 +6,7 @@ from gardening.models import *
 from django.contrib.auth.models import User
 from django.forms import widgets
 
+import re
 
 class GardenerSerializer(serializers.ModelSerializer):
 	username = serializers.CharField(allow_blank = True, required = False)
@@ -83,3 +84,6 @@ class GardenerPlantSerializer(serializers.Serializer):
 	state = serializers.ChoiceField(STATE_ABBREVS, required = False)
 	zipcode = serializers.CharField(allow_blank = True, required = False)
 	plants = CompoundPlantSerializer(many = True)
+
+class ConvoSerializer(serializers.Serializer):
+	text = serializers.CharField(allow_blank = True, required = True)

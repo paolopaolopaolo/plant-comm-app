@@ -178,6 +178,24 @@ class PlantImg(models.Model):
     def __unicode__(self):
         return "%s: %s" % (unicode(self.plant.user.user.username),  unicode(self.id))
 
+class Convo(models.Model):
+    text = models.TextField()
+    time_initiated = models.DateTimeField(auto_now = True)
+    user_a = models.ForeignKey(Gardener, related_name = "+")
+    user_b = models.ForeignKey(Gardener, related_name = "+")
+    active = models.BooleanField(default = True)
+    seen_a = models.BooleanField(default = False)
+    seen_b = models.BooleanField(default = False)
+    
+
+    def __unicode__(self):
+        return "Convo:%s:: %s: %s" % (
+                                        unicode(self.id),
+                                        unicode(self.user_a.username),
+                                        unicode(self.user_b.username)
+                                      )
+
+
 # Job Description that will be shown with respect to the User
 class Job(models.Model):
     text_description = models.CharField(max_length = 700)

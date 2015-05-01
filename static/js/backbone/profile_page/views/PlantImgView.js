@@ -207,13 +207,30 @@ var PlantImgView = Backbone.View.extend({
 
 	// Render images
 	render: function (model) {
+		var context, url_to_render;
+		context = _.clone(model.attributes);
 		this.toggleArrowDisplay();
+
+		if (context['imageURL'].indexOf("http") < 0) {
+			url_to_render = [
+								window.location.protocol,
+								"//",
+								window.location.hostname,
+								(window.location.port ? ":" + window.location.port : ""),
+								'/media/',
+								context['imageURL']
+							].join('');
+		} else {
+			url_to_render = context['imageURL'];
+		}
+		context['imageURL'] = url_to_render;
+
 		if (this.$el.find('.plantpic_thumb').length === 0) {
-			this.$el.prepend(this.template(model.attributes));
+			this.$el.prepend(this.template(context));
 		} else {
 			this.$el.find('.plantpic_thumb')
 					.last()
-					.after(this.template(model.attributes));
+					.after(this.template(context));
 		}
 		// Whenever an image is rendered, set index and position to the last spot
 		// and move to that position
