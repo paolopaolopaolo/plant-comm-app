@@ -86,17 +86,16 @@ USE_TZ = True
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'), )
 
 if DEBUG:
-    ALLOWED_HOSTS = ["*",]
     with open(os.path.join(BASE_DIR, "ZIP_CODE_API.txt"), "rb") as zipcode:
         ZIPCODE_API_KEY = zipcode.read()
     with open(os.path.join(BASE_DIR, "SECRET_KEY.txt") ,'rb') as secret_key:
         SECRET_KEY = secret_key.read()
 
-    STATIC_URL = '/static/'
-    STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static')
-    MEDIA_ROOT = os.path.join(STATIC_ROOT, "media")
-    COMPRESS_ROOT = os.path.join(STATIC_ROOT, "COMPRESS")
-    COMPRESS_URL = STATIC_URL
+    # STATIC_URL = '/static/'
+    # STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static')
+    # MEDIA_ROOT = os.path.join(STATIC_ROOT, "media")
+    # COMPRESS_ROOT = os.path.join(STATIC_ROOT, "COMPRESS")
+    # COMPRESS_URL = STATIC_URL
 
     # DATABASES = {
     #     'default': {
@@ -113,16 +112,13 @@ if DEBUG:
             },
         }
     }
+    with open(os.path.join(BASE_DIR, "AWS_SETTINGS.txt"), "rb") as AWS_INFORMATION:
+        AWS_INFORMATION = AWS_INFORMATION.read().split("\n")
+        AWS_STORAGE_BUCKET_NAME = AWS_INFORMATION[0]
+        AWS_ACCESS_KEY_ID = AWS_INFORMATION[1]
+        AWS_SECRET_ACCESS_KEY = AWS_INFORMATION[2]
 
 else:
-    ALLOWED_HOSTS = [".54.148.204.235",
-                     ".54.148.204.235.",
-                     ".plantappstorage.s3.amazonaws.com",
-                     ".plantappstorage.s3.amazonaws.com.",
-                     ".s3-us-west-2.amazonaws.com",
-                     ".s3-us-west-2.amazonaws.com/plantappstorage.",
-                     ]
-
     ZIPCODE_API_KEY = os.environ['ZAP']
     SECRET_KEY = os.environ['SK']
 
@@ -136,28 +132,42 @@ else:
             'PORT': os.environ['DB_PORT'],
         }
     }
-
     # AWS Access Keys and Bucket Name
     AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
     AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
     AWS_STORAGE_BUCKET_NAME = os.environ['AWS_STORAGE_BUCKET_NAME']
-    # Create Proper URLS for File Storage
-    STATICFILES_STORAGE = 'gardening.custom_storages.StaticStorage'
-    DEFAULT_FILE_STORAGE = 'gardening.custom_storages.MediaStorage'
-    COMPRESS_STORAGE = STATICFILES_STORAGE
-    AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
-    STATICFILES_LOCATION = "static"
-    MEDIAFILES_LOCATION = "media"
-    COMPRESS_LOCATION = "static"
-    STATIC_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, STATICFILES_LOCATION)
-    MEDIA_URL =  "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, MEDIAFILES_LOCATION)
-    # Set storage engines to custom Storages, separating static from media
-    # Enable compression
-    COMPRESS_ENABLED = True
-    COMPRESS_URL = STATIC_URL
-    COMPRESS_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'COMPRESS')
-    STATIC_ROOT = COMPRESS_ROOT
-    MEDIA_ROOT = ''
+    
+
+# else:
+ALLOWED_HOSTS = [
+                 ".127.0.0.1:8000",
+                 ".127.0.0.1:8000.",
+                 ".54.148.204.235",
+                 ".54.148.204.235.",
+                 ".plantappstorage.s3.amazonaws.com",
+                 ".plantappstorage.s3.amazonaws.com.",
+                 ".s3-us-west-2.amazonaws.com",
+                 ".s3-us-west-2.amazonaws.com/plantappstorage.",
+                 ]
+
+
+# Create Proper URLS for File Storage
+STATICFILES_STORAGE = 'gardening.custom_storages.StaticStorage'
+DEFAULT_FILE_STORAGE = 'gardening.custom_storages.MediaStorage'
+COMPRESS_STORAGE = STATICFILES_STORAGE
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+STATICFILES_LOCATION = "static"
+MEDIAFILES_LOCATION = "media"
+COMPRESS_LOCATION = "static"
+STATIC_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, STATICFILES_LOCATION)
+MEDIA_URL =  "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, MEDIAFILES_LOCATION)
+# Set storage engines to custom Storages, separating static from media
+# Enable compression
+COMPRESS_ENABLED = True
+COMPRESS_URL = STATIC_URL
+COMPRESS_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'COMPRESS')
+STATIC_ROOT = COMPRESS_ROOT
+MEDIA_ROOT = ''
 
 # Django Compressor Settings
 if COMPRESS_ENABLED:

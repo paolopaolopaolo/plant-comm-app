@@ -246,16 +246,16 @@ class ProfilePage(APIView):
 					}
 					imgs = PlantImg.objects.filter(plant = plant)
 					for img in imgs:
-						if settings.DEBUG:
-							target_plant['images'].append({
-											'imageURL': re.sub(r'\\', '/', os.path.join(settings.DOMAIN,
-																	'media',
-																	img.thumbnail.url)),
-											'id': img.id})
-						else:
-							target_plant['images'].append({
-											'imageURL': img.thumbnail.url,
-											'id': img.id})
+						# if settings.DEBUG:
+						# 	target_plant['images'].append({
+						# 					'imageURL': re.sub(r'\\', '/', os.path.join(settings.DOMAIN,
+						# 											'media',
+						# 											img.thumbnail.url)),
+						# 					'id': img.id})
+						# else:
+						target_plant['images'].append({
+										'imageURL': img.thumbnail.url,
+										'id': img.id})
 
 					current_plants.append(target_plant)
 			else:
@@ -264,17 +264,17 @@ class ProfilePage(APIView):
 				target_plant = self.plants.get(id = _id)
 				imgs = PlantImg.objects.filter(plant = target_plant)
 				for img in imgs:
-					if settings.DEBUG:
-						current_plants.append({
-										'imageURL':os.path.join(settings.DOMAIN,
-													   			'media',
-													   			img.thumbnail.url),
-										'id': img.id})
-					else:
-						current_plants.append({
-										'imageURL':img.thumbnail.url,
-										'id': img.id
-										})
+					# if settings.DEBUG:
+					# 	current_plants.append({
+					# 					'imageURL':os.path.join(settings.DOMAIN,
+					# 								   			'media',
+					# 								   			img.thumbnail.url),
+					# 					'id': img.id})
+					# else:
+					current_plants.append({
+									'imageURL':img.thumbnail.url,
+									'id': img.id
+									})
 
 		return current_plants
 
@@ -343,21 +343,21 @@ class FeedPage(APIView):
 				plant_images = PlantImg.objects.filter(plant = plant.id)
 				images = []
 				for img in plant_images:
-					if settings.DEBUG:
-						images.append({
-							'id': img.id,
-							'imageURL': re.sub(r'\\',
-											   '/',
-											   os.path.join(
-											   	settings.DOMAIN,
-											   	'media',
-											   	img.thumbnail.url)
-											   )
-							})
-					else:
-						images.append({
-							'id': img.id,
-							'imageURL': img.thumbnail.url})
+					# if settings.DEBUG:
+					# 	images.append({
+					# 		'id': img.id,
+					# 		'imageURL': re.sub(r'\\',
+					# 						   '/',
+					# 						   os.path.join(
+					# 						   	settings.DOMAIN,
+					# 						   	'media',
+					# 						   	img.thumbnail.url)
+					# 						   )
+					# 		})
+					# else:
+					images.append({
+						'id': img.id,
+						'imageURL': img.thumbnail.url})
 				model['plants'].append({
 					'plant': model_to_dict(plant),
 					'imgs': images})
