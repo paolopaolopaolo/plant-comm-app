@@ -9,6 +9,7 @@ var Convos = Backbone.Collection.extend({
 				base,
 				"clientTime=" + this.options['timestamp']
 			].join("?");
+			delete this.options['timestamp'];
 		}
 		return base;
 	},

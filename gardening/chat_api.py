@@ -57,48 +57,55 @@ class ChatAPI(APIView):
 				convos.append(convo_to_add)
 		self.convos = convos
 
+	def _checkServerTimes(self, convos, clientTime):
+		def __clientTimeCheck__(convo_time):
+			return clientTime < convo_time
+		all_convo_times = [convo["time_initiated"] for convo in convos]
+		filtered_convos = filter(__clientTimeCheck__, all_convo_times)
+		return filtered_convos
+
 	# Listing Conversations and Retrieving text messages
 	@set_user_and_gardener_and_convos
 	def get(self, request, *args, **kwargs):
-		print request.user
 		# List all the conversations User is involved with
 		# in the absence of a specific convo id
 		if kwargs['id'] is None:
 			clientTime = request.GET['clientTime']
 			while True:
 				self._refreshConvos()
-				serverTime = max([convo["time_initiated"] for convo in self.convos])
-				if clientTime < serverTime:
+				newerServerTimes = self._checkServerTimes(self.convos, clientTime)
+				# So I want client time to be checked across all conversations
+				if len(newerServerTimes) > 0:
 					return HttpResponse(json.dumps(self.convos), content_type='application/json')
 				time.sleep(0.25)
 		
-		while True:
-			# Get an updated set of params from the DB
-			convo_to_stringify, stringified_convo, lastline = self._getLastLine(kwargs['id'])
-			# Strip the incoming timestamp (requestG is the client's latest timestamp)
-			requestG = request.GET['currentTime'].lstrip().rstrip()
-			# if not requestG == lastline:
-			# 	print "Discrepancy::\nClient: ",
-			# 	print requestG,
-			# 	print "\t Server: ",
-			# 	print lastline
-			# Compare the client's timestamp with the server's last timestamp
-			if requestG < lastline:
-				# Find out who the user is and their 'seen' attribute for this convo
-				if not(convo_to_stringify.user_a.username == request.user.username):
-					stringified_convo['user'] = convo_to_stringify.user_a.username
-					stringified_convo['seen'] = stringified_convo['seen_b']
-				else:
-					stringified_convo['user'] = convo_to_stringify.user_b.username
-					stringified_convo['seen'] = stringified_convo['seen_a']
+		# while True:
+		# 	# Get an updated set of params from the DB
+		# 	convo_to_stringify, stringified_convo, lastline = self._getLastLine(kwargs['id'])
+		# 	# Strip the incoming timestamp (requestG is the client's latest timestamp)
+		# 	requestG = request.GET['currentTime'].lstrip().rstrip()
+		# 	# if not requestG == lastline:
+		# 	# 	print "Discrepancy::\nClient: ",
+		# 	# 	print requestG,
+		# 	# 	print "\t Server: ",
+		# 	# 	print lastline
+		# 	# Compare the client's timestamp with the server's last timestamp
+		# 	if requestG < lastline:
+		# 		# Find out who the user is and their 'seen' attribute for this convo
+		# 		if not(convo_to_stringify.user_a.username == request.user.username):
+		# 			stringified_convo['user'] = convo_to_stringify.user_a.username
+		# 			stringified_convo['seen'] = stringified_convo['seen_b']
+		# 		else:
+		# 			stringified_convo['user'] = convo_to_stringify.user_b.username
+		# 			stringified_convo['seen'] = stringified_convo['seen_a']
 
-				# Send the updated time back to the client
-				stringified_convo['time_initiated'] = lastline
-				# Send the updated text back to the client
-				stringified_convo['text'] = convo_to_stringify.text
-				return HttpResponse(json.dumps(stringified_convo), content_type='application/json')
-			# Check every 1/4 second
-			time.sleep(0.25)
+		# 		# Send the updated time back to the client
+		# 		stringified_convo['time_initiated'] = lastline
+		# 		# Send the updated text back to the client
+		# 		stringified_convo['text'] = convo_to_stringify.text
+		# 		return HttpResponse(json.dumps(stringified_convo), content_type='application/json')
+		# 	# Check every 1/4 second
+		# 	time.sleep(0.25)
 
 	# Creating a new conversation!
 	@set_user_and_gardener_and_convos

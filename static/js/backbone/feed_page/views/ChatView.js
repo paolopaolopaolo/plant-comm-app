@@ -59,14 +59,14 @@ var ChatView = Backbone.View.extend({
 	},
 
 	// Initializes Long Polling
-	_startLongPoll: function () {
-		// Fetch for the model and then re-call the function
-		// once you get a return from the server
-		this.model_target.fetch()
-						 .always(_.bind(function () {
-						 		this._startLongPoll();
-						 }, this));
-	},
+	// _startLongPoll: function () {
+	// 	// Fetch for the model and then re-call the function
+	// 	// once you get a return from the server
+	// 	this.model_target.fetch()
+	// 					 .always(_.bind(function () {
+	// 					 		this._startLongPoll();
+	// 					 }, this));
+	// },
 
 	_reformatTextline: function (textline) {
 		var line_components, result = "";

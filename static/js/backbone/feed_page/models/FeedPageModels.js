@@ -34,9 +34,9 @@ var Convo = Backbone.Model.extend({
 		return url_to_return;
 	},
 
-	fetch: function (options) {
-		this.options['sendTime'] = true;
-		return Backbone.Model.prototype.fetch.apply(this, options);
-	}
+	// fetch: function (options) {
+	// 	this.options['sendTime'] = true;
+	// 	return Backbone.Model.prototype.fetch.apply(this, options);
+	// }
 	
 });
