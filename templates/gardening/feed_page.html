@@ -73,7 +73,7 @@
 	{% verbatim %}
 		<!-- Chat Text -->
 		<script id='chat_text_template' type='text/html'>
-			{{ ["<div class='text_line'>",text.split("</div><div class='text_line'>").slice(2, text.split("</div><div class='text_line'>").length).join("</div><div class='text_line'>"),"</div>"].join("") }}
+			{{ ["<div class='text_line'>",text.split("</div><div class='text_line'>").slice(1, text.split("</div><div class='text_line'>").length).join("</div><div class='text_line'>"),"</div>"].join("") }}
 		</script>
 		<!-- Chat Window-->
 		<script id='chat_window_template' type='text/html'>
