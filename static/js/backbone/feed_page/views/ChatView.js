@@ -148,10 +148,8 @@ var ChatView = Backbone.View.extend({
 	},
 
 	// Render the text within the Chatboxes
-	textRender: function () {
-		var context, textlines;
-		// Copy the current model's attributes
-		context = _.clone(this.model_target.attributes);
+	textRender: function (context) {
+		var textlines;
 
 		// Make an array of texts split by the {{switch_user}}
 		// delimiter
@@ -176,22 +174,19 @@ var ChatView = Backbone.View.extend({
 
 		this.$el.find('input[name="user_chat_line"]').val("");
 		this._scrollToEnd();
-		return context;
 	},
 
 	// Renders changes to the chat window
 	render: function () {
-		var context;
-
+		var context = _.clone(this.model_target.attributes);
+		this.$el.children().detach();
 		if (this.parent._getOpenConvo() === this._id) {
 			this.model_target.set({seen: true});
 		}
-
-		this.$el.children().detach();
-		context =  = this.textRender();
 		// Append the template + context
 		this.$el.removeAttr("style");
 		this.$el.append(this.template(context));
+		this.textRender(context);
 		this._scrollToEnd();
 	},
 
