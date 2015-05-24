@@ -148,9 +148,9 @@ var ChatView = Backbone.View.extend({
 	},
 
 	// Render the text within the Chatboxes
-	textRender: function (context) {
-		var textlines;
-
+	textRender: function () {
+		var context, textlines;
+		context = _.clone(this.model_target.attributes);
 		// Make an array of texts split by the {{switch_user}}
 		// delimiter
 		textlines = context['text'].split("{{switch_user}}");	
@@ -186,7 +186,7 @@ var ChatView = Backbone.View.extend({
 		// Append the template + context
 		this.$el.removeAttr("style");
 		this.$el.append(this.template(context));
-		this.textRender(context);
+		this.textRender();
 		this._scrollToEnd();
 	},
 
