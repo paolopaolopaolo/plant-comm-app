@@ -51,6 +51,8 @@ var ChatView = Backbone.View.extend({
 
 	// Closes Event Listeners for this ChatView
 	closeChatbox: function () {
+		this.stopListening(this.model_target, "change:text");
+		this.listenTo(this.model_target, "change:text", this.render);
 		this.$el.css({"padding": "0", "width": "0", "height": "0"});
 		this.$el.children().detach();
 		this.open = false;
@@ -60,6 +62,7 @@ var ChatView = Backbone.View.extend({
 
 	// Opens Event Listeners for the Chatview
 	openChatbox: function (do_not_render_page) {
+		this.stopListening(this.model_target, "change:text");
 		this.listenTo(this.model_target, "change:text", this.textRender);
 		if (!do_not_render_page) {
 			this.render();
