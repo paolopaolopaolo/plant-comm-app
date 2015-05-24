@@ -3,6 +3,7 @@
 var ChatView = Backbone.View.extend({
 
 	template: _.template($("#chat_window_template").html()),
+	text_template: _.template($("#chat_text_template").html()),
 
 	end_poll: false,
 
@@ -51,7 +52,6 @@ var ChatView = Backbone.View.extend({
 	// Closes Event Listeners for this ChatView
 	closeChatbox: function () {
 		this.$el.css({"padding": "0", "width": "0", "height": "0"});
-		// this.stopListening(this, 'pressEnter');
 		this.$el.children().detach();
 		this.open = false;
 		this.minimized = false;
@@ -60,7 +60,7 @@ var ChatView = Backbone.View.extend({
 
 	// Opens Event Listeners for the Chatview
 	openChatbox: function (do_not_render_page) {
-		this.listenTo(this.model_target, "change:text", this.render);
+		this.listenTo(this.model_target, "change:text", this.textRender);
 		if (!do_not_render_page) {
 			this.render();
 			this.open = true;
@@ -92,7 +92,9 @@ var ChatView = Backbone.View.extend({
 			
 			this.model_target.save({
 				'text': text_to_save,
-			});
+			}).done(_.bind(function () {
+				this.$el.find('input[name="user_chat_line"]').val("");
+			}));
 		}
 	},
 
@@ -102,29 +104,51 @@ var ChatView = Backbone.View.extend({
 
 
 	_reformatTextline: function (textline) {
-		var line_components, result = "";
+		var line_components, name, text;
 		line_components = textline.split(':');
-		_.each(line_components, _.bind(function (line_component, idx) {
-			var join_element = ": ";
-			line_component = _.escape(line_component);
-			if (idx === 0) {
-				line_component = [
-					"<b>",
-					line_component,
-					"</b>"
-				].join("");
-				join_element = "";
-			} 
-			result = [
-				result,
-				line_component
-			].join(join_element);
-		}, this));
+		name = line_components[0];
+		text = line_components[1];
+		if (text) {
+			if (text.length > 0) {
+				if (name === USER) {
+					result = [
+						"<div class='chat_format self_text'>",
+						_.escape(text),
+						"</div>"
+					].join("");
+				} else {
+					result = [
+						"<div class='chat_format other_text'>",
+						_.escape(text),
+						"</div>"
+					].join("");
+				}
+			}
+		}
+		else {
+			result = "";
+		}
+		// _.each(line_components, _.bind(function (line_component, idx) {
+		// 	var join_element = ": ";
+		// 	line_component = _.escape(line_component);
+		// 	if (idx === 0) {
+		// 		line_component = [
+		// 			"<b>",
+		// 			line_component,
+		// 			"</b>"
+		// 		].join("");
+		// 		join_element = "";
+		// 	} 
+		// 	result = [
+		// 		result,
+		// 		line_component
+		// 	].join(join_element);
+		// }, this));
 		return result;
 	},
 
-	// Renders changes to the chat window
-	render: function () {
+	// Render the text within the Chatboxes
+	textRender: function () {
 		var context, textlines;
 		// Copy the current model's attributes
 		context = _.clone(this.model_target.attributes);
@@ -134,14 +158,30 @@ var ChatView = Backbone.View.extend({
 		textlines = context['text'].split("{{switch_user}}");	
 		context['text'] = "<div class='text_line'>";
 
-		// Iterate along textLines
+		// Iterate along text array
 		_.each(textlines, _.bind(function (textline) {
 			textline = this._reformatTextline(textline);
-			context['text'] = [
-									context['text'], 
-									textline,
-							  ].join("</div><div class='text_line'>");
+			if (textline !== "") {
+				context['text'] = [
+										context['text'], 
+										textline,
+								  ].join("</div><div class='text_line'>");
+			}
 		}, this));
+
+		// Delete everything in the chatbox
+		this.$el.find(".chatText").children().detach();
+		// Append the template + context to the chatbox
+		this.$el.find(".chatText").append(this.text_template(context));
+
+		this.$el.find('input[name="user_chat_line"]').val("");
+		this._scrollToEnd();
+		return context;
+	},
+
+	// Renders changes to the chat window
+	render: function () {
+		var context = this.textRender();
 
 		if (this.parent._getOpenConvo() === this._id) {
 			this.model_target.set({seen: true});

@@ -71,6 +71,10 @@
 {% block bt %}
 
 	{% verbatim %}
+		<!-- Chat Text -->
+		<script id='chat_text_template' type='text/html'>
+			{{ ["<div class='text_line'>",text.split("</div><div class='text_line'>").slice(2, text.split("</div><div class='text_line'>").length).join("</div><div class='text_line'>"),"</div>"].join("") }}
+		</script>
 		<!-- Chat Window-->
 		<script id='chat_window_template' type='text/html'>
 				<div class='chatHeader'>
@@ -81,11 +85,7 @@
 				<div class='chatText'>
 				{{ ["<div class='text_line'>",text.split("</div><div class='text_line'>").slice(2, text.split("</div><div class='text_line'>").length).join("</div><div class='text_line'>"),"</div>"].join("") }}
 				</div>
-				
-					<input type='text' name='user_chat_line' class='user_chat_spec' autofocus/>
-		
-				
-
+				<input type='text' name='user_chat_line' class='user_chat_spec' autofocus/>
 		</script>
 		<!-- Chat Menu -->
 		<script id='chat_menu_template' type='text/html'>

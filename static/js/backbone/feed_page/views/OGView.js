@@ -137,8 +137,8 @@ var OGView = Backbone.View.extend({
 
 			// Iterate among the plant's images
 			_.each(images, _.bind(function (image) {
+				image = this._setImageUrl(image);
 				if (first_img) {
-					image = this._setImageUrl(image);
 					$img_box.append(this.img_template(image));
 					$img_box.children('.plantimg_sprites:first-child')
 							.addClass('first_plant_img');
@@ -147,13 +147,13 @@ var OGView = Backbone.View.extend({
 				$img_box.append(this.img_template(image));
 			}, this));
 			first_img = true;
-
 		}, this));
 	},
 
 	_setImageUrl: function (img_obj) {
 		var img_to_return;
 		img_to_return = _.clone(img_obj);
+		
 		if (img_to_return['imageURL'].indexOf("http") < 0) {
 			img_to_return['imageURL'] = [
 				window.location.protocol,
