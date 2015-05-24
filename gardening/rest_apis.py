@@ -181,7 +181,7 @@ class OtherGardenerAPI( mixins.RetrieveModelMixin,
 		print thing.validated_data
 
 	@set_user
-	@setGardenerPlantQueryset(5)
+	@setGardenerPlantQueryset
 	def get(self, request, *args, **kwargs):
 		if kwargs['id'] is None:
 			return self.list(self, request, *args, **kwargs)

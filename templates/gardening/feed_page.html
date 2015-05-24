@@ -83,7 +83,6 @@
 					<button class='minimize_chat_win command_chat_win'>_</button>
 				</div>
 				<div class='chatText'>
-				{{ ["<div class='text_line'>",text.split("</div><div class='text_line'>").slice(2, text.split("</div><div class='text_line'>").length).join("</div><div class='text_line'>"),"</div>"].join("") }}
 				</div>
 				<input type='text' name='user_chat_line' class='user_chat_spec' autofocus/>
 		</script>
@@ -156,7 +155,7 @@
 	<!-- AJAX and Backbone.sync settings -->
 	<script src='{% static "js/backbone/profile_page/sync.js" %}'></script>
 	<!-- Backbone Models -->
-	<script src='{% static "js/backbone/feed_page/models/FeedPageModels.js" %}'></script>		
+	<script src='{% static "js/backbone/feed_page/models/FeedPageModels.js" %}'></script>
 	<!-- Backbone Collections -->
 	<script src='{% static "js/backbone/feed_page/collections/Convos.js" %}'></script>
 	<script src='{% static "js/backbone/feed_page/collections/OtherGardeners.js" %}'></script>
