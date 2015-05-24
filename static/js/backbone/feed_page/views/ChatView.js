@@ -181,13 +181,14 @@ var ChatView = Backbone.View.extend({
 
 	// Renders changes to the chat window
 	render: function () {
-		var context = this.textRender();
+		var context;
 
 		if (this.parent._getOpenConvo() === this._id) {
 			this.model_target.set({seen: true});
 		}
 
 		this.$el.children().detach();
+		context =  = this.textRender();
 		// Append the template + context
 		this.$el.removeAttr("style");
 		this.$el.append(this.template(context));
