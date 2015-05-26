@@ -3,8 +3,6 @@ var ConvoView = Backbone.View.extend({
 
 	el: "#chat_menu",
 	template: _.template($("#chat_menu_template").html()),
-	
-	// chat_template: _.template($("#chat_window_template").html()),
 
 	dialogues: {},
 
@@ -135,7 +133,7 @@ var ConvoView = Backbone.View.extend({
 			text_items = context['text'].split("{{switch_user}}");
 			text_items = text_items[text_items.length -1];
 			// alert(text_items !== "<i class='fa fa-cog fa-spin'></i>");
-			if (text_items !== "<i class='fa fa-cog fa-spin'></i>") {
+			if (text_items !== "<i class='fa fa-spinner fa-spin'></i>") {
 				text_items = text_items.split(":");
 				text_items = _.escape(text_items[text_items.length -1]);
 			} else {

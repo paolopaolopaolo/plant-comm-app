@@ -108,6 +108,9 @@ var OGView = Backbone.View.extend({
 		// Add 'avail' as a parameter that evaluates
 		// to a string that will be added onto the template 
 		context['available'] ? context['avail'] = "": context['avail'] = "NOT";
+
+		context['online'] ? context['online'] = "<span style='color:green'>ONLINE</span>" :
+							context['online'] = "<span style='color:red'>OFFLINE</span>";
 		
 		// Append to the view the templated context
 		this.$el.append(this.template(context));

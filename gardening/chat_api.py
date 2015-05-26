@@ -74,12 +74,12 @@ class ChatAPI(APIView):
 	# Listing Conversations and Retrieving text messages
 	@set_user_and_gardener_and_convos
 	def get(self, request, *args, **kwargs):
+
 		# List all the conversations User is involved with
 		# in the absence of a specific convo id
 		try:
 			clientTime = request.GET['clientTime']
 			while True:
-				# 
 				self._refreshConvos()
 				newerServerTimes = self._checkServerTimes(self.convos, clientTime)
 
@@ -87,8 +87,11 @@ class ChatAPI(APIView):
 				if len(newerServerTimes) > 0:
 					return HttpResponse(json.dumps(self.convos), content_type='application/json')
 
+				
 				# Check every 1/4 second
 				time.sleep(0.25)
+
+			return HttpResponse(json.dumps(self.convos), content_type='application/json')
 		
 		except Exception, e:
 			return HttpResponseServerError(json.dumps({'Error' : str(e)}), content_type='application/json')
@@ -124,7 +127,7 @@ class ChatAPI(APIView):
 			new_convo = Convo(
 					user_a = self.gardener,
 					user_b = user_targ,
-					text = "<i class='fa fa-cog fa-spin'></i>",
+					text = "<i class='fa fa-spinner fa-spin'></i>",
 					time_initiated = datetime.datetime.now(),
 					active = True,
 					seen_a = True,

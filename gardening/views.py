@@ -28,6 +28,9 @@ import json, os, StringIO, re
 # Logs user out and returns
 # to landing page
 def log_out(request):
+	gardener = Gardener.objects.get(request.user)
+	gardener.online = False
+	gardener.save()
 	logout(request)
 	return redirect('landing')
 
@@ -88,6 +91,14 @@ class LandingPage(View):
 				user = loginform.auth_user()
 				# Login user to feed page once authenticated
 				if user is not None:
+					gardener = Gardener.objects.get(
+									user = User.objects.get(
+												username = loginform.cleaned_data["uname_email"]
+												)
+									)
+					gardener.online = True
+					gardener.save()
+
 					# Redirect users to feed page
 					login(request, user)
 					return redirect("feed")
@@ -270,7 +281,7 @@ class FeedPage(APIView):
 	@set_user
 	@set_user_and_gardener_and_convos
 	def get(self, request, *args, **kwargs):
-		self.context['other_gardeners'] = self.RETURN_OTHER_GARDENERS(5)
+		self.context['other_gardeners'] = self.RETURN_OTHER_GARDENERS()
 		self.context['convos'] = json.dumps(self.convos)
 		self.context['user'] = request.user
 		return render(request, 'feed_page.html', self.context)

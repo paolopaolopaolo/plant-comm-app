@@ -61,13 +61,11 @@ var ChatView = Backbone.View.extend({
 	},
 
 	// Opens Event Listeners for the Chatview
-	openChatbox: function (do_not_render_page) {
+	openChatbox: function () {
 		this.stopListening(this.model_target, "change:text");
 		this.listenTo(this.model_target, "change:text", this.textRender);
-		if (!do_not_render_page) {
-			this.render();
-			this.open = true;
-		}
+		this.render();
+		this.open = true;
 		this.minimized = false;
 		this.trigger('resetChatTops');
 	},
@@ -131,22 +129,6 @@ var ChatView = Backbone.View.extend({
 		else {
 			result = "";
 		}
-		// _.each(line_components, _.bind(function (line_component, idx) {
-		// 	var join_element = ": ";
-		// 	line_component = _.escape(line_component);
-		// 	if (idx === 0) {
-		// 		line_component = [
-		// 			"<b>",
-		// 			line_component,
-		// 			"</b>"
-		// 		].join("");
-		// 		join_element = "";
-		// 	} 
-		// 	result = [
-		// 		result,
-		// 		line_component
-		// 	].join(join_element);
-		// }, this));
 		return result;
 	},
 
@@ -177,6 +159,7 @@ var ChatView = Backbone.View.extend({
 
 		this.$el.find('input[name="user_chat_line"]').val("");
 		this._scrollToEnd();
+		this.model_target.set({'seen': true }, {'patch': true});
 	},
 
 	// Renders changes to the chat window
@@ -202,7 +185,6 @@ var ChatView = Backbone.View.extend({
 
 		this._setSubmitEvents();
 		this.closeChatbox();
-		this.openChatbox(true);
 		
 		this.listenTo(this, "open", this.openChatbox);
 		this.listenTo(this, "pressEnter", this._submitMessage);

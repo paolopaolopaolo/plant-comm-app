@@ -93,6 +93,7 @@ def plant_path(instance, filename):
 # Authentication and some other attributes
 class Gardener(models.Model):
     user = models.OneToOneField(User)
+    online = models.BooleanField(default = False)
     username = models.CharField(max_length = 50, default = "")
     first_name = models.CharField(max_length = 50, default = "")
     last_name = models.CharField(max_length = 50, default = "")
