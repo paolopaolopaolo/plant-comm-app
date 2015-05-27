@@ -76,10 +76,14 @@ var FeedPageView = Backbone.View.extend({
 
 	showConvoNumber: function () {
 		var new_num, init_button_html;
-		new_num = this.convoview
-					  .collection
-					  .where({seen: false})
-					  .length;
+		new_num = _.reject(this.convoview
+					  		   .collection
+					  		   .where({seen: false}),
+					  		function (model) {
+					  			return model.attributes['text']
+					  					    .split("{{switch_user}}")
+					  					    .length === 1;
+					  		}).length;
 
 		this.$el.find(".mail_button")
 				.html([
