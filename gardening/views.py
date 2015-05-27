@@ -28,7 +28,7 @@ import json, os, StringIO, re
 # Logs user out and returns
 # to landing page
 def log_out(request):
-	gardener = Gardener.objects.get(request.user)
+	gardener = Gardener.objects.get(user = request.user)
 	gardener.online = False
 	gardener.save()
 	logout(request)

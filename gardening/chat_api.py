@@ -63,7 +63,7 @@ class ChatAPI(APIView):
 		def __clientTimeCheck2__(convo_time):
 			return clientTime > convo_time
 
-		all_convo_times = [convo["time_initiated"] for convo in convos]
+		all_convo_times = [convo['time_initiated'] for convo in convos]
 		if isNew:
 			filtered_convos = filter(__clientTimeCheck__, all_convo_times)
 		else:
