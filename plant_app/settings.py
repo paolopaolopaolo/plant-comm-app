@@ -16,7 +16,7 @@ try:
 except ImportError:
     DEBUG = False
     TEMPLATE_DEBUG = False
-    DOMAIN = 'http://54.148.204.235/'
+    DOMAIN = 'http://54.148.204.235'
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))

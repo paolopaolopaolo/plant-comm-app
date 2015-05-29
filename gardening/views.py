@@ -84,35 +84,31 @@ class LandingPage(View):
 			return render(request, "landing_page.html", self.context)
 		# Below: Login Procedure
 		else:
-			try:
-				loginform = LogInForm(request.POST)
-				# Validate POST and then authenticate
-				if loginform.is_valid():
-					# Built-in method authenticates the user
-					user = loginform.auth_user()
-					# Login user to feed page once authenticated
-					if user is not None:
-						# gardener = Gardener.objects.get(
-						# 				user = User.objects.get(
-						# 							username = loginform.cleaned_data["uname_email"]
-						# 							)
-						# 				)
-						# gardener.online = True
-						# gardener.save()
+			loginform = LogInForm(request.POST)
+			# Validate POST and then authenticate
+			if loginform.is_valid():
+				# Built-in method authenticates the user
+				user = loginform.auth_user()
+				# Login user to feed page once authenticated
+				if user is not None:
+					gardener = Gardener.objects.get(
+									user = User.objects.get(
+												username = user.username
+												)
+									)
+					gardener.online = True
+					gardener.save()
 
-						# Redirect users to feed page
-						login(request, user)
-						return redirect("feed")
-					
-					message = "Invalid Email/Password combination Try again"
-					self.context["error_message"] = message
-					return render(request, "landing_page.html", self.context)
-				message = "Please use a valid email."
+					# Redirect users to feed page
+					login(request, user)
+					return redirect("feed")
+				
+				message = "Invalid Email/Password combination Try again"
 				self.context["error_message"] = message
 				return render(request, "landing_page.html", self.context)
-			except Exception, e:
-				print str(e)
-				return HttpResponse(str(e), content_type='text/plain')
+			message = "Please use a valid email."
+			self.context["error_message"] = message
+			return render(request, "landing_page.html", self.context)
 
 # Profile Page: Edit the profile
 class ProfilePage(APIView):
@@ -223,6 +219,11 @@ class ProfilePage(APIView):
 
 # Feed Page: View gardeners/gardens in the area
 class FeedPage(APIView):
+	if settings.DEBUG:
+		domain = settings.DOMAIN
+	else:
+		domain = "https://plantappstorage.s3.amazonaws.com"
+
 	context = {
 		'domain': settings.DOMAIN,
 		'compress_enabled': settings.COMPRESS_ENABLED
@@ -270,6 +271,7 @@ class FeedPage(APIView):
 					try:
 						img_thumbnail = img.thumbnail.url
 					except Exception:
+						print "Original image url not used (Issue with S3?)!"
 						img_thumbnail = "/".join([
 											"https://plantappstorage.s3.amazonaws.com/media",
 						                	img.thumbnail.name
