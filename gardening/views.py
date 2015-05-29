@@ -84,31 +84,35 @@ class LandingPage(View):
 			return render(request, "landing_page.html", self.context)
 		# Below: Login Procedure
 		else:
-			loginform = LogInForm(request.POST)
-			# Validate POST and then authenticate
-			if loginform.is_valid():
-				# Built-in method authenticates the user
-				user = loginform.auth_user()
-				# Login user to feed page once authenticated
-				if user is not None:
-					gardener = Gardener.objects.get(
-									user = User.objects.get(
-												username = loginform.cleaned_data["uname_email"]
-												)
-									)
-					gardener.online = True
-					gardener.save()
+			try:
+				loginform = LogInForm(request.POST)
+				# Validate POST and then authenticate
+				if loginform.is_valid():
+					# Built-in method authenticates the user
+					user = loginform.auth_user()
+					# Login user to feed page once authenticated
+					if user is not None:
+						# gardener = Gardener.objects.get(
+						# 				user = User.objects.get(
+						# 							username = loginform.cleaned_data["uname_email"]
+						# 							)
+						# 				)
+						# gardener.online = True
+						# gardener.save()
 
-					# Redirect users to feed page
-					login(request, user)
-					return redirect("feed")
-				
-				message = "Invalid Email/Password combination Try again"
+						# Redirect users to feed page
+						login(request, user)
+						return redirect("feed")
+					
+					message = "Invalid Email/Password combination Try again"
+					self.context["error_message"] = message
+					return render(request, "landing_page.html", self.context)
+				message = "Please use a valid email."
 				self.context["error_message"] = message
 				return render(request, "landing_page.html", self.context)
-			message = "Please use a valid email."
-			self.context["error_message"] = message
-			return render(request, "landing_page.html", self.context)
+			except Exception, e:
+				print str(e)
+				return HttpResponse(str(e), content_type='text/plain')
 
 # Profile Page: Edit the profile
 class ProfilePage(APIView):
@@ -262,9 +266,19 @@ class FeedPage(APIView):
 				images = []
 				# For each image in plantimg, add to images array that plant image
 				for img in plant_images:
+					img_thumbnail = None
+					try:
+						img_thumbnail = img.thumbnail.url
+					except Exception:
+						img_thumbnail = "/".join([
+											"https://plantappstorage.s3.amazonaws.com/media",
+						                	img.thumbnail.name
+						                ])
 					images.append({
 						'id': img.id,
-						'imageURL': img.thumbnail.url})
+						'imageURL': img_thumbnail})
+
+
 				# Add to 'plants' attribute the plant attributes 
 				# and the list of images
 				model['plants'].append({
@@ -281,8 +295,12 @@ class FeedPage(APIView):
 	@set_user
 	@set_user_and_gardener_and_convos
 	def get(self, request, *args, **kwargs):
-		self.context['other_gardeners'] = self.RETURN_OTHER_GARDENERS()
-		self.context['convos'] = json.dumps(self.convos)
-		self.context['user'] = request.user
-		return render(request, 'feed_page.html', self.context)
+		try:
+			self.context['other_gardeners'] = self.RETURN_OTHER_GARDENERS()
+			self.context['convos'] = json.dumps(self.convos)
+			self.context['user'] = request.user
+			return render(request, 'feed_page.html', self.context)
+		except Exception, e:
+			print str(e)
+			return HttpResponse(str(e))
 
