@@ -464,6 +464,7 @@ div#chat_window {
 			position: relative;
 			overflow-y: auto;
 			height: 240px;
+			.clearfix();
 			.text_line {
 				width: 80%;
 				word-wrap: break-word;
@@ -473,12 +474,18 @@ div#chat_window {
 				margin: 5px;
 				.chat_format {
 					padding: 5px;
+					font-size: 12px;
+					border: 1px solid @content_body_color + #444;
+					border-radius: 5px;
+				}
+				.other_text {
+					background-color: white;
 				}
 				.self_text {
 					background-color: @content_body_color3 + #444;
 				}
-				.other_text {
-					background-color: @content_body_color3;
+				.info_text {
+					background-color: @topbar_color + #444;
 				}
 			}
 		}

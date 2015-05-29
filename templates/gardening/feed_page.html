@@ -73,12 +73,12 @@
 	{% verbatim %}
 		<!-- Chat Text -->
 		<script id='chat_text_template' type='text/html'>
-			{{ ["<div class='text_line'>",text.split("</div><div class='text_line'>").slice(1, text.split("</div><div class='text_line'>").length).join("</div><div class='text_line'>"),"</div>"].join("") }}
+			{{ text }}
 		</script>
 		<!-- Chat Window-->
 		<script id='chat_window_template' type='text/html'>
 				<div class='chatHeader'>
-					<b>{{ user}}</b>
+					<b>{{ user }}</b>
 					<button class='close_chat_win command_chat_win'>&times;</button>
 					<button class='minimize_chat_win command_chat_win'>_</button>
 				</div>

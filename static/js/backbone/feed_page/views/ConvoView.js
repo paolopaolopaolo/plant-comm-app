@@ -132,13 +132,18 @@ var ConvoView = Backbone.View.extend({
 			// Set context[text] to the last exchange between user_a and user_b
 			text_items = context['text'].split("{{switch_user}}");
 			text_items = text_items[text_items.length -1];
-			// alert(text_items !== "<i class='fa fa-cog fa-spin'></i>");
+			// If the last line is not the spinner icon, set "text"
+			// in context to an escaped string (not including the user label)
 			if (text_items !== "<i class='fa fa-spinner fa-spin'></i>") {
 				text_items = text_items.split(":");
 				text_items = _.escape(text_items[text_items.length -1]);
 			} else {
-				text_items = _.unescape(text_items)
+				// We want the waiting icon to spin to its heart's content
+				// so unescape that icon
+				text_items = "Pending...";
 			} 
+
+			// Reduce the "Text" context of the menu to the last line
 			context["text"] = text_items;
 
 			// Append to the ul the line item conversation
@@ -149,7 +154,6 @@ var ConvoView = Backbone.View.extend({
 			line_item_html = $target_element.children('li.convo_line_item')
 											.last()
 											.html();
-
 
 			!context["seen"] ? $target_element.children('li.convo_line_item')
 											  .last()

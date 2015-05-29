@@ -142,8 +142,22 @@ var ChatView = Backbone.View.extend({
 		context['text'] = "<div class='text_line'>";
 
 		// Iterate along text array
-		_.each(textlines, _.bind(function (textline) {
-			textline = this._reformatTextline(textline);
+		_.each(textlines, _.bind(function (textline, idx) {
+			if (idx !== 0) {
+				textline = this._reformatTextline(textline);
+			}
+			else {
+				textline = [
+								"<div class='chat_format info_text'>",
+								"You've started a chat dialogue with ",
+								"<b>",
+								context["user"],
+								"</b>",
+								"! Type in your message in the text prompt ",
+								"and press enter to say hello!",
+								"</div>"
+							].join("");
+			}
 			if (textline !== "") {
 				context['text'] = [
 										context['text'], 
@@ -151,6 +165,8 @@ var ChatView = Backbone.View.extend({
 								  ].join("</div><div class='text_line'>");
 			}
 		}, this));
+
+		context['text'] = [context['text'], "</div>"].join("");
 
 		// Delete everything in the chatbox
 		this.$el.find(".chatText").children().detach();
