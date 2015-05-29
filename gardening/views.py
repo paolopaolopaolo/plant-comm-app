@@ -45,7 +45,10 @@ class LandingPage(View):
 	# Just pull up the webpage
 	def get(self, request):
 		try:
-			return render(request, "landing_page.html", self.context)
+			if request.user.is_authenticated():
+				return redirect("feed")
+			else:
+				return render(request, "landing_page.html", self.context)
 		except Exception, e:
 			return HttpResponseServerError(str(e), content_type='text/plain')
 
