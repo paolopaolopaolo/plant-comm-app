@@ -31,7 +31,7 @@ var PlantView = Backbone.View.extend({
 
 		new_plant = new Plant({
 			'information': ['You\'ve added a new plant. Use this section',
-			                ' to tell people how they shouldcare for your',
+			                ' to tell people how they should care for your',
 			                ' plants (i.e. instructions for watering,',
 			                ' pruning, fertilizer, etc.).'].join(""),
 			'quantity': 0,

@@ -20,6 +20,7 @@ body {
 	background-color: @side_background_color;
 	padding: 0;
 	margin: 0;
+	overflow-x: hidden;
 }
 
 * {
@@ -191,12 +192,8 @@ body {
 		margin: 0 10px;
 	}
 	.gardener_box{
-		// margin: 10px 0;
 		font-size: 14px;
 		padding: 10px;
-		// background-color: @content_body_color - #211;
-		// border-radius: 5px;
-		// box-shadow: black 1px 1px 6px;
 		h3 {
 				margin: 0;
 		}
@@ -219,7 +216,8 @@ body {
 				margin-left: 24px;
 			}
 			@media (max-width: @sm_screen_cutoff) {
-				clear: left;
+				width: 30px;
+				display: block;
 				margin-left: 20px;
 			}
 		}
@@ -272,8 +270,13 @@ body {
 
 			.plant_box {
 				.clearfix();
-				margin: 5px;
-				border-radius: 2px;
+				@media (max-width: @sm_screen_cutoff) {
+					margin: 5px 16% 5px 0px;
+				}
+				@media screen {
+					margin: 5px;
+					border-radius: 2px;
+				}
 				&:nth-child(odd) {
 					background-color: @plant_body_color1;
 				}
@@ -314,9 +317,7 @@ body {
 		.og-partition {
 			@media screen {
 				float: left;
-				// border: 1px red dotted;
 				display: inline-block;
-				// height: 250px;
 				margin: 10px 20px;
 				overflow-y: auto;
 			}
@@ -333,7 +334,7 @@ body {
 	}
 }
 
-// This is the chat menu/ chat window
+// This is the chat menu
 #chat_wrapper {
 	@media screen {
 		top: 20%;
@@ -413,28 +414,45 @@ body {
 
 }
 
+// This is the main chat window
 div#chat_window {
-	display: block;
-	position: fixed;
-	bottom: 0px;
-	right: 0px;
-	white-space: nowrap;
-	vertical-align: bottom;
+	@media screen {
+		display: block;
+		position: fixed;
+		bottom: 0px;
+		right: 0px;
+		white-space: nowrap;
+		vertical-align: bottom;
+	}
+	@media (max-width: @sm_screen_cutoff) {
+		top: 0px;
+		left: 3%;
+		width: 97%;
+		height: 0px;
+		z-index: 1000000000000000000;
+	}
 	.clearfix();		
-
+	// Each individual user chat window
 	.chat_window {
-		margin-left: 8px;
-		z-index: 100000000000000000;
-		// padding: 10px 5px 40px 10px;
-		background-color: white;
-		display: inline-block;
-		white-space: normal;
-		overflow: hidden;
-		width: @chat_window_width;
-		height: 300px;
-		float: right;
-		padding: 5px;
-		margin: 1px;
+		@media screen {
+			z-index: 100000000000000000;
+			background-color: white;
+			display: inline-block;
+			white-space: normal;
+			overflow: hidden;
+			width: @chat_window_width;
+			height: 300px;
+			float: right;
+			padding: 5px;
+			margin: 1px;
+		}
+		@media (max-width: @sm_screen_cutoff) {
+			position: relative;
+			top: 0px !important;
+			left: 0px;
+			width: 100%;
+  			z-index: 1000000000000000000;
+		}
 		.chatHeader {
 			position: relative;
 			top: 0px;
@@ -497,6 +515,7 @@ div#chat_window {
 		  width: @chat_window_width - 15px;
 		  border: 5px @topbar_color solid;
 		  border-radius: 3px;
+		  left: 12px;
 		}	
 	}
 

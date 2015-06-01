@@ -19,6 +19,8 @@ var OGView = Backbone.View.extend({
 		'click .contact_gardener': 'openGardenerDialogue',
 	},
 
+	// A throttled trigger debouncer (keeps crazy people from accidentally)
+	// opening 500000 of the same dialogue window
 	_throttledTrigger : _.debounce(function (event, arg) {
 		this.trigger(event, arg);
 	}, 1000, true),
@@ -71,6 +73,7 @@ var OGView = Backbone.View.extend({
 		return this
 	},
 
+	// Takes an OG context and sets the url appropriately
 	_setProfilePic: function (context) {
 		var profile_pic_url;
 
@@ -89,18 +92,8 @@ var OGView = Backbone.View.extend({
 		return profile_pic_url;
 	},
 
-	// This function appends a new view for every
-	// new OG model
-	_createNewOG: function (model) {
-		var context, plants, images, $avail, first_img, profile_pic;
-
-		first_img = true;
-
-		// Set template context with model attributes
-		// and set plants to the plants attribute in each model
-		context = _.clone(model.attributes);
-		plants = context['plants'];
-
+	// Setting profile_pic, avail, and online in context
+	__contextFixes: function (context) {
 		// Set profile pic to default if there is no URL
 		context['profile_pic'] === "" ? context['profile_pic'] = DEFAULT_PROFILE_PIC:
 										context['profile_pic'] = this._setProfilePic(context);
@@ -109,11 +102,15 @@ var OGView = Backbone.View.extend({
 		// to a string that will be added onto the template 
 		context['available'] ? context['avail'] = "": context['avail'] = "NOT";
 
+		// Set 'online' status
 		context['online'] ? context['online'] = "<span style='color:green'>ONLINE</span>" :
 							context['online'] = "<span style='color:red'>OFFLINE</span>";
-		
-		// Append to the view the templated context
-		this.$el.append(this.template(context));
+		return context;
+	},
+
+	// Using content['avail'] to add classes to jQuery objs 
+	__setAvailState: function (context) {
+		var $avail;
 
 		// Set $avail to be the span that color codes whether or not
 		// a person is available for gardening
@@ -127,20 +124,73 @@ var OGView = Backbone.View.extend({
 		// Add the appropriate color class based on whether or not
 		// a user is "available"
 		context['available'] ? $avail.addClass("positive") : $avail.addClass("negative");
+	},
+
+	// Fix plant information (if user hasn't fully updated plants ie species
+	// and information for the plant are still the default start messages
+	__fixPlantDescription: function (context) {
+		var result_context, DEFAULT_SPECIES, DEFAULT_DESCRIPTION;
+
+		result_context = _.clone(context);
+		DEFAULT_SPECIES = "Use the name most familiar to you.";
+		DEFAULT_DESCRIPTION = [
+									"You've added a new plant. ",
+									"Use this section to tell people",
+									" how they should care for your plants ",
+									"(i.e. instructions for watering, pruning,",
+									" fertilizer, etc.)."
+							  ].join("");
+
+		result_context['species'] = (context['species'] === DEFAULT_SPECIES ? 
+									"Unknown": context['species']);
+		result_context['information'] = (context['information'] === DEFAULT_DESCRIPTION ? 
+										"Pending...": context['information']); 
+		return result_context;
+	},
+
+
+	// This function appends a new view for every
+	// new OG model
+	_createNewOG: function (model) {
+		var context, plants, first_img;
+
+		first_img = true;
+
+		// Set template context with model attributes
+		// and set plants to the plants attribute in each model
+		context = _.clone(model.attributes);
+		plants = context['plants'];
+
+		context = this.__contextFixes(context);
+		
+		// Append to the view the templated context
+		this.$el.append(this.template(context));
+
+		this.__setAvailState(context);
 
 		// Iterate among the user's plants
 		_.each(plants, _.bind(function (plant) {
-			var $plants_box, $img_box, images;
+			var $plants_box, $img_box, images, plant_context;
 
-			$plants_box = $(["#og-plants", context['id'].toString()].join(""));
-			$plants_box.append(this.plant_template(plant['plant']));
-
-			$img_box = $plants_box.find("#plant_img" + plant['plant']['id'].toString());
+			// Get images for each plant
 			images = plant['imgs'];
+			
+			// Set jQuery target for the appropriate plant and plantimg boxes
+			$plants_box = $(["#og-plants", context['id'].toString()].join(""));
+			
+			plant_context = this.__fixPlantDescription(plant['plant']);
+
+			// Append to plant target the plant template
+			$plants_box.append(this.plant_template(plant_context));
+			
+			$img_box = $plants_box.find("#plant_img" + plant['plant']['id'].toString());
 
 			// Iterate among the plant's images
 			_.each(images, _.bind(function (image) {
+				// Run each image through a filter that will 
+				// return an image with an adjusted imageURL
 				image = this._setImageUrl(image);
+				// Have the first image be added twice
 				if (first_img) {
 					$img_box.append(this.img_template(image));
 					$img_box.children('.plantimg_sprites:first-child')
@@ -153,10 +203,17 @@ var OGView = Backbone.View.extend({
 		}, this));
 	},
 
+	// Helper function that takes an image object
+	// and adjusts the imageURL attribute, depending
+	// on whether the current imageURL is already
+	// a hyperlink or not
 	_setImageUrl: function (img_obj) {
 		var img_to_return;
 		img_to_return = _.clone(img_obj);
 		
+		// If imageURL is not a hyperlink, assume
+		// a local environment and piece together
+		// the local mediafiles URL 
 		if (img_to_return['imageURL'].indexOf("http") < 0) {
 			img_to_return['imageURL'] = [
 				window.location.protocol,
@@ -185,7 +242,7 @@ var OGView = Backbone.View.extend({
 			this._createNewOG(model);
 		} ,this));
 		
-		// Set event listeners
+		// Set event listeners on the collection
 		this.listenTo(this.collection, "add", this._createNewOG);
 		this.listenTo(this.collection, "change", this.render);
 		this.listenTo(this.collection, "remove", this.render);
