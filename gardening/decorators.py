@@ -62,6 +62,7 @@ def setGardenerPlantQueryset(method, limit = None, preFilter = None):
 		def wrapper1(*args, **kwargs):
 			self = args[0]
 			request = args[1]
+			domain = "https://plantappstorage.s3.amazonaws.com"
 
 			def filterMethod(queryset_member):
 				return not (self.gardener.id == queryset_member.id)
@@ -85,10 +86,20 @@ def setGardenerPlantQueryset(method, limit = None, preFilter = None):
 					result_obj['imgs'] = []
 					plantimgs = PlantImg.objects.filter(plant = plant.id)
 					for plantimg in plantimgs:
-						result_obj['imgs'].append({ 
-									'id': plantimg.id,
-									'imageURL': plantimg.thumbnail.url
-									})
+						try:
+							result_obj['imgs'].append({ 
+										'id': plantimg.id,
+										'imageURL': plantimg.thumbnail.url
+										})
+						except Exception:
+							result_obj['imgs'].append({ 
+										'id': plantimg.id,
+										'imageURL': os.path.join(
+															domain,
+															"media",
+															plantimg.thumbnail.name
+															)
+										})
 					model.plants.append(result_obj)
 
 			# self.data = self.queryset
