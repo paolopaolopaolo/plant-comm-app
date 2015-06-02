@@ -301,7 +301,7 @@ class FeedPage(APIView):
 	@set_user_and_gardener_and_convos
 	def get(self, request, *args, **kwargs):
 		try:
-			self.context['other_gardeners'] = self.RETURN_OTHER_GARDENERS(5)
+			self.context['other_gardeners'] = self.RETURN_OTHER_GARDENERS(2)
 			self.context['convos'] = json.dumps(self.convos)
 			self.context['user'] = request.user
 			return render(request, 'feed_page.html', self.context)
