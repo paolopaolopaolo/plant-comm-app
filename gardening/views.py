@@ -236,7 +236,7 @@ class FeedPage(APIView):
 	def bootstrapLimit(self, query_list, limit = None):
 		if len(query_list) < limit or limit is None:
 			return query_list
-		return query_list[0, limit]
+		return query_list[0: limit]
 
 	# This function returns information of a certain number of Gardeners
 	def RETURN_OTHER_GARDENERS(self, limit = None):
@@ -301,7 +301,7 @@ class FeedPage(APIView):
 	@set_user_and_gardener_and_convos
 	def get(self, request, *args, **kwargs):
 		try:
-			self.context['other_gardeners'] = self.RETURN_OTHER_GARDENERS()
+			self.context['other_gardeners'] = self.RETURN_OTHER_GARDENERS(5)
 			self.context['convos'] = json.dumps(self.convos)
 			self.context['user'] = request.user
 			return render(request, 'feed_page.html', self.context)

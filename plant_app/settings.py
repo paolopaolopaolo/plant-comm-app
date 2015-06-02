@@ -29,6 +29,11 @@ TEMPLATE_DIRS = (
 
 LOGIN_URL = '/'
 
+REST_FRAMEWORK = {
+#     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 5
+}
+
 # Formattable Zipcode API URL
 ZIPCODE_API_URL = ''.join([
     "https://www.zipcodeapi.com/rest/",

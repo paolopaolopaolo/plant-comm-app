@@ -14,6 +14,7 @@ from rest_framework.views import APIView
 from django.forms.models import model_to_dict
 from django.db import IntegrityError
 from django.core.exceptions import SuspiciousOperation
+from rest_framework.pagination import PageNumberPagination
 
 from rest_framework import mixins
 from rest_framework import generics
@@ -181,9 +182,12 @@ class OtherGardenerAPI( mixins.RetrieveModelMixin,
 		print thing.validated_data
 
 	@set_user
-	@setGardenerPlantQueryset()
+	@setGardenerPlantQueryset
 	def get(self, request, *args, **kwargs):
+		self.pagination_class = None
 		if kwargs['id'] is None:
+			if 'page' in request.GET:
+				self.pagination_class = PageNumberPagination
 			return self.list(self, request, *args, **kwargs)
 		return self.retrieve(self, request, *args, **kwargs)
 

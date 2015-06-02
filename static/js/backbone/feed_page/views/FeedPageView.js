@@ -13,6 +13,21 @@ var FeedPageView = Backbone.View.extend({
 		'click .mail_button': 'startupChatView',
 	},
 
+	_setBOMEvents: function () {
+		// An event that triggers an alert once the bottom of the document is 
+		// scrolled down to
+		$(window).scroll(_.bind(function (event) {
+			var top_window_border, bottom_threshold;
+			top_window_border = Math.floor(
+									$(document).height() - $(window).scrollTop()
+								);
+			bottom_threshold = $(window).height() + 1;
+			if (top_window_border <= bottom_threshold) {
+				this.trigger("scrolledToBottom");
+			}
+		}, this));
+	},
+
 	_countMaximizedChatWindows: function () {
 		var max_chat_win_num;
 
@@ -156,6 +171,9 @@ var FeedPageView = Backbone.View.extend({
 		this.listenTo(this.convoview, "resetChatTops", this.resetChatTops);
 		this.listenTo(this.ogview, "openNewDialogue", this.openNewDialogue);
 		
+		// BOM Events
+		this._setBOMEvents();
+
 		this.showConvoNumber();
 
 	}

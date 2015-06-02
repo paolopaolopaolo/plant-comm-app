@@ -2,20 +2,25 @@ from rest_framework import mixins
 from gardening.models import *
 from django.contrib.auth.models import User
 from django.utils.html import escape
+from django.http import HttpResponse, HttpResponseServerError
+
 import re
 ## Decorators ##
 
 # Sets user/gardener/plant objects 
 # for ProfilePage GET method 
 def set_user(method):
-	def setting_user(*args, **kwargs):
-		self = args[0]
-		request = args[1]
-		self.user = User.objects.get(username = request.user)
-		self.gardener = Gardener.objects.get(user = self.user)
-		self.plants = Plant.objects.filter(user = self.gardener)
-		return method(*args, **kwargs)
-	return setting_user
+	try:
+		def setting_user(*args, **kwargs):
+			self = args[0]
+			request = args[1]
+			self.user = User.objects.get(username = request.user)
+			self.gardener = Gardener.objects.get(user = self.user)
+			self.plants = Plant.objects.filter(user = self.gardener)
+			return method(*args, **kwargs)
+		return setting_user
+	except Exception, e:
+		return HttpResponse(str(e), content_type='text/plain')
 
 # Sets the user attribute for PlantAPI
 def setApiUser(method):
@@ -52,8 +57,8 @@ def setApiPlant(method):
 # Decorator: sets queryset to be a 
 # new view that adds plant information
 # to the gardener
-def setGardenerPlantQueryset(limit = None, preFilter = None):
-	def wrapper0(method):
+def setGardenerPlantQueryset(method, limit = None, preFilter = None):
+	try:
 		def wrapper1(*args, **kwargs):
 			self = args[0]
 			request = args[1]
@@ -89,7 +94,8 @@ def setGardenerPlantQueryset(limit = None, preFilter = None):
 			# self.data = self.queryset
 			return method(self, request, *args, **kwargs)
 		return wrapper1
-	return wrapper0
+	except Exception, e:
+		return HttpResponse(str(e), content_type='application/json')
 
 def set_user_and_gardener_and_convos(mthod):
 	def wrapper(*args, **kwargs):

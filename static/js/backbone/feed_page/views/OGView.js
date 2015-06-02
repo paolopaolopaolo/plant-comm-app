@@ -6,6 +6,7 @@ var OGView = Backbone.View.extend({
 
 	// Target element
 	el: '#og_content',
+	current_page: 2,
 
 	// Templates
 	template: _.template($('#other_gardener_template').html()),
@@ -227,6 +228,28 @@ var OGView = Backbone.View.extend({
 		return img_to_return;
 	},
 
+	_handleBottomScroll: function () {
+		var last_page;
+		// This is a workaround; if I use 'fetch'
+		// then the collection will get corrupted with 
+		// the pagination XHR object (which includes
+		// attributes like 'count', 'next', and 'prev')
+		$.ajax({
+			method: 'GET',
+			url: [
+					'/feed/gardener?page',
+					this.current_page.toString()
+				 ].join("="),
+		}).done(_.bind(function (response) {
+			last_page = response;
+			this.collection.set(response.results, {remove: false});
+			if (last_page.next !== null) {
+				this.current_page++;
+			}
+		}, this));
+
+	},
+
 	initialize: function (attrs, opts) {
 		'use strict';
 
@@ -246,6 +269,9 @@ var OGView = Backbone.View.extend({
 		this.listenTo(this.collection, "add", this._createNewOG);
 		this.listenTo(this.collection, "change", this.render);
 		this.listenTo(this.collection, "remove", this.render);
+
+		// Set event listener on parent view
+		this.listenTo(this.parent, "scrolledToBottom", this._handleBottomScroll);
 
 		// Set refresher to refresh automagically every 5 minutes
 		this.REFRESHER = setInterval(_.bind(function () {
