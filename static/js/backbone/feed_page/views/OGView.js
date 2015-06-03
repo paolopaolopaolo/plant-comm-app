@@ -7,6 +7,7 @@ var OGView = Backbone.View.extend({
 	// Target element
 	el: '#og_content',
 	current_page: 2,
+	page_url: undefined,
 
 	// Templates
 	template: _.template($('#other_gardener_template').html()),
@@ -229,23 +230,38 @@ var OGView = Backbone.View.extend({
 	},
 
 	_handleBottomScroll: function () {
-		var last_page;
+		var target_url;
 		// This is a workaround; if I use 'fetch'
 		// then the collection will get corrupted with 
 		// the pagination XHR object (which includes
 		// attributes like 'count', 'next', and 'prev')
+
+		// Set target_url
+		if (this.page_url === undefined) {
+			target_url = '/feed/gardener?page=2';
+		} else {
+			if (this.page_url.next !== null) {
+				target_url =  this.page_url
+								  .next
+								  .slice(
+								  			this.page_url
+								  				.next
+								  				.indexOf('/feed'),
+								  			this.page_url.length
+								  		);
+			}
+			else {
+				// If there's no more pages, end the function
+				return false;
+			}
+		}
+
 		$.ajax({
 			method: 'GET',
-			url: [
-					'/feed/gardener?page',
-					this.current_page.toString()
-				 ].join("="),
+			url: target_url,
 		}).done(_.bind(function (response) {
-			last_page = response;
+			this.page_url = response;
 			this.collection.set(response.results, {remove: false});
-			if (last_page.next !== null) {
-				this.current_page++;
-			}
 		}, this));
 
 	},
@@ -277,6 +293,8 @@ var OGView = Backbone.View.extend({
 		this.REFRESHER = setInterval(_.bind(function () {
 			this.fetchGardeners();
 		}, this), 300000);
+
+		this.current_page = 2;
 	},
 	
 

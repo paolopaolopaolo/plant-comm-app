@@ -3,13 +3,26 @@ var ConvoView = Backbone.View.extend({
 
 	el: "#chat_menu",
 	template: _.template($("#chat_menu_template").html()),
+	chat_menu_minimized: true,
 
 	dialogues: {},
 
 	events: {
+		"click .min_button": "minimizeChatMenu",
 		"click .close_button": "hideChatMenu",
 		"click li.convo_line_item": "openDialogue",
 		// "click button.del_convo": "deleteDialogue",
+	},
+
+	minimizeChatMenu: function (event) {
+		if (this.chat_menu_minimized) {
+			this.$el.parent().addClass('minimizeChatMenu');
+			$(event.currentTarget).html(_.unescape("<i class='fa fa-square-o'></i>"));
+		} else {
+			this.$el.parent().removeClass('minimizeChatMenu');
+			$(event.currentTarget).html(_.unescape("<b>_</b>"));
+		}
+		this.chat_menu_minimized = !this.chat_menu_minimized;
 	},
 
 	// Long Poll the collection
@@ -181,6 +194,7 @@ var ConvoView = Backbone.View.extend({
 
 		this.listenTo(this.collection, "add", this.render);
 		this.listenTo(this.collection, "change", this.render);
+
 	},
 	
 

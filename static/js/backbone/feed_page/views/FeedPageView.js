@@ -72,13 +72,15 @@ var FeedPageView = Backbone.View.extend({
 			$('#settings').css({'border-radius': '5px'});
 			$('#settings-list').animate({
 											'height': '0px',
-											'minHeight': '0px'
+											'minHeight': '0px',
+											'padding': '0px'
 										});
 		} else {
 			$('#settings').css({'border-radius': '5px 5px 0 0'});
 			$('#settings-list').animate({
 											'height': $('#settings-list').data('height'),
 											'minHeight': $('#settings-list').data('min-height'),
+											'padding': '10px'
 										});
 		}
 		this.SETTINGS_TOGGLE = !this.SETTINGS_TOGGLE;
@@ -152,13 +154,14 @@ var FeedPageView = Backbone.View.extend({
 	initialize: function () {
 		"use strict";
 		var new_convos;
+		$(window).scrollTop('0px');
 		// Settings button UI
 		this.ogview = new OGView({parent: this});
 		this.showSettings();
 		this.convoview = new ConvoView({parent: this});
 
 		// Make the window draggable
-		this.$el.find("#chat_wrapper").draggable({containment: "parent"});
+		// this.$el.find("#chat_wrapper").draggable({containment: "parent"});
 
 
 		// Listen to ConvoView's collection changes to update the "new" number 
@@ -175,6 +178,8 @@ var FeedPageView = Backbone.View.extend({
 		this._setBOMEvents();
 
 		this.showConvoNumber();
+
+
 
 	}
 
