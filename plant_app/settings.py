@@ -55,7 +55,7 @@ INSTALLED_APPS = (
     'compressor',
     # 'simple_email_confirmation',
     'rest_framework',
-    'mod_wsgi.server',
+    #'mod_wsgi.server',
     'storages',
     'gardening',
 )
@@ -147,8 +147,11 @@ else:
 
 # else:
 ALLOWED_HOSTS = [
+                 "*",
                  ".127.0.0.1:8000",
                  ".127.0.0.1:8000.",
+                 ".192.168.1.35:8000.",
+                 ".192.168.1.35:8000",
                  ".54.148.204.235",
                  ".54.148.204.235.",
                  ".plantappstorage.s3.amazonaws.com",

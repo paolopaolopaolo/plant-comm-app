@@ -134,6 +134,7 @@ class PlantImgAPI( mixins.CreateModelMixin,
 			newplantimg.save()
 		except Exception, e:
 			return HttpResponseServerError(str(e), content_type='text/plain')
+
 		response = json.dumps({
 				'id': newplantimg.id,
 				'imageURL': newplantimg.thumbnail.url
@@ -150,9 +151,20 @@ class PlantImgAPI( mixins.CreateModelMixin,
 		# If url is /profile/plantimg/(nothing)
 		# return all of the PlantImg entries 
 		# of that plant
+		def urlToGet(entry):
+			url_to_get = ""
+			try:
+				url_to_get = entry.thumbnail.url
+			except Exception:
+				url_to_get = os.path.join(
+								"https://plantappstorage.s3.amazonaws.com/media",
+								entry.thumbnail.name
+							)
+			return url_to_get
+			
 		if 'id' not in self.data:
 			response = self.queryset.filter(plant = kwargs['id'])
-			response = json.dumps([{'id': entry.id, 'imageURL': entry.thumbnail.url } for entry in response])
+			response = json.dumps([{'id': entry.id, 'imageURL': urlToGet(entry) } for entry in response])
 			return HttpResponse(response, content_type='application/json')
 		return self.retrieve(self, request, *args, **kwargs)
 
