@@ -152,6 +152,7 @@ class ProfilePage(APIView):
 
 	# Returns plant data as a list of dictionaries/BOOTSTRAPPING
 	def RETURN_PLANT_DATA(self, img = False, _id = None):
+		domain_aws = "https://plantappstorage.s3.amazonaws.com/media"
 		current_plants = []
 		# if img is false, return plant data
 		if not img:
@@ -174,9 +175,14 @@ class ProfilePage(APIView):
 					}
 					imgs = PlantImg.objects.filter(plant = plant)
 					for img in imgs:
-						target_plant['images'].append({
-										'imageURL': img.thumbnail.url,
-										'id': img.id})
+						try:
+							target_plant['images'].append({
+											'imageURL': img.thumbnail.url,
+											'id': img.id})
+						except Exception:
+							target_plant['images'].append({
+											'imageURL': "/".join([domain_aws, img.thumbnail.name]),
+											'id': img.id})
 
 					current_plants.append(target_plant)
 			else:
