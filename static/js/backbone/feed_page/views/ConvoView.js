@@ -149,7 +149,8 @@ var ConvoView = Backbone.View.extend({
 			// in context to an escaped string (not including the user label)
 			if (text_items !== "<i class='fa fa-spinner fa-spin'></i>") {
 				text_items = text_items.split(":");
-				text_items = _.escape(text_items[text_items.length -1]);
+				text_items = text_items.slice(1, text_items.length).join(":");
+				text_items = _.escape(text_items);
 			} else {
 				// We want the waiting icon to spin to its heart's content
 				// so unescape that icon

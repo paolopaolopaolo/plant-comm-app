@@ -108,7 +108,7 @@ var ChatView = Backbone.View.extend({
 		var line_components, name, text;
 		line_components = textline.split(':');
 		name = line_components[0];
-		text = line_components[1];
+		text = line_components.slice(1, line_components.length).join(":");
 		if (text) {
 			if (text.length > 0) {
 				if (name === USER) {
