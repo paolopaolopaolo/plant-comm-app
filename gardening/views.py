@@ -152,7 +152,11 @@ class ProfilePage(APIView):
 
 	# Returns plant data as a list of dictionaries/BOOTSTRAPPING
 	def RETURN_PLANT_DATA(self, img = False, _id = None):
-		domain_aws = "https://plantappstorage.s3.amazonaws.com/media"
+
+		domain_aws = "".join[
+						"https://",
+						settings.AWS_STORAGE_BUCKET_NAME,
+						".s3.amazonaws.com/media"]
 		current_plants = []
 		# if img is false, return plant data
 		if not img:

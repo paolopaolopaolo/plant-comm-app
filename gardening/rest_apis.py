@@ -134,7 +134,6 @@ class PlantImgAPI( mixins.CreateModelMixin,
 			newplantimg.save()
 		except Exception, e:
 			return HttpResponseServerError(str(e), content_type='text/plain')
-
 		response = json.dumps({
 				'id': newplantimg.id,
 				'imageURL': newplantimg.thumbnail.url
