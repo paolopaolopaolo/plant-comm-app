@@ -54,6 +54,10 @@ class ChatAPI(APIView):
 				elif convo_to_add['user_b'] == self.gardener.id:
 					convo_to_add['user'] = convo.user_a.username
 					convo_to_add['seen'] = convo.seen_b
+
+				gardener = User.objects.get(username=convo_to_add['user'])
+				gardener = Gardener.objects.get(user = gardener)
+				convo_to_add['msg_profile_pic'] = gardener.profile_pic.name
 				convos.append(convo_to_add)
 		self.convos = convos
 
@@ -140,6 +144,8 @@ class ChatAPI(APIView):
 		response.reason_phrase = 'CREATED'
 		response.content_type = 'application/json'
 		returnContent['user'] = user_targ.username
+		returnContent['time_initiated'] = new_convo.time_initiated.isoformat() 
+		returnContent['msg_profile_pic'] = user_targ.profile_pic.name
 		response.content = json.dumps(returnContent)
 		return response
 

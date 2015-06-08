@@ -28,215 +28,98 @@ import json, os, StringIO, re
 # Logs user out and returns
 # to landing page
 def log_out(request):
-	gardener = Gardener.objects.get(user = request.user)
-	gardener.online = False
-	gardener.save()
+	# if hasattr(request, "user"):
+	# 	print "Logout"
+	# 	print request.user
+	# 	gardener = Gardener.objects.get(user = User.objects.get(username=request.user))
+	# 	gardener.online = False
+	# 	gardener.save()
 	logout(request)
 	return redirect('landing')
 
-# Landing page (for signing up/logging in)
-class LandingPage(View):
+
+# Class common to all views
+class GreenThumbPage(View):
 	context = {
-				"signinform": SignUpForm(),
-				"loginform": LogInForm(),
-				"compress_enabled": settings.COMPRESS_ENABLED
-			  }
-
-	# Just pull up the webpage
-	def get(self, request):
-		try:
-			if request.user.is_authenticated():
-				return redirect("feed")
-			else:
-				return render(request, "landing_page.html", self.context)
-		except Exception, e:
-			return HttpResponseServerError(str(e), content_type='text/plain')
-
-	def post(self, request):
-		# Get form results based on what is in POST
-		# Below: Signup Procedure
-		if "confirm_password" in request.POST:
-			signupform = SignUpForm(request.POST)
-			# Clean up form and validate results
-			if signupform.is_valid():
-				# Set variable storing cleaned_data
-				form_data = signupform.cleaned_data
-
-				# if form has valid data, create user and 
-				# gardener instance and redirect to the profile page
-				user = User.objects.create_user(
-							email = form_data.get('email').lower(),
-							username = form_data.get('username').lower(),
-							first_name = form_data.get('first_name'),
-							last_name = form_data.get('last_name'), 
-							password = form_data.get('password') 
-						)
-				garden_user = Gardener(user = user)
-				garden_user.save()
-				# Authenticate and login this new user
-				auth_user = authenticate(
-								username = form_data.get('username'),
-								password = form_data.get('password')
-							)
-				login(request, auth_user)
-				# redirect to profile with user
-				return redirect("profile")
-			# Feed error message to the view context
-			message = signupform.error_message
-			self.context["error_message"] = message
-			return render(request, "landing_page.html", self.context)
-		# Below: Login Procedure
-		else:
-			loginform = LogInForm(request.POST)
-			# Validate POST and then authenticate
-			if loginform.is_valid():
-				# Built-in method authenticates the user
-				user = loginform.auth_user()
-				# Login user to feed page once authenticated
-				if user is not None:
-					gardener = Gardener.objects.get(
-									user = User.objects.get(
-												username = user.username
-												)
-									)
-					gardener.online = True
-					gardener.save()
-
-					# Redirect users to feed page
-					login(request, user)
-					return redirect("feed")
-				
-				message = "Invalid Email/Password combination Try again"
-				self.context["error_message"] = message
-				return render(request, "landing_page.html", self.context)
-			message = "Please use a valid email."
-			self.context["error_message"] = message
-			return render(request, "landing_page.html", self.context)
-
-# Profile Page: Edit the profile
-class ProfilePage(APIView):
-	user = None
-	gardener = None
-	plants = None
-	cleaned_data = {}
-	context = {
-				'domain': settings.DOMAIN,
-				'compress_enabled': settings.COMPRESS_ENABLED
-			  }
-	
+		"domain": settings.DOMAIN,
+		"media_url": settings.MEDIA_URL,
+		"compress_enabled": settings.COMPRESS_ENABLED,
+		"signinform": SignUpForm(),
+		"loginform": LogInForm(),
+		"showsFooter": True,
+	}
 	# Utility, method for sorting by id
 	def sortById(self, arrayItem):
 		return arrayItem["id"]
 
 	# Returns User data as a dictionary/BOOTSTRAPPING  
-	def RETURN_USER_DATA(self):
+	def RETURN_USER_DATA(self, _id = None, plants=False):
+		if _id is None:
+			gardener = self.gardener
+			user = self.user
+		else:
+			user = User.objects.get(username = _id)
+			gardener = Gardener.objects.get(user = user)
+
 		result = {
-					'id': self.gardener.id,
-					'username': self.user.username,
-					'first_name': self.user.first_name,
-					'last_name': self.user.last_name,
-					'city': self.gardener.city,
-					'state': self.gardener.state,
-					'zipcode': self.gardener.zipcode,
-					'text_blurb': self.gardener.text_blurb,
-					'available': self.gardener.available,
+					'id': gardener.id,
+					'username': user.username,
+					'online': gardener.online,
+					'first_name': user.first_name,
+					'last_name': user.last_name,
+					'city': gardener.city,
+					'state': gardener.state,
+					'zipcode': gardener.zipcode,
+					'text_blurb': gardener.text_blurb,
+					'available': gardener.available,
 				}
-		if self.gardener.profile_pic:
+		if gardener.profile_pic:
 			try:
-				result['profile_pic'] = self.gardener.profile_pic.url
+				result['profile_pic'] = gardener.profile_pic.url
 			except SuspiciousOperation:
-				result['profile_pic'] = self.gardener.profile_pic.name
+				result['profile_pic'] = gardener.profile_pic.name
 		else:
 			result['profile_pic'] = ""
+
+		if plants:
+			result["plants"] = self.RETURN_PLANT_DATA(img=True, _id = result["username"])
 		return result
 
 	# Returns plant data as a list of dictionaries/BOOTSTRAPPING
 	def RETURN_PLANT_DATA(self, img = False, _id = None):
-		domain_aws = "https://plantappstorage.s3.amazonaws.com/media"
+		domain_aws = settings.MEDIA_URL
 		current_plants = []
-		# if img is false, return plant data
-		if not img:
-			for plant in self.plants:
-				current_plants.append({
-					'id': plant.id,
-					'information': plant.information,
-					'species': plant.species,
-					'quantity': plant.quantity
-				})
+		if _id is None:
+			plants = self.plants
 		else:
-			# if img is true
-			if _id is None:
-				# and no _id is specified,
-				# return a list of id:imageURL-list data pairs
-				for plant in self.plants:
-					target_plant = {
-						'id': plant.id,
-						'images': []
-					}
-					imgs = PlantImg.objects.filter(plant = plant)
-					for img in imgs:
-						try:
-							target_plant['images'].append({
-											'imageURL': img.thumbnail.url,
-											'id': img.id})
-						except Exception:
-							target_plant['images'].append({
-											'imageURL': "/".join([domain_aws, img.thumbnail.name]),
-											'id': img.id})
+			gardener = Gardener.objects.get(user = User.objects.get(username=_id))
+			plants = Plant.objects.filter(user = gardener)
 
-					current_plants.append(target_plant)
-			else:
-				# and an _id is specified,
-				# return a list of imageURLs
-				target_plant = self.plants.get(id = _id)
-				imgs = PlantImg.objects.filter(plant = target_plant)
+		current_plants = []
+
+		# if img is false, return plant data
+		for plant in plants:
+			plant_obj = {
+				'id': plant.id,
+				'information': plant.information,
+				'species': plant.species,
+				'quantity': plant.quantity
+			}
+			# if img is true, return plant_img data
+			if img:
+				plant_obj['images'] = []
+				imgs = PlantImg.objects.filter(plant = plant)
 				for img in imgs:
-					current_plants.append({
-									'imageURL':img.thumbnail.url,
-									'id': img.id
-									})
+					try:
+						url_target = img.thumbnail.url
+					except Exception:
+						url_target = img.thumbnail.name
+					plant_obj['images'].append({
+									'imageURL': url_target,
+									'id': img.id})
+			current_plants.append(plant_obj)
 
 		return current_plants
-
-	@method_decorator(login_required)
-	def dispatch(self, *args, **kwargs):
-		return super(ProfilePage, self).dispatch(*args, **kwargs)
-
-	@set_user
-	# Bootstrap the data
-	def get(self, request, _id = None):
-		try:
-			# Populate the template context with user and gardener objects and forms
-			self.context['user'] = request.user.first_name
-			# Populate the script above the fold with the appropriate contexts
-			self.context['plant_objects'] = json.dumps(sorted(self.RETURN_PLANT_DATA(),
-											 key=self.sortById))
-			try:
-				self.context['gardener_object'] = json.dumps(self.RETURN_USER_DATA())
-			except Exception, e:
-				return HttpResponseServerError(str(e.message), content_type='text/plain')
-			self.context['plant_img_objects'] = json.dumps(self.RETURN_PLANT_DATA(img = True))
-			# Pre-render the profile picture
-			if self.gardener.profile_pic:
-				self.context['profile_pic'] = self.gardener.profile_pic.name
-			# Use a Django form for the profile
-			self.context['profile_form'] = ProfileForm()
-			# Return the rendered page
-			return render(request, "profile_page.html", self.context)
-		except Exception, e:
-			return HttpResponseServerError(str(e), content_type='text/plain')
-
-# Feed Page: View gardeners/gardens in the area
-class FeedPage(APIView):
-	if settings.DEBUG:
-		domain = settings.DOMAIN
-	else:
-		domain = "https://plantappstorage.s3.amazonaws.com"
-
-	context = {
-		'domain': settings.DOMAIN,
-		'compress_enabled': settings.COMPRESS_ENABLED
-	}
 
 	# Limits how many instances in a query get through
 	def bootstrapLimit(self, query_list, limit = None):
@@ -281,10 +164,7 @@ class FeedPage(APIView):
 						img_thumbnail = img.thumbnail.url
 					except Exception:
 						print "Original image url not used (Issue with S3?)!"
-						img_thumbnail = "/".join([
-											"https://plantappstorage.s3.amazonaws.com/media",
-						                	img.thumbnail.name
-						                ])
+						img_thumbnail = img.thumbnail.name
 					images.append({
 						'id': img.id,
 						'imageURL': img_thumbnail})
@@ -297,21 +177,176 @@ class FeedPage(APIView):
 					'imgs': images})
 		return json.dumps(other_gardeners)
 
+# Landing page (gateway before signing up/logging in)
+class LandingPage(GreenThumbPage):
+
+	# Just pull up the webpage
+	def get(self, request):
+		content_items = {}
+		for content_item in Content.objects.filter(page='LA'):
+			content_items[content_item.descriptor] = content_item.content
+
+		self.context["content"] = content_items
+		self.context["showsFooter"] = True
+		self.context["isAuthenticated"] = request.user.is_authenticated()
+		self.context["useBackbone"] = False
+		try:
+			if request.user.is_authenticated():
+				return redirect("feed")
+			else:
+				return render(request, "gardening/landing_page/landing_page.html", self.context)
+		except Exception, e:
+			return HttpResponseServerError(str(e), content_type='text/plain')
+
+# SignUp/Login Pages
+class UserAuthenticationPage(GreenThumbPage):
+	def get(self, request):
+		self.context["user"] = request.user.username
+		self.context["isAuthenticated"] = request.user.is_authenticated()
+		self.context["showsFooter"] = False
+		if request.user.is_authenticated():
+			return redirect("feed")
+		else:
+			if request.GET['access_type'] == 'login':
+				self.context["showSignUp"] = False
+				self.context["showLogIn"] = True
+			elif request.GET['access_type'] =='signup':
+				self.context["showSignUp"] = True
+				self.context["showLogIn"] = False
+			return render(request, "gardening/uauth_page/uauth.html", self.context)
+
+	def post(self, request):
+		# Get form results based on what is in POST
+		# Below: Signup Procedure
+		if "confirm_password" in request.POST:
+			signupform = SignUpForm(request.POST)
+			# Clean up form and validate results
+			if signupform.is_valid():
+				# Set variable storing cleaned_data
+				form_data = signupform.cleaned_data
+
+				# if form has valid data, create user and 
+				# gardener instance and redirect to the profile page
+				user = User.objects.create_user(
+							email = form_data.get('email').lower(),
+							username = form_data.get('username').lower(),
+							first_name = form_data.get('first_name'),
+							last_name = form_data.get('last_name'), 
+							password = form_data.get('password') 
+						)
+				garden_user = Gardener(user = user, username = user.username)
+				garden_user.save()
+				# Authenticate and login this new user
+				auth_user = authenticate(
+								username = form_data.get('username'),
+								password = form_data.get('password')
+							)
+				login(request, auth_user)
+				if "next" in request.GET:
+					return redirect(request.GET["next"])
+
+				# redirect to profile with user
+				return redirect("profile")
+			# Feed error message to the view context
+			message = signupform.error_message
+			self.context["error_message"] = message
+			self.context["showSignUp"] = True
+			self.context["showLogIn"] = False
+			return render(request, "gardening/uauth_page/uauth.html", self.context)
+		# Below: Login Procedure
+		else:
+			loginform = LogInForm(request.POST)
+			# Validate POST and then authenticate
+			if loginform.is_valid():
+				# Built-in method authenticates the user
+				user = loginform.auth_user()
+				# Login user to feed page once authenticated
+				if user is not None:
+					gardener = Gardener.objects.get(
+									user = User.objects.get(
+												username = user.username
+												)
+									)
+					gardener.online = True
+					gardener.save()
+
+					# Redirect users to feed page
+					login(request, user)
+					if "next" in request.GET:
+						return redirect(request.GET["next"])
+					return redirect("feed")
+				
+				message = "Invalid Email/Password combination Try again"
+				self.context["error_message"] = message
+				self.context["showSignUp"] = False
+				self.context["showLogIn"] = True
+				return render(request, "gardening/uauth_page/uauth.html", self.context)
+			message = "Please use a valid email."
+			self.context["error_message"] = message
+			self.context["showSignUp"] = False
+			self.context["showLogIn"] = True
+			return render(request, "gardening/uauth_page/uauth.html", self.context)
+		
+# Profile Page: Edit/View the profile
+class ProfilePage(GreenThumbPage, APIView):
+
+	@set_user_and_gardener_and_convos
+	# Bootstrap the data
+	def get(self, request, *args, **kwargs):
+		if request.user.is_authenticated():
+			self.context["header_profile_pic"] = self.gardener.profile_pic
+			self.context["convos"] = json.dumps(self.convos)
+		self.context["showsFooter"] = True
+		self.context["isAuthenticated"] = request.user.is_authenticated()
+
+		if kwargs["user"] is None or "user" not in kwargs:
+			__user = None
+			editable = True
+		else:
+			__user = kwargs["user"]
+			editable = False
+
+		self.context["useBackbone"] = True
+
+		# Populate Profile Page with Non-JSON-Encoded user and plant data
+		self.context['gardener'] = self.RETURN_USER_DATA(_id = __user, plants=True)
+		self.context['plants'] = sorted(self.RETURN_PLANT_DATA(_id = __user, img = True), key=self.sortById)		
+		self.context['is_editable'] = editable
+
+
+		# Populate the template context with user and gardener objects and forms
+		self.context['user'] = request.user
+		
+		# Populate the script above the fold with the appropriate contexts
+		self.context['plant_objects'] = json.dumps(self.context['plants'])
+
+		self.context['gardener_object'] = json.dumps(self.context['gardener'])
+
+		self.context['isEditable'] = json.dumps(self.context['is_editable'])
+
+		# Use a Django form for the profile
+		if editable:
+			self.context['profile_form'] = ProfileForm()
+		
+		# Return the rendered page
+		return render(request, "gardening/profile_page/profile_page.html", self.context)
+
+# Feed Page: View gardeners/gardens in the area
+class FeedPage(GreenThumbPage, APIView):
+
+	# Enforce login-only 
 	@method_decorator(login_required)
 	def dispatch(self, *args, **kwargs):
 		return super(FeedPage, self).dispatch(*args, **kwargs)
 
-	# @setGardenerPlantQueryset(5)
-	# Bootstrapping values to show in context
-	@set_user
 	@set_user_and_gardener_and_convos
 	def get(self, request, *args, **kwargs):
-		try:
-			self.context['other_gardeners'] = self.RETURN_OTHER_GARDENERS(2)
-			self.context['convos'] = json.dumps(self.convos)
-			self.context['user'] = request.user
-			return render(request, 'feed_page.html', self.context)
-		except Exception, e:
-			print str(e)
-			return HttpResponse(str(e))
+		self.context['header_profile_pic'] = self.gardener.profile_pic
+		self.context['other_gardeners'] = self.RETURN_OTHER_GARDENERS(2)
+		self.context['convos'] = json.dumps(self.convos)
+		self.context['user'] = request.user
+		self.context['showsFooter'] = True
+		self.context['isAuthenticated'] = request.user.is_authenticated()
+		return render(request, 'gardening/feed_page/feed_page.html', self.context)
+	
 

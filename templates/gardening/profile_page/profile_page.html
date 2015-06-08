@@ -1,0 +1,49 @@
+{% extends "gardening/shared/base.html" %}
+{% load static %}
+{% load compress %}
+
+{% block css_styles %}
+	<!-- Slick Image Carousel CSS-->
+	<link rel="stylesheet" href="{% static 'gardening/shared/slick/slick/slick.css' %}"/>
+	<link rel="stylesheet" href="{% static 'gardening/shared/slick/slick/slick-theme.css' %} ">
+{% endblock %}
+
+{% block less_styling_browser_compile %}
+	<link rel="stylesheet/less" href="{% static 'gardening/profile_page/less/profile_page.less' %}"/>
+{% endblock %}
+
+{% block less_styling_pre_compile %}
+	<link type="text/less" rel="stylesheet" href="{% static 'gardening/profile_page/less/profile_page.less' %}"/>
+{% endblock %}
+
+{% block bootstrap_vars %}
+	{% autoescape off %}
+	var PLANTS = {{ plant_objects }};
+	var GARDENER = {{ gardener_object }};
+	{% if isAuthenticated and user.username == gardener.username %}
+		var isEditable = true;
+	{% else %}
+		var isEditable = false;
+	{% endif %}
+	{% endautoescape %}
+{% endblock %}
+
+{% block main_content %}
+	<div class="profile-page">
+		<div class="profile-page-content container">
+			{% include "gardening/shared/profile_header.html" with isAuthenticated=isAuthenticated result=gardener %}
+		</div>
+		<div class="plant-content container">
+			{% for plant in plants %}
+				{% include "gardening/profile_page/plant_template.html" with plant=plant %}
+			{% endfor %}
+		</div>
+	</div>
+{% endblock %}
+
+{% block scripts %}
+	<script src="{% static 'gardening/profile_page/js/backbone/models/ProfilePageModels.js' %}"></script>
+	<script src="{% static 'gardening/profile_page/js/backbone/collections/PlantCollection.js' %}"></script>
+	<script src="{% static 'gardening/profile_page/js/backbone/collections/PlantImgCollection.js' %}"></script>
+	<script src="{% static 'gardening/profile_page/js/backbone/views/ProfilePageView.js' %}"></script>
+{% endblock %}

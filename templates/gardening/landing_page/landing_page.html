@@ -1,0 +1,81 @@
+{% extends "gardening/shared/base.html" %}
+{% load static from staticfiles %}
+{% load template_tags %}
+
+{% block title %}
+	<title>GreenThumbs: Green thumbs for Home Gardens</title>
+{% endblock %}
+
+{% block less_styling_browser_compile %}
+	<link type="text/css"
+		  rel="stylesheet/less"
+		  href="{% static 'gardening/landing_page/less/landing_page.less' %}"
+	/>
+{% endblock %}
+
+{% block less_styling_pre_compile %}
+	<link type="text/less"
+		  rel="stylesheet" 
+	      href="{% static 'gardening/landing_page/less/landing_page.less' %}"
+	/>
+{% endblock %}
+
+{% block bootstrap_vars %}
+{% endblock %}
+
+{% block main_content %}
+	<div class="top-img">
+		<div class="top-headline container">
+			<div class="row">
+			<h1 class='headline-text col-xs-12'>
+				Connecting home gardens to green thumbs
+			</h1>
+			</div>
+			<div class="row">
+			<div class='col-xs-12'>
+				<a class="signup-btn btn btn-default"
+				   href="uauth/?access_type=signup">Sign Up</a>
+			</div>
+			</div>
+		</div>
+	</div>
+	<div class="container">
+		<ul class="mid-graphics row">
+			<li class="mid-graphics-item col-xs-12 col-sm-6 col-md-4">
+				<div class="text-item panel">
+					Find other green thumbs in your area!
+					<div id="mgi-1" class="mid-graphics-image">
+						<!-- <img src="{% static 'gardening/landing_page/img/map-img.png' %}"/> -->
+					</div>
+				</div>
+			</li>
+			<!--<li class='hidden-xs col-sm-2 col-md-1'>-->
+			<li class='mid-graphics-item col-xs-12 col-sm-6 col-md-4'>
+				<div class='text-item panel'>
+					Build your community and share your knowledge!
+					<div id='mgi-2' class='mid-graphics-image'>
+					</div>
+				</div>
+			</li>
+			<!--<li class='hidden-sm col-md-1'>-->
+			<li class='mid-graphics-item col-xs-12 col-sm-5 col-md-4'>
+				<div class='text-item panel'>
+					Connect with other green thumbs!
+					<div id='mgi-3' class='mid-graphics-image'>
+					</div>
+				</div>
+			</li>
+		</ul>
+	</div>
+	<div class='content-managed container'>
+		{% autoescape off %}
+			{{ content.header | checkIfExist }}
+			{{ content.about | checkIfExist  }}
+		{% endautoescape %}
+	</div>
+{% endblock %}
+
+{% block scripts %}
+		<script src="{% static 'gardening/landing_page/js/cached_UI.js' %}"></script>
+		<script src="{% static 'gardening/landing_page/js/landing_page.js' %}"></script>
+{% endblock %}

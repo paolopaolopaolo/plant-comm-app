@@ -1,0 +1,20 @@
+{% load compress %}
+{% load static from staticfiles %}
+
+{% compress js%}
+	<script src="{% static 'gardening/shared/js/underscore.min.js' %}">
+	</script>
+	<script src='{% static "gardening/shared/js/backbone.min.js" %}'>
+	</script>
+	<script src='{% static "gardening/shared/js/sync.js" %}'>
+	</script>
+	<!-- Shared Backbone MVC -->
+	<!-- Models -->
+	<!-- Collections -->
+	<!-- Views -->
+	<script src="{% static 'gardening/shared/js/backbone/views/HeaderView.js'%}"></script>
+	<script src="{% static 'gardening/shared/js/backbone/views/BaseView.js' %}"></script>
+	<!-- Page Specific JS Scripts -->
+	{% block scripts %}
+	{% endblock %}
+{% endcompress %}

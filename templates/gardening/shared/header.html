@@ -1,0 +1,80 @@
+{% load static from staticfiles %}
+{% load template_tags %}
+
+<div class="header-wrapper container">
+	<div class="header row">
+			<a class="col-xs-1 col-sm-5" href="/">
+				<img id="greenthumb-icon" src="{% static 'gardening/shared/img/greenthumb_icon.svg' %}">
+				<h2 class="hidden-xs">GreenThumbs</h2>
+			</a>
+			<form class="search-wrapper col-xs-3" action="/search">
+				<input class="search-text" name="query" type="text" />
+				<input class="search-submit" type="submit" value="&#xf002;"/>
+			</form>
+		{% if isAuthenticated %}
+			<span class="user-menu-btn dropdown">
+				<span class="user-text">
+					<a href="/profile/{{user}}">
+						<img class="header-profile-pic" 
+							 src="{{ header_profile_pic | normalizeMediaPic:media_url }}"/>
+					</a>
+					<span class="click-down">{{ user }}</span>
+					<i class="fa fa-sort-desc click-down hidden-xs"></i>
+				</span>
+			</span>
+			<span class="chat-btn dropdown">
+				<i class="fa fa-envelope"></i>
+				<div class="count" style="
+				    position: absolute;
+				    top: 3px;
+				    font-size: 12px;
+				    background: #09AA03;
+				    padding: 1px 5px;
+				    border-radius: 10px;
+				    color: #FFF;
+				    right: 12px;
+				">3</div>
+			</span>
+			<div id="dropdown-menus" class="container">
+				<div class="row">
+					<div class="toggle-menu-wrapper menu-wrappers col-xs-12 col-sm-3 col-sm-offset-9">
+						<div class="arrow-up"></div>
+						<ul class="toggle-menu">
+							<li>
+								<a href="/profile">
+									<i class="fa fa-cog"></i> Account Settings
+								</a>
+							</li>
+							<li>
+								<a href="/logout">
+									<i class="fa fa-sign-out"></i> Logout
+								</a>
+							</li>
+						</ul>
+					</div>
+					<div class="chat-menu-wrapper menu-wrappers col-xs-12 col-sm-4 col-sm-offset-7">
+						<div class="arrow-up"></div>
+						<div class="chat-menu">
+							<h3>Messages</h3>
+							{% for convo in convos %}
+							{% empty %}
+							<div><b>No messages yet! Get out there and talk to people!</b></div>
+							{% endfor %}
+							<ul class="mCustomScrollbar" data-mcs-theme="dark"></ul>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div id="chat-window"></div>
+		{% else %}
+			<span class="header-auth-btn">
+			  <a href="/uauth/?access_type=signup">Sign Up</a>
+			  <a href="/uauth/?access_type=login">Login</a>
+			</span>
+		{% endif %}
+	</div>
+	
+</div>
+
+

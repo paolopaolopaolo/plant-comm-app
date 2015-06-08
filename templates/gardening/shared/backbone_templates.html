@@ -1,0 +1,71 @@
+{% verbatim %}
+	<!-- Chat Text -->
+	<script id='chat-text-template' type='text/html'>
+		{{ text }}
+	</script>
+
+	<!-- Chat Window-->
+	<script id='chat-window-template' type='text/html'>
+			<div class='chat-header'>
+				<b>{{ user }}</b>
+				<button class='close-chat-win command-chat-win'>&times;</button>
+				<button class='minimize-chat-win command-chat-win'>_</button>
+			</div>
+			<div class='chat-text'>
+			</div>
+			<input type='text' name='user-chat-line' class='user-chat-spec' autofocus/>
+	</script>
+
+	<!-- Chat Menu -->
+	<script id='chat_menu_template' type='text/html'>
+		<li id='convo-line-item{{ id }}' class='convo-line-item'>
+			<input type='hidden' name='convo_id' value='{{ id }}'/>
+			<span class='convo-name'>{{ user }} :</span> {{ text }}
+		</li>
+	</script>
+
+	<!-- Other Gardener template -->
+	<script id='other_gardener_template' type='text/html'>
+		<div id='gardener_box{{ id }}' class='gardener_box clearfix' >
+			<h2 id='gardener_name{{ id }}' class='gardener_name'>
+				{{ username }}
+			</h2>{{ online }}
+			<p>{{ first_name }}&nbsp;{{ last_name }}&nbsp;({{ city }},&nbsp;{{ state }})</p>
+			<img class='og-profilepic' src='{{ profile_pic }}'/>
+			<div class='og-aboutme og-partition'>
+				<h3>About {{ first_name }}</h3>
+				<span>
+					{{ text_blurb }}
+					<br>
+					<br>
+					I am <span class='availability'>{{avail}} available</span> to care for gardens.
+				</span>
+				<button id='contact__{{ id }}' class='contact_gardener'>Contact Me <i class="fa fa-envelope-o"></i></button>
+			</div>
+			<h3 class='plant_header'>{{first_name}}&rsquor;s Plants</h3>
+			<div id='og-plants{{ id }}' class='og-plants og-partition'>
+			</div>
+		</div>
+	</script>
+
+	<!-- Plant Template (within Other Gardener template)-->
+	<script id='other_gardener_plant_template' type='text/html'>
+		<div id='plant_box{{ id }}' class='plant_box'>
+			<div id='plant_info{{ id }}' class='plant_info'>
+				<h4>Species:</h4>
+				<p>{{ species }}</p>
+				<h4>Quantity</h4>
+				<p>{{ quantity }}</p>
+				<h4>Information:</h4>
+				<p>{{ information }}</p>
+			</div>
+			<div id='plant_img{{ id }}' class='plant_info plant_imgs'>
+			</div>
+		</div>
+	</script>
+	
+	<!-- Plant image template (within Plant Template) -->
+	<script id='plant_image_template' type='text/html'>
+		<img class='plantimg_sprites' src='{{ imageURL }}'/>
+	</script>
+{% endverbatim %}

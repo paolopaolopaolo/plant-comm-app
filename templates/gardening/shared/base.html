@@ -1,0 +1,113 @@
+{% load compress %}
+{% load static from staticfiles %}
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<!-- Meta Tag for RESPONSIVITY -->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0 minimal-ui"/>
+		<!-- Page Title -->
+		{% block title %}
+		{% endblock %}
+		<!-- Styles and Links -->
+		<!-- Google Font: Muli Font -->
+		<link href="//fonts.googleapis.com/css?family=Muli:400,300italic"
+	  		  rel="stylesheet"
+	  		  type="text/css"/>
+		<!-- Font Awesome-->
+		<link rel="stylesheet" 
+	 		  href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"/>
+	 	<!-- Twitter Bootstrap -->
+	 	<link rel="stylesheet" 
+	 		  href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"/>
+	 	<!-- Fancy Scrollbars -->
+	 	<link rel="stylesheet"
+	 		  href="//cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.0.9/jquery.mCustomScrollbar.css"/>
+
+		 <!-- Page Specific CSS Styling-->
+		{% block css_styles %}
+		{% endblock %}
+		{% compress css %}
+			{% block css %}
+			{% endblock %}
+		{% endcompress %}
+		<!-- Page Specific LESS Styling -->
+		{% if not compress_enabled %}
+			<link rel="stylesheet/less"
+		  		  href="{% static 'gardening/shared/less/base.less' %}"
+			/>
+			{% block less_styling_browser_compile %}
+			{% endblock %}
+			<script src="{% static 'gardening/shared/js/less.min.js' %}" 
+			type="text/javascript"></script>
+		{% else %}
+			{% compress css %}
+				<link type="text/less"
+		  			  rel="stylesheet" 
+	      			  href="{% static 'gardening/shared/less/base.less' %}"
+				/>
+				{% block less_styling_pre_compile %}
+				{% endblock %}
+			{% endcompress %}
+		{% endif %}
+		<!-- Bootstrapped Javascript Variables -->
+		<script>
+			{% autoescape off %}
+				var USER = "{{ user.username }}";
+				var MEDIA_URL = "{{ media_url }}";
+				{% if not isAuthenticated %}
+					var isChatDisabled = true;
+				{% else %}
+					var isChatDisabled = false;
+				{% endif %}
+				{% if convos and isAuthenticated %}
+					var CONVOS = {{ convos }};
+				{% endif %}
+				var DEFAULT_PROFILE_PIC = "https://plantappstorage.s3.amazonaws.com/static/img/user_blank_image.png";
+				{% block bootstrap_vars %}
+				{% endblock %}
+			{% endautoescape %}
+		</script>
+	</head>
+	<body>
+		<div class="main-content-wrapper">
+			<!-- Header -->
+			{% include "gardening/shared/header.html" with isAuthenticated=isAuthenticated user=user profile_pic=profile_pic%}
+
+			<!-- Main Content -->
+			{% block main_content %}
+			{% endblock %}
+			
+			<!-- Bacbone Templates -->
+			{% if isAuthenticated %}
+				{% include "gardening/shared/backbone_chat_templates.html" %}
+			{% endif %}
+
+			{% compress js %}
+				<script src="{% static 'gardening/shared/js/jquery-1.11.1.min.js' %}">
+				</script>
+				<script src="{% static 'gardening/shared/js/jquery-ui.min.js' %}">
+				</script>
+				<script src="{% static 'gardening/shared/js/jquery.cookie.min.js' %}">
+				</script>
+			{% endcompress %}
+			<!-- Shared Javascript  -->
+			<script src="{% static 'gardening/shared/slick/slick/slick.js' %}"></script>
+			<script src="//cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.0.9/jquery.mCustomScrollbar.concat.min.js"></script>
+
+			{% if isAuthenticated %}
+				{% include "gardening/shared/authenticated_scripts.html" %}
+			{% else %}
+				{% include "gardening/shared/unauthenticated_scripts.html" %}
+			{% endif %}
+
+			{% compress js %}
+				{% block scripts %}
+				{% endblock%}
+			{% endcompress %}
+			
+			<!-- Footer -->
+			{% include "gardening/shared/footer.html" with showsFooter=showsFooter %}
+		</div>
+	</body>
+</html>

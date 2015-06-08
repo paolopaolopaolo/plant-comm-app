@@ -23,8 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 GARDENING_DIR = os.path.join(BASE_DIR, "gardening")
 TEMPLATE_DIR = os.path.join(BASE_DIR, "templates")
 TEMPLATE_DIRS = (
-                    os.path.join(TEMPLATE_DIR, "gardening"),
-                    os.path.join(BASE_DIR, "static", "js", "backbone", "profile_page"),
+                    TEMPLATE_DIR,
                 )
 
 LOGIN_URL = '/'
@@ -99,6 +98,7 @@ if DEBUG:
     STATIC_URL = '/static/'
     STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static')
     MEDIA_ROOT = os.path.join(STATIC_ROOT, "media")
+    MEDIA_URL = '/media/'
     COMPRESS_ROOT = os.path.join(STATIC_ROOT, "COMPRESS")
     COMPRESS_URL = STATIC_URL
 

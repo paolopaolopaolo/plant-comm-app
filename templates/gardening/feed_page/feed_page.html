@@ -1,0 +1,40 @@
+{% extends "gardening/shared/base.html" %}
+{% load static from staticfiles %}
+
+<!-- CSS Styling -->
+{% block css %}
+	<link href='{% static "gardening/shared/css/jquery-ui.min.css" %}' rel='stylesheet' type='text/css'/>
+{% endblock %}
+
+<!-- DEVELOPMENT STYLING BRANCH -->
+<!-- LESS Link has these attributes: -->
+<!-- type="text/css" rel='stylesheet/less' href='{% static "file.less"%}'-->
+{% block less_styling_browser_compile %}
+	<link rel="stylesheet/less"
+		  href="{% static 'gardening/feed_page/less/feed_page.less'%}"/>
+{% endblock %}
+
+<!-- PRODUCTION STYLING BRANCH -->
+<!-- LESS Link has these attributes: -->
+<!-- type="text/less" rel='stylesheet' href='{% static "file.less"%}'-->
+{% block less_styling_pre_compile %}
+	<link type="text/less"
+		  rel="stylesheet"
+		  href="{% static 'gardening/feed_page/less/feed_page.less'%}"/>
+{% endblock %}
+
+<!-- Script tag with Bootstrapped values -->
+{% block bootstrap_vars %}
+ 
+	var DOMAIN, OTHER_GARDENERS;
+	DOMAIN = "{{ domain }}";
+	OTHER_GARDENERS = {{ other_gardeners }};
+{% endblock %}
+
+<!-- Main content -->
+{% block main_content %}
+{% endblock %}
+
+<!--Feed Page Specific scripts -->
+{% block scripts %}
+{% endblock %}

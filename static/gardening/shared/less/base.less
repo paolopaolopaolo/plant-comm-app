@@ -1,0 +1,514 @@
+@header_color: #e1f0e2;
+@header_height: 55px;
+
+@background_color: #fafafa;
+@panel_color: #ffffff;
+
+// Animation Keyframes
+@keyframes getbigger {
+	0% {
+		font-size: 17px;
+	}
+	50% {
+		font-size: 20px;
+	}
+	100% {
+		font-size: 27px;
+	}
+}
+
+@keyframes appear {
+	0% {
+		height: 0;
+	}
+	25% {
+		height: 20px;
+	}
+	50% {
+		height: 50px;
+	}
+	100% {
+		height: initial;
+	}
+}
+
+
+// Mixins
+.list_style_none() {
+	list-style-type: none;
+	list-style: none;
+	list-style-image: url(data:0);
+}
+
+.show-hidden {
+	display: inline-block !important;
+	animation-name: appear;
+	animation-duration: 0.5s;
+}
+
+.arrow-up {
+	width: 0;
+  	height: 0;
+  	border-left: 10px solid transparent;
+  	border-right: 10px solid transparent;
+  	border-bottom: 10px solid #fff;
+  	position: absolute;
+  	right: 4px;
+  	top: -10px;
+}
+
+.hidden {
+	display: none !important;
+}
+
+// Styling for gardening/shared/base.html
+* {
+	font-family: "Muli", garamond, sans-serif;
+}
+
+// HACKS(1): Setting Footer at the bottom, see other HACKS(1)
+html {
+	height: 100%;
+	body {
+		background-color: @background_color;
+		margin: 0;
+		padding: 0 0 75px 0;
+		height: 100%;
+		.main-content-wrapper {
+			min-height: 100%;
+			position: relative;
+		}
+	}
+}
+
+ul {
+	.list_style_none();
+	padding: 0;
+}
+
+.panel {
+	background-color: @panel_color;
+  	box-shadow: 0 0 6px #ddd;
+}
+
+// Styling for gardening/shared/header.html
+.header-wrapper {
+	background-color: @background_color;
+	width: 100%;
+	border-bottom-style: solid;
+    border-bottom-width: 1px;
+	border-bottom-color: #999; 
+	.header {
+		position: relative;
+		white-space: nowrap;
+		color: #333;
+		height: @header_height;
+		h2 {
+			  color: #228822;
+			  float: left;
+			  /* bottom: 10px; */
+			  display: inline-block;
+			  /* left: 40px; */
+			  margin: 10px 0px 0 0;
+			  /* position: relative; */
+			  /* top: 12px; */		
+		}
+		a {
+			text-decoration: none;
+			color: #333;
+			margin-right: 5px;
+			&:hover {
+				text-decoration: none;
+				color: #2222ee;
+			}
+		}
+		
+		.search-wrapper {
+			position: relative;
+    		white-space: nowrap;
+  			display: inline-block;
+  			margin: 13px 0px 0 10px;
+			* {
+				float: left;
+				display: inherit;
+			}
+			.search-text {
+				border: 1px solid #666;
+			  	border-radius: 30px;
+			  	padding: 5px 1px 3px 10px;
+			  	background-color: transparent;
+			  	font-size: 12px;
+			  	outline: none;
+			  	width: 100%;
+			}
+			.search-submit {
+				position: absolute;
+	  		 	right: 18px;
+			  	font-family: FontAwesome;
+			  	border: none;
+			  	background-color: transparent;
+			  	bottom: 3px;
+			}
+		}
+
+		.header-auth-btn {
+			text-align: center;
+			font-size: 15px;
+			float: right; 
+			height: 35px;
+			top: 18px;
+			margin-right: 15px;
+			position: relative;
+		}
+
+
+		.chat-btn {
+			font-size: 30px;
+		 	float: right;
+		 	margin: 7px 18px 0 -15px;
+		 	position: relative;
+		  	padding: 0 20px;
+		  	border-right: 1px solid #ddd;
+  			i {
+  				font-size: 24px;
+			  	color: #999;
+			  	position: relative;
+			  	top: -2px;
+  			}
+		}
+
+		.user-menu-btn {
+			float: right;
+			text-align: center;
+			font-size: 17px;
+			margin-left: -10px;
+			.user-text {
+				position: relative;
+				top: 8px;
+				* {
+					&:hover {
+						color: #333555;
+					}
+				}
+				a {
+					margin: 0;
+					text-decoration: none;
+					.header-profile-pic {
+						border-radius: 50%;
+						height: 35px;
+						width: 35px;
+						position: relative;
+						top: 0px;
+						margin-right: 8px
+					}
+				}
+				span {
+					margin-right: 5px;
+					margin-top: 9px;
+					cursor: pointer;
+				}
+				i {
+					position: relative;
+					cursor: pointer;
+					color: #777;
+  					top: -3px;
+				}
+			}
+		}
+
+
+		#dropdown-menus {
+			position: absolute;
+			top: @header_height;
+			right: 35px;
+			z-index: 100;
+			// .menu-wrappers {
+			// 	position: relative;
+			// 	float: right;
+			// 	margin-right: 15px;
+			// }
+			.chat-menu-wrapper {
+				position: relative;			  	
+				display: inline-block;
+			  	background-color: #fff;
+			  	box-shadow: 0 0 6px #ddd;
+			  	.chat-menu {
+			  		h3 {
+			  			margin: 0;
+			  			padding: 10px 15px;
+			  			font-size: 15px;
+			  		}
+			  		ul {
+					  	max-height: 215px;
+						overflow-y: hidden;
+			  			position: relative;
+					  	width: 100%;
+					  	background-color: #fafafa;
+					  	li {
+					  		cursor: pointer;
+					  		padding: 10px 5px;
+					  		 &::after {
+					  		 	content: "";
+							  	height: 0px;
+							  	display: block;
+							  	clear: both;
+							}
+					  		&:nth-child(odd) {
+					  			background-color: #fafafa;
+					  		}
+					  		&:nth-child(even) {
+					  			background-color: #fff;
+					  		}
+						  	div {
+						  		display: inline-block;
+						  		text-overflow: ellipsis;
+  								overflow: hidden;
+  								width: 60%;
+  								float: left;
+						  	}
+						  	.convo-text {
+						  		font-size: 12px;
+						  		margin: 5px 0;
+						  	}
+						  	.chat-thumbnail {
+						  		width: 52px;
+							  	height: 52px;
+							  	vertical-align: top;
+							  	margin-right: 10px;
+							  	border-radius: 50%;
+							  	float: left;
+							  	position: relative;
+							  	top: 8px;
+						  	}
+					  	}
+			  		}
+			  		.close-button {
+			  			float: right;
+						background-color: transparent;
+						border: none;
+						font-weight: bold;
+						font-size: 22px;
+						position: absolute;
+						top: 5px;
+						right: 5px;
+			  		}
+			  	}
+			}
+			.toggle-menu-wrapper {
+				position: relative;		
+				font-size: 15px;
+			  	border: #ddd;
+			  	display: none;
+			  	background-color: #fff;
+			  	box-shadow: 0 0 6px #ddd;
+			  	.toggle-menu {
+			  		margin: 10px 0px;
+				  	li {
+				  		padding: 15px 10px;
+				  		cursor: pointer;
+				  		&:hover {
+				  			background-color: #fafafa;
+				  		}
+				  	}
+			  	}
+			}
+		}
+
+		#chat-window {
+			@media screen {
+				z-index: 100;
+				display: block;
+				position: fixed;
+				bottom: 0px;
+				right: 0px;
+				white-space: nowrap;
+				vertical-align: bottom;
+				padding: 2px;
+			}
+			// Each individual user chat window
+			.chat-window {
+				@media screen {
+					z-index: 100000000000000000;
+					background-color: white;
+					display: inline-block;
+					white-space: normal;
+					overflow: hidden;
+					width: 300px;
+					height: 300px;
+					float: right;
+					margin: 3px;
+					border: 1px solid #ddd;
+				}
+				@media (max-width: 768px) {
+					width: 100%;
+					top: 0px !important;
+				}
+				.chat-header {
+					position: relative;
+					top: 0px;
+					width: 100%;
+					font-weight: bold;
+					padding: 7px 5px 5px 10px;
+					background-color: #13A6FF;
+					button.command-chat-win {
+						position: relative;
+						margin: 0 0 0 5px;
+						float: right;
+						font-size: 10px;
+						color: #13A6FF;
+						font-weight: bold;
+						cursor: pointer;
+						background-color: #FFF;
+						border: 1px solid #FFF;
+						border-radius: 2px;
+						&:hover {
+							opacity: 0.5;
+						}
+					}
+				}
+				.chat-text {
+					position: relative;
+					overflow-y: auto;
+					height: 240px;
+					.text-line {
+						width: 95%;
+						word-wrap: break-word;
+						white-space: pre-line;
+						position: relative;
+						display: block;
+						clear: both;
+						left: 8px;
+						margin: 5px;
+
+						.chat-format {
+							padding: 5px;
+							font-size: 12px;
+							border-radius: 5px;
+							margin: 5px;
+						}
+						.other-text {
+							background-color: #788384 + #555;
+							float: left;
+
+						}
+						.self-text {
+							background-color: #e0e0e0;
+							float: right;
+						}
+						.info-text {
+							background-color: #fafafa;
+						}
+					}
+				}
+
+				input.user-chat-spec {
+				  	display: inline-block;
+				  	position: relative;
+				  	padding: 2px;
+				  	background-color: #fafafa;
+				  	width: 100%;
+				  	border: none;
+				  	border-top: 1px #ddd solid;
+				}	
+			}
+		}
+
+		#greenthumb-icon {
+			  width: 50px;
+			  height: 45px;
+			  display: inline-block;
+			  float: left;
+		}
+
+	}
+}
+
+@profile-header-height: 135px;
+@profile-header-pic-height: 300px;
+
+// .profile-header-wrapper {
+// 	width: 100%;
+.profile-header {
+	position: relative;
+	padding: 10px;
+	border: 1px solid #ddd;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	min-height: @profile-header-height;
+	.profile-header-pic {
+		margin: 20px 0;
+		max-width: @profile-header-pic-height;
+	  	max-height: @profile-header-pic-height * (4/3);
+	  	vertical-align: top;
+	}
+	.profile-header-text {
+		position: relative;
+		display: inline-block;
+		a {
+			text-decoration: none;
+			color: #444;
+
+			&:hover {
+				color: #337ab7;
+			}
+		}
+		p {
+			color: #555;
+			font-size: 16px;
+			.icon {
+				position: relative;
+				display: inline-block;
+				vertical-align: middle;
+				height: 30px;
+				width: 30px;
+				bottom: 4px;
+				margin-right: 5px;
+			}
+		}
+	}
+	.profile-header-buttons {
+		float: left;
+		position: relative;
+		display: inline-block;
+		margin-top: 24px;
+		font-size: 20px;
+		color: #3a9a00;
+		button {
+			display: block;
+			margin-bottom: 20px;
+			border: 0;
+			background-color: #4fcd00;
+			color: #fff;
+		}
+	}
+	
+}
+// }
+
+// HACKS(1): Set footer at bottom:-75px (height)
+.footer-wrapper {
+	height: 75px;
+	background-color: @background_color - #111;
+	width: 100%;
+	margin-top: 37px;
+	bottom: -75px;
+	position: absolute;
+	.footer {
+		background-color: @background_color - #111;
+		text-align: center;
+		padding: 13px 0;
+		color: #333;
+		div {
+			display: inline-block;
+			margin: 10px 48px;
+		}
+		a {
+			text-decoration: none;
+			color: #333;
+			&:hover {
+				color: #33F;
+			}
+		}
+	}
+}
+
