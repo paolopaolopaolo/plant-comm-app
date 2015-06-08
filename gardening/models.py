@@ -72,6 +72,13 @@ STATE_ABBREVS = (
         ('WY', 'Wyoming'),
 )
 
+PAGES = (
+            ('LA', "Landing Page"),
+            ('PR', "Profile Page"),
+            ('FE', "Feed Page"),
+            ('NA', "Unassigned")
+        )
+
 # Sets filepath for profile pics
 def profile_path(instance, filename):
     return os.path.join(
@@ -89,6 +96,14 @@ def plant_path(instance, filename):
     )
 
 # Create your models here.
+
+class Content(models.Model):
+    page = models.CharField(max_length = 2, default = "NA", choices = PAGES)
+    descriptor = models.CharField(max_length = 20, default = "")
+    content = models.TextField(default = "")
+
+    def __unicode__(self):
+        return unicode(" : ".join((self.page, self.descriptor)))
 
 # Authentication and some other attributes
 class Gardener(models.Model):

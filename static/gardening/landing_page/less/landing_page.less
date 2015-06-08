@@ -1,0 +1,81 @@
+@shadow_properties: 2px 2px 4px #333;
+
+// Content Managed tags
+.content-managed {
+	padding-left: 30px;
+	p {
+		padding-left: 20px;
+		font-size: 18px;
+	}
+}
+
+.top-img {
+	position: relative;
+	height: 400px;
+	width: 100%;
+	background-image: url("../img/pink-spring.jpg");
+	background-size: cover;
+	text-shadow: @shadow_properties;
+	.top-headline {
+		color: floralwhite;
+		text-align: center;
+		position: absolute;
+		bottom: 75px;
+		.headline-text {
+			margin-bottom: 72px;
+		}
+		.signup-btn {
+			padding: 10px 100px;
+			font-size: 25px;
+			color: #fff;
+			background-color: #4fcd00;
+			border-color: #4fcd00;
+			text-align: center;
+			margin: 5px auto;
+			box-shadow: 0px 0px 8px #333;
+			text-shadow: 0 0 0;
+			&:hover {
+				color: #2222aa;
+			}
+		}
+	}
+}
+
+.mid-graphics {
+	.mid-graphics-item {
+		// font-size: 18px;
+		// margin-top: 25px;
+		.text-item {
+			box-shadow: 0 0 6px #ddd;
+			text-align: center;
+			margin-top: 20px;
+			min-height: 335px;
+			padding: 5%;
+			width: 100%;
+			position: relative;
+			.mid-graphics-image {
+			  width: 94%;
+			  height: 220px;
+			  background-color: transparent;
+			  background-size: contain;
+			  background-repeat: no-repeat;
+			  background-position-x: 50%;
+			  padding: 10px 0px;
+			  margin: 0 auto;
+			  position: absolute;
+			  bottom: 30px;
+			  overflow: hidden;
+			}
+			#mgi-1 {
+				background-image: url("../img/map-img.png");
+			}
+			#mgi-2 {
+				background-image: url("../img/community.svg");
+			}
+			#mgi-3 {
+				background-image: url("../img/user-network.svg");
+			}
+		}
+	}
+
+}

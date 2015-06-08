@@ -1,0 +1,32 @@
+
+{% verbatim %}
+
+	<!-- Chat Text -->
+	<script id="chat-text-template" type="text/html">
+		{{ text }}
+	</script>
+
+	<!-- Chat Window-->
+	<script id="chat-window-template" type="text/html">
+			<div class="chat-header">
+				<b>{{ user }}</b>
+				<button class="close-chat-win command-chat-win">&times;</button>
+				<button class="minimize-chat-win command-chat-win">_</button>
+			</div>
+			<div class="chat-text">
+			</div>
+			<input type="text" name="user-chat-line" class="user-chat-spec" autofocus/>
+	</script>
+
+	<!-- Chat Menu -->
+	<script id="chat-menu-template" type="text/html">
+		<li id="convo-line-item{{ id }}" class="convo-line-item">
+			<input type="hidden" name="convo-id" value="{{ id }}"/>
+			<img class="chat-thumbnail" src="{{ msg_profile_pic }}">
+			<div class="convo-name">{{ user }}</div>
+			<div class="convo-text">{{ text }}</div>
+			<div class="convo-time">{{ time_initiated }}</div>
+		</li>
+	</script>
+
+{% endverbatim %}

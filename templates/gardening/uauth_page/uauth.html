@@ -1,0 +1,51 @@
+{% extends "gardening/shared/base.html" %}
+{% load static from staticfiles %}
+{% load template_tags %}
+
+{% block less_styling_browser_compile %}
+	<link href="{% static 'gardening/uauth_page/less/uauth.less' %}"
+		  rel="stylesheet/less"/>
+{% endblock %}
+
+{% block less_styling_pre_compile %}
+	<link href="{% static 'gardening/uauth_page/less/uauth.less' %}"
+		  type="text/less"
+		  rel="stylesheet"/>
+{% endblock %}
+
+{% block main_content %}
+	<div class="auth-wrapper">
+		<div class="auth container">
+			<div class="row">
+				<form class="col-xs-12" method="POST">
+					{% csrf_token %}
+					{% if showLogIn and not showSignUp %}
+						<h2>Log In</h2>
+						{% for field in loginform %}
+							<p>
+								<label>
+									{{ field.label | removeColon }}
+								</label>
+								{{ field }}
+							</p>
+						{% endfor %}
+
+					{% elif showSignUp and not showLogIn %}
+						<h2>Sign Up</h2>
+						{% for field in signinform %}
+							<p>
+								<label>
+									{{ field.label | removeColon }}
+								</label>
+								{{ field }}
+							</p>
+						{% endfor %}
+					{% endif %}
+					<input class="submit-btn" type="submit" value="Submit"/>
+				</form>
+			</div>
+			<p class="error-msg">{{ error_message }}</p>
+		</div>
+	</div>
+
+{% endblock %}

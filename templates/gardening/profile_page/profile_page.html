@@ -1,0 +1,24 @@
+{% extends "gardening/shared/base.html" %}
+{% load static %}
+{% load compress %}
+
+{% block less_styling_browser_compile %}
+{% endblock %}
+
+{% block less_styling_pre_compile %}
+{% endblock %}
+
+{% block bootstrap_vars %}
+	{% autoescape off %}
+	var PLANTS = {{ plant_objects }};
+	var GARDENER = {{ gardener_object }};
+	var PLANT_IMGS = {{ plant_img_objects }};
+	var isEditable = {{ editable }};
+	{% endautoescape %}
+{% endblock %}
+
+{% block main_content %}
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}

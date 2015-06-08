@@ -1,0 +1,21 @@
+{% extends "gardening/shared/base.html" %}
+{% load template_tags %}
+{% load static from staticfiles %}
+
+{% block less_styling_pre_compile %}
+	<link rel="stylesheet" type="text/less" href="{% static 'gardening/search_page/less/search_page.less' %}"/>
+{% endblock %}
+
+{% block main_content %}
+	<div class="search-wrapper container">
+		<div class="search-header-wrapper row">
+			<h5 class="search-header col-xs-12">Results for "{{ query }}"... ({{ search_results | getLength }} result{% if search_results_length > 1 %}s{% endif %})
+			</h5>
+			</div>
+		{% for result in search_results %}
+			{% include "gardening/shared/profile_header.html" with isAuthenticated=isAuthenticated result=result %}
+		{% empty %}
+			We got nothing. Have you tried GOOOOOOOGLE????!!!
+	{% endfor %}
+	</div>
+{% endblock %}

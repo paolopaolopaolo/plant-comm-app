@@ -1,0 +1,115 @@
+{% load compress %}
+{% load static from staticfiles %}
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<!-- Meta Tag for RESPONSIVITY -->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, minimal-ui"/>
+		<!-- Page Title -->
+		{% block title %}
+		{% endblock %}
+		<!-- Styles and Links -->
+		<!-- Google Font: Muli Font -->
+		<link href="//fonts.googleapis.com/css?family=Muli:400,300italic"
+	  		  rel="stylesheet"
+	  		  type="text/css"/>
+		<!-- Font Awesome-->
+		<link rel="stylesheet" 
+	 		  href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"/>
+	 	<!-- Twitter Bootstrap -->
+	 	<link rel="stylesheet" 
+	 		  href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"/>
+	 	<link rel="stylesheet"
+	 		  href="//cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.0.9/jquery.mCustomScrollbar.css"/>
+		{% compress css %}
+			 <!-- Page Specific CSS Styling-->
+			{% block css %}
+			{% endblock %}
+		{% endcompress %}
+		<!-- Page Specific LESS Styling -->
+		{% if not compress_enabled %}
+			<link rel="stylesheet/less"
+		  		  href="{% static 'gardening/shared/less/base.less' %}"
+			/>
+			{% block less_styling_browser_compile %}
+			{% endblock %}
+			<script src="{% static 'gardening/shared/js/less.min.js' %}" 
+			type="text/javascript"></script>
+		{% else %}
+			{% compress css %}
+				<link type="text/less"
+		  			  rel="stylesheet" 
+	      			  href="{% static 'gardening/shared/less/base.less' %}"
+				/>
+				{% block less_styling_pre_compile %}
+				{% endblock %}
+			{% endcompress %}
+		{% endif %}
+		<!-- Bootstrapped Javascript Variables -->
+		<script>
+			{% autoescape off %}
+				var USER = "{{ user.username }}";
+				var MEDIA_URL = "{{ media_url }}";
+				{% if not isAuthenticated %}
+					var isChatDisabled = true;
+				{% else %}
+					var isChatDisabled = false;
+				{% endif %}
+				{% if convos and isAuthenticated %}
+					var CONVOS = {{ convos }};
+				{% endif %}
+				var DEFAULT_PROFILE_PIC = "https://plantappstorage.s3.amazonaws.com/static/img/user_blank_image.png";
+				{% block bootstrap_vars %}
+				{% endblock %}
+			{% endautoescape %}
+		</script>
+	</head>
+	<body>
+		<!-- Header -->
+		{% include "gardening/shared/header.html" with isAuthenticated=isAuthenticated user=user profile_pic=profile_pic%}
+
+		<!-- Main Content -->
+		{% block main_content %}
+		{% endblock %}
+		
+		<!-- Bacbone Templates -->
+		{% if isAuthenticated %}
+			{% include "gardening/shared/backbone_chat_templates.html" %}
+		{% endif %}
+
+		<!-- Shared Javascript  -->
+		
+		{% compress js %}
+			<script src="{% static 'gardening/shared/js/jquery-1.11.1.min.js' %}">
+			</script>
+			<script src="{% static 'gardening/shared/js/jquery-ui.min.js' %}">
+			</script>
+			<script src="{% static 'gardening/shared/js/jquery.cookie.min.js' %}">
+			</script>
+			<script src="{% static 'gardening/shared/js/underscore.min.js' %}">
+			</script>
+			<script src='{% static "gardening/shared/js/backbone.min.js" %}'>
+			</script>
+			<script src='{% static "gardening/shared/js/sync.js" %}'>
+			</script>
+			<!-- Shared Backbone MVC -->
+			<!-- Models -->
+			<script src="{% static 'gardening/shared/js/backbone/models/Convo.js'%}"></script>
+			<!-- Collections -->
+			<script src="{% static 'gardening/shared/js/backbone/collections/Convos.js'%}"></script>
+			<!-- Views -->
+			<script src="{% static 'gardening/shared/js/backbone/views/ChatView.js'%}"></script>
+			<script src="{% static 'gardening/shared/js/backbone/views/ConvoView.js'%}"></script>
+			<script src="{% static 'gardening/shared/js/backbone/views/HeaderView.js'%}"></script>
+			<script src="{% static 'gardening/shared/js/backbone/views/BaseView.js' %}"></script>
+			<!-- Page Specific JS Scripts -->
+			{% block scripts %}
+			{% endblock %}
+		{% endcompress %}
+		<script src="//cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.0.9/jquery.mCustomScrollbar.concat.min.js"></script>
+
+		<!-- Footer -->
+		{% include "gardening/shared/footer.html" with showsFooter=showsFooter %}
+	</body>
+</html>

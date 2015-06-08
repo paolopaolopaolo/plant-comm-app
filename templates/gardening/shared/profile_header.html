@@ -1,0 +1,20 @@
+{% load template_tags %}
+
+<div class="profile-header row">
+		<input name="contact-id" value="{{result.id}}" type="hidden"/>
+		<img class="profile-header-pic col-xs-12 col-sm-3" src="{{ result.profile_pic|normalizeMediaPic:media_url }}"/>
+		<div class="profile-header-text col-xs-12 col-sm-6">
+			<h3>
+				<a href="/profile/{{result.username}}">{{ result.username }}</a>
+			</h3>
+			{%if result.city and result.state %}
+				<p>{{ result.city }}, {{result.state}}</p>
+			{% endif %}
+			<p>{{ result.plants|getLength }} Plants</p>
+		</div>
+		<div class="profile-header-buttons col-xs-12 col-sm-3">
+			<button class="p-header-follow-btn">Follow</button>
+			<button class="p-header-contact-btn">Contact</button>
+		</div>
+
+</div>

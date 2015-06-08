@@ -53,7 +53,7 @@ class SignUpForm(forms.Form):
 
 
 	first_name = forms.CharField(max_length=100,
-								 label="First name",
+								 label="First name\b",
 								 required=True)
 
 	last_name = forms.CharField(max_length=100,
@@ -104,8 +104,11 @@ class LogInForm(forms.Form):
 		print "login_is_email: %s" % self.login_is_email
 		print "email: %s" % self.email
 		if self.login_is_email:
-			user = User.objects.get(email = self.email.lower())
-			username = user.username
+			try:
+				user = User.objects.get(email = self.email.lower())
+				username = user.username
+			except User.DoesNotExist:
+				username = ""
 		else:
 			username = self.cleaned_data["uname_email"].lower()
 		return authenticate(

@@ -14,9 +14,14 @@ def set_user(method):
 		def setting_user(*args, **kwargs):
 			self = args[0]
 			request = args[1]
-			self.user = User.objects.get(username = request.user)
-			self.gardener = Gardener.objects.get(user = self.user)
-			self.plants = Plant.objects.filter(user = self.gardener)
+			try:
+				self.user = User.objects.get(username = request.user)
+				self.gardener = Gardener.objects.get(user = self.user)
+				self.plants = Plant.objects.filter(user = self.gardener)
+			except User.DoesNotExist:
+				self.user = None
+				self.gardener = None
+				self.plants = None
 			return method(*args, **kwargs)
 		return setting_user
 	except Exception, e:
@@ -65,7 +70,9 @@ def setGardenerPlantQueryset(method, limit = None, preFilter = None):
 			domain = "https://plantappstorage.s3.amazonaws.com"
 
 			def filterMethod(queryset_member):
-				return not (self.gardener.id == queryset_member.id)
+				if hasattr(self.gardener, "id"):
+					return not (self.gardener.id == queryset_member.id)
+				return True
 
 			if preFilter is not None:
 				gardeners = preFilter(Gardener.objects.all())
@@ -73,10 +80,14 @@ def setGardenerPlantQueryset(method, limit = None, preFilter = None):
 			else:
 				gardeners = Gardener.objects.all()
 
-			if limit is None or len(gardeners) < limit:
-				self.queryset = filter(filterMethod, gardeners)
+			if self.gardener is None:
+				if limit is None or len(gardeners) < limit:
+					self.queryset = filter(filterMethod, gardeners)
+				else:
+					self.queryset = filter(filterMethod, gardeners)[0: limit]
 			else:
-				self.queryset = filter(filterMethod, gardeners)[0: limit]
+				self.queryset = gardeners
+				
 			for model in self.queryset:
 				model.username = model.user.username
 				model.plants = []
@@ -113,8 +124,17 @@ def set_user_and_gardener_and_convos(mthod):
 		self = args[0]
 		request = args[1]
 
-		self.user = User.objects.get(username = request.user)
-		self.gardener = Gardener.objects.get(user = self.user)
+		try:
+			self.user = User.objects.get(username = request.user)
+			self.gardener = Gardener.objects.get(user = self.user)
+			self.plants = Plant.objects.filter(user = self.gardener)
+		except Exception:
+			self.user = None
+			self.gardener = None
+			self.plants = []
+			self.convos = []
+			return mthod(self, request, *args, **kwargs)
+
 		self.convos = (
 						Convo.objects.filter(user_a = self.gardener) |
 						Convo.objects.filter(user_b = self.gardener)
@@ -135,7 +155,12 @@ def set_user_and_gardener_and_convos(mthod):
 				elif convo_to_add['user_b'] == self.gardener.id:
 					convo_to_add['user'] = convo.user_a.username
 					convo_to_add['seen'] = convo.seen_b
+
+				gardener = User.objects.get(username=convo_to_add['user'])
+				gardener = Gardener.objects.get(user = gardener)
+				convo_to_add['msg_profile_pic'] = gardener.profile_pic.name
 				convos.append(convo_to_add)
+
 		self.convos = convos
 		return mthod(self, request, *args, **kwargs)
 	return wrapper

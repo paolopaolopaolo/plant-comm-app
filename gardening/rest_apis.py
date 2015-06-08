@@ -15,6 +15,7 @@ from django.forms.models import model_to_dict
 from django.db import IntegrityError
 from django.core.exceptions import SuspiciousOperation
 from rest_framework.pagination import PageNumberPagination
+from gardening.views import GreenThumbPage
 
 from rest_framework import mixins
 from rest_framework import generics
@@ -22,6 +23,55 @@ from PIL import Image
 import json, re
 
 from gardening.decorators import *
+
+### Shared Page REST API ###
+
+class SearchAPI( GreenThumbPage, mixins.ListModelMixin, generics.GenericAPIView ):
+	
+	serializer_class = GardenerPlantSerializer
+
+	@set_user_and_gardener_and_convos
+	@setGardenerPlantQueryset
+	def get(self, request, *args, **kwargs):
+
+		def filterFunction(query):
+			def check_each_term(term, strings):
+				for string in strings:
+					if term in string:
+						return True
+				return False
+
+			query_term = request.GET["query"].lower()
+			plants = [plant["plant"] for plant in query.plants]
+			plant_names = [plant.species.lower() for plant in plants]
+			plant_infos = [plant.information.lower() for plant in plants]
+
+			test1 = query_term in query.username.lower()
+			test2 = query_term in query.first_name.lower()
+			test3 = query_term in query.last_name.lower()
+			test4 = check_each_term(query_term, plant_names)
+			test5 = check_each_term(query_term, plant_infos)
+			test6 = query_term in query.city.lower()
+
+			return test1 or test2 or test3 or test4 or test5 or test6
+
+		self.queryset = filter(filterFunction, self.queryset)
+		results = [self.serializer_class(query).data for query in self.queryset]
+		context = {
+						"query": request.GET["query"],
+						"media_url": settings.MEDIA_URL,
+						"compress_enabled": settings.COMPRESS_ENABLED,
+						"convos": json.dumps(self.convos),
+						"user": request.user,
+						"search_results": results,
+						"search_results_length": len(results),
+						"isAuthenticated": request.user.is_authenticated(),
+				  }
+		if self.gardener is not None:
+			context["header_profile_pic"] = self.gardener.profile_pic
+
+		return render(request, "gardening/search_page/search_page.html", context)
+
 ### Profile Page REST APIs ###
 
 # Handle gardener data in profile page API
@@ -190,19 +240,3 @@ class OtherGardenerAPI( mixins.RetrieveModelMixin,
 				self.pagination_class = PageNumberPagination
 			return self.list(self, request, *args, **kwargs)
 		return self.retrieve(self, request, *args, **kwargs)
-
-class CompoundGardenerPlant():
-	available = False
-	profile_pic = ""
-	text_blurb = ""
-	id = None
-	first_name = ""
-	last_name = ""
-	city = ""
-	state = ""
-	zipcode = None
-	plants = []
-
-
-class JobSetAPI(View):
-	pass
