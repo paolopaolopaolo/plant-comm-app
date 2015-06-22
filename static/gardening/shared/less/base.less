@@ -57,8 +57,8 @@
   	top: -10px;
 }
 
-.hidden {
-	display: none !important;
+.menu-hidden {
+	visibility: hidden !important;
 }
 
 // Styling for gardening/shared/base.html
@@ -175,6 +175,16 @@ ul {
 			  	position: relative;
 			  	top: -2px;
   			}
+  			.count {
+  				position: absolute;
+				top: 3px;
+				font-size: 12px;
+				background: #09AA03;
+				padding: 1px 5px;
+				border-radius: 10px;
+				color: #FFF;
+				right: 12px;
+  			}
 		}
 
 		.user-menu-btn {
@@ -279,6 +289,9 @@ ul {
 							  	float: left;
 							  	position: relative;
 							  	top: 8px;
+						  	}
+						  	.fa-star {
+						  		color: #09AA03;
 						  	}
 					  	}
 			  		}

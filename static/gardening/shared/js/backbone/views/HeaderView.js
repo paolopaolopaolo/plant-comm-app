@@ -20,7 +20,8 @@ var HeaderView = Backbone.View.extend({
 	// 		  into objects
 	selectors: [
 					'.toggle-menu-wrapper',
-					'.chat-menu-wrapper'
+					'.chat-menu-wrapper',
+					'.count'
 				],
 
 	// @desc: An object of keys-to-jQuery objects
@@ -50,6 +51,7 @@ var HeaderView = Backbone.View.extend({
 		return media_url;
 	},
 
+	// @HACK
 	// @desc: Counts the number of maximized chat windows
 	// @param: None
 	// @res: int 
@@ -138,7 +140,6 @@ var HeaderView = Backbone.View.extend({
 				this.$$vars[selector] = 'Selector not active';
 			}
 		}, this));
-
 	},
 
 
@@ -147,7 +148,7 @@ var HeaderView = Backbone.View.extend({
 	// @res: Void
 	closeChatBox: function () {
 		if (!isChatDisabled) {
-			this.$$vars['.chat-menu-wrapper'].addClass('hidden');
+			this.$$vars['.chat-menu-wrapper'].addClass('menu-hidden');
 			this.isChatMenuShowing = false;
 		}
 	},
@@ -161,9 +162,19 @@ var HeaderView = Backbone.View.extend({
 				this.closeChatBox();
 			} else {
 				this.toggleMenu(false);
-				this.$$vars['.chat-menu-wrapper'].removeClass('hidden');
+				this.$$vars['.chat-menu-wrapper'].removeClass('menu-hidden');
 				this.isChatMenuShowing = !this.isChatMenuShowing;
 			}
+		}
+	},
+
+	// @desc: Changes the number
+	adjustCountVar: function (seen_count) {
+		if (seen_count > 0) {
+			this.$$vars[".count"].show();
+			this.$$vars[".count"].html(seen_count.toString());
+		} else {
+			this.$$vars[".count"].hide();
 		}
 	},
 

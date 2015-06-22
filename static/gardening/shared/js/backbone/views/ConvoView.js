@@ -155,13 +155,19 @@ var ConvoView = Backbone.View.extend({
 	render: function (initial) {
 		var $target_element;
 
-		!initial ? initial = false: initial = true;
+		initial && typeof initial ==="boolean" ? initial = true: initial = false;
 
-		$target_element = this.$el.find("ul");
-		$target_element.children("li.convo-line-item").detach();
+		if (initial) {
+			$target_element = this.$el.find("ul");
+		} else {
+			$target_element = this.$el.find(".mCSB_container");
+		}
+		
+		$target_element.find("li.convo-line-item").detach();
 
 		// Iterate along the collection
 		this.collection.each(_.bind(function (model) {
+
 			var context, line_item_html, text_items, parsed_time;
 			
 			context = _.clone(model.attributes);
@@ -169,7 +175,7 @@ var ConvoView = Backbone.View.extend({
 			text_items = context['text'].split("{{switch_user}}");
 			text_items = text_items[text_items.length -1];
 			// If the last line is not the spinner icon, set "text"
-			// in context to an escaped string (not including the user label)
+			// in context to the last exchange (escaped) (not including the user label)
 			if (text_items !== "<i class='fa fa-spinner fa-spin'></i>") {
 				text_items = text_items.split(":");
 				text_items = text_items.slice(1, text_items.length).join(":");
@@ -177,9 +183,9 @@ var ConvoView = Backbone.View.extend({
 			} else {
 				// We want the waiting icon to spin to its heart's content
 				// so unescape that icon
-				text_items = "Pending...";
+				text_items = _.unescape(text_items);
+				// text_items = "Pending...";
 			}
-
 			// Set profile pic
 			if (_.has(context, "msg_profile_pic") && context["msg_profile_pic"] !== undefined) {
 				context["msg_profile_pic"] = this.view.setMediaPic(context, "msg_profile_pic"); 
@@ -193,6 +199,7 @@ var ConvoView = Backbone.View.extend({
 
 			// Append to the ul the line item conversation
 			$target_element.append(this.template(context));
+		
 
 			// Add a star to the line if the convo is unseen AND
 			// if that current conversation is not open right now
@@ -203,7 +210,7 @@ var ConvoView = Backbone.View.extend({
 			!context["seen"] ? $target_element.children('li.convo-line-item')
 											  .last()
 											  .html([
-											  			"<i class='fa fa-star'></i>",
+											  			"<i class='fa fa-star fa-spin'></i>",
 											  			line_item_html
 											  		].join("")) : undefined;
 
@@ -213,6 +220,26 @@ var ConvoView = Backbone.View.extend({
 				this._createDialogue(model);
 			}
 		}, this));
+
+		// Once everything is loaded, set the Scrollbar
+		if (initial) {
+			$target_element.mCustomScrollbar({theme: "dark"});
+		} else {
+			$target_element.mCustomScrollbar("update");
+		}
+	},
+
+	// @desc: Tells HeaderView what the number of seen messages are
+	// @params: None
+	// @res: Void
+	updateSeenCount: function () {
+		var seen_models;
+		// Render Convo-View
+		this.render();
+		seen_models = this.collection.filter(function (model) {
+			return !model.attributes['seen'];
+		});
+		this.view.adjustCountVar(seen_models.length);
 	},
 
 	// 
@@ -224,9 +251,10 @@ var ConvoView = Backbone.View.extend({
 		this.render(true);
 
 		this.updateConvos();
+		this.updateSeenCount();
 
 		this.listenTo(this.collection, "add", this.render);
-		this.listenTo(this.collection, "change", this.render);
+		this.listenTo(this.collection, "change", this.updateSeenCount);
 
 	},
 	
