@@ -33,15 +33,6 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 2
 }
 
-# Formattable Zipcode API URL
-ZIPCODE_API_URL = ''.join([
-    "https://www.zipcodeapi.com/rest/",
-    "%s/",
-    "distance.json/",
-    "%s/",
-    "%s/",
-    "<units>"])
-
 # Application definition
 
 INSTALLED_APPS = (
@@ -51,8 +42,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'compressor',
-    # 'simple_email_confirmation',
     'rest_framework',
     'mod_wsgi.server',
     'storages',
@@ -61,8 +52,10 @@ INSTALLED_APPS = (
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'corsheaders.middleware.CorsPostCsrfMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -88,6 +81,10 @@ USE_TZ = True
 
 
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'), )
+CORS_ORIGIN_REGEX_WHITELIST = ('^(https?://)?(\w+\.)?zipcodeapi\.com$', 
+                                'localhost:8000',
+                              )
+CORS_REPLACE_HTTPS_REFERER = True
 
 if DEBUG:
     with open(os.path.join(BASE_DIR, "ZIP_CODE_API.txt"), "rb") as zipcode:
@@ -110,21 +107,8 @@ if DEBUG:
         }
     }
 
-    # DATABASES = {
-    #     'default': {
-    #         'ENGINE': 'django.db.backends.mysql',
-    #         'OPTIONS': {
-    #             'read_default_file': os.path.join(BASE_DIR, "MySQL.conf"),
-    #         },
-    #     }
-    # }
-    # with open(os.path.join(BASE_DIR, "AWS_SETTINGS.txt"), "rb") as AWS_INFORMATION:
-    #     AWS_INFORMATION = AWS_INFORMATION.read().split("\n")
-    #     AWS_STORAGE_BUCKET_NAME = AWS_INFORMATION[0]
-    #     AWS_ACCESS_KEY_ID = AWS_INFORMATION[1]
-    #     AWS_SECRET_ACCESS_KEY = AWS_INFORMATION[2]
-
 else:
+
     ZIPCODE_API_KEY = os.environ['ZAP']
     SECRET_KEY = os.environ['SK']
 
@@ -143,9 +127,12 @@ else:
     AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
     AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
     AWS_STORAGE_BUCKET_NAME = os.environ['AWS_STORAGE_BUCKET_NAME']
-    
 
-# else:
+ # Formattable Zipcode API URLS    
+ZIPCODE_API_URL = ''.join([
+    "https://www.zipcodeapi.com/rest/",
+    "%s"]) % (ZIPCODE_API_KEY)
+
 ALLOWED_HOSTS = [
                  "*",
                  ".127.0.0.1:8000",
@@ -176,6 +163,7 @@ if not DEBUG:
     COMPRESS_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'COMPRESS')
     STATIC_ROOT = COMPRESS_ROOT
     MEDIA_ROOT = ''
+
 
 # Django Compressor Settings
 if COMPRESS_ENABLED:

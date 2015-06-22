@@ -59,6 +59,7 @@
 
 .menu-hidden {
 	visibility: hidden !important;
+	height: 0px;
 }
 
 // Styling for gardening/shared/base.html
@@ -437,11 +438,10 @@ ul {
 }
 
 @profile-header-height: 135px;
-@profile-header-pic-height: 300px;
+@profile-header-pic-height: 400px;
 
-// .profile-header-wrapper {
-// 	width: 100%;
-.profile-header {
+
+.profile-header-base {
 	position: relative;
 	padding: 10px;
 	border: 1px solid #ddd;
@@ -449,10 +449,17 @@ ul {
 	margin-bottom: 20px;
 	min-height: @profile-header-height;
 	.profile-header-pic {
-		margin: 20px 0;
-		max-width: @profile-header-pic-height;
-	  	max-height: @profile-header-pic-height * (4/3);
-	  	vertical-align: top;
+		@media screen {
+			margin: 20px 0;
+			max-width: @profile-header-pic-height;
+		  	max-height: @profile-header-pic-height;
+		  	vertical-align: top;
+		  	border-radius: 25px;
+		  	position: relative;
+		}
+		@media (max-width: 768px) {
+			top: 0 !important;
+		}
 	}
 	.profile-header-text {
 		position: relative;
@@ -478,12 +485,13 @@ ul {
 				margin-right: 5px;
 			}
 		}
+
 	}
 	.profile-header-buttons {
 		float: left;
 		position: relative;
 		display: inline-block;
-		margin-top: 24px;
+		margin-top: 47px;
 		font-size: 20px;
 		color: #3a9a00;
 		button {
@@ -494,8 +502,8 @@ ul {
 			color: #fff;
 		}
 	}
-	
 }
+
 // }
 
 // HACKS(1): Set footer at bottom:-75px (height)

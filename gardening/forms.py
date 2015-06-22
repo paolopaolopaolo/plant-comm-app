@@ -117,13 +117,6 @@ class LogInForm(forms.Form):
 			)
 
 class ProfileForm(forms.Form):
-
-	available = forms.BooleanField(label = "Available to garden",
-								   required = False)
-
-	username = forms.CharField(max_length = 100,
-							   label = "Username",
-							   required = False)
 	
 	first_name = forms.CharField(max_length = 100,
 								 label = "First name",
@@ -132,6 +125,10 @@ class ProfileForm(forms.Form):
 	last_name = forms.CharField(max_length = 100,
 								label = "Last name",
 								required = False)
+	
+	username = forms.CharField(max_length = 100,
+							   label = "Username",
+							   required = False)
 
 	profile_pic = forms.ImageField(label = "Profile picture",
 								  required = False)

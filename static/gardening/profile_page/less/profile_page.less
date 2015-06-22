@@ -1,3 +1,65 @@
+.error {
+	border: 1px solid red !important;
+}
+
+.push-down {
+	top: 75px;
+}
+
+.field-error {
+	color: red;
+}
+
+.profile-form {
+	.gardener-field {
+		float: left;
+		margin-top: 23px;
+		margin-right: 20px;
+		&:nth-child(odd) {
+			clear: both;
+		}
+
+		label {
+			width: 100%;
+		}
+		input, select, textarea {
+			border-radius: 5px;
+  			border: 1px black solid;
+  			padding: 5px 10px;
+  			width: 230px;
+		}
+	}
+
+	#profile-pic-field {
+		@media screen {
+			position: absolute;
+			right: 104%;
+    		top: 0%;
+		}
+		@media (max-width: 1238px) {
+			position: relative !important;
+			right: 0 !important;
+			top: 0 !important;
+		}
+	}	
+}
+
+.expandable-blurb {
+	overflow: hidden;
+	height: 57px;
+	word-wrap: break-word;
+	.expand-blurb {
+		text-decoration: none;
+		cursor: pointer;
+	}
+	.handler-text_blurb {
+		white-space: pre;
+    	margin: 25px 0;
+    	font-size: 16px;	
+	}
+}
+
+
 .plant-item {
 	border-bottom:  1px solid #ddd;
 	.img-carousel-wrapper {

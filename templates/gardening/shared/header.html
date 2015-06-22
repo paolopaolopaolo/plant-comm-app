@@ -14,11 +14,11 @@
 		{% if isAuthenticated %}
 			<span class="user-menu-btn dropdown">
 				<span class="user-text">
-					<a href="/profile/{{user}}">
+					<a href="/profile">
 						<img class="header-profile-pic" 
 							 src="{{ header_profile_pic | normalizeMediaPic:media_url }}"/>
 					</a>
-					<span class="click-down">{{ user }}</span>
+					<span class="click-down handler-username">{{ user }}</span>
 					<i class="fa fa-sort-desc click-down hidden-xs"></i>
 				</span>
 			</span>

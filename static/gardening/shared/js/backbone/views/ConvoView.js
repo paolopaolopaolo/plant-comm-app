@@ -13,7 +13,9 @@ var ConvoView = Backbone.View.extend({
 		"click li.convo-line-item": "openDialogue",
 	},
 
-	// @desc: Gets ID number of the 
+	// @desc: Gets ID number of the Open Conversation
+	// @params: None
+	// @res: Int
 	_getOpenConvo: function () {
 		var $open_window, selector_str, result;
 		$open_window = this.$el.next().children();
@@ -49,7 +51,6 @@ var ConvoView = Backbone.View.extend({
 			this.updateConvos();
 		}, this));
 	},
-
 
 	// @desc: Generate a new Chat View to store in this.dialogues
 	// 	 	  and apply event listeners to its model
@@ -140,7 +141,6 @@ var ConvoView = Backbone.View.extend({
 					 }, this));
 		}
 	},
-
 
 	// @desc: Triggers the closeChatBox event
 	// @params: None
@@ -242,7 +242,9 @@ var ConvoView = Backbone.View.extend({
 		this.view.adjustCountVar(seen_models.length);
 	},
 
-	// 
+	// @desc: Runs the necessary things for ConvoView
+	// @params: Object, Object
+	// @res: Void
 	initialize: function (attrs, opts) {
 		this.view = attrs["parent"];
 		// Use bootstrapped values to start
@@ -255,9 +257,6 @@ var ConvoView = Backbone.View.extend({
 
 		this.listenTo(this.collection, "add", this.render);
 		this.listenTo(this.collection, "change", this.updateSeenCount);
-
 	},
 	
-
-
 });

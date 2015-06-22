@@ -14,7 +14,7 @@
 		<div class="plant-text">
 			<h4>{{ plant.species | replaceDefaultPlant:"species" }}</h4>
 			<h6>Quantity: {{ plant.quantity | replaceDefaultPlant:"quantity" }}</h6>
-			<p>{{ plant.information | replaceDefaultPlant:"information" }}</p>
+			<p>{{ plant.information | replaceDefaultPlant:user.first_name }}</p>
 		</div>
 	</div>
 </div>

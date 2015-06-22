@@ -42,10 +42,12 @@ def log_out(request):
 class GreenThumbPage(View):
 	context = {
 		"domain": settings.DOMAIN,
+		"zipcode_api_url": json.dumps(settings.ZIPCODE_API_URL),
 		"media_url": settings.MEDIA_URL,
 		"compress_enabled": settings.COMPRESS_ENABLED,
 		"signinform": SignUpForm(),
 		"loginform": LogInForm(),
+		"profileform": ProfileForm(),
 		"showsFooter": True,
 	}
 	# Utility, method for sorting by id
@@ -324,9 +326,8 @@ class ProfilePage(GreenThumbPage, APIView):
 
 		self.context['isEditable'] = json.dumps(self.context['is_editable'])
 
-		# Use a Django form for the profile
-		if editable:
-			self.context['profile_form'] = ProfileForm()
+		self.context['profileform'] = ProfileForm(initial=self.context['gardener'])
+
 		
 		# Return the rendered page
 		return render(request, "gardening/profile_page/profile_page.html", self.context)

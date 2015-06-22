@@ -6,6 +6,27 @@ var BaseView = Backbone.View.extend({
 		"click .p-header-contact-btn": "openDialogue",
 	},
 
+	// @desc: Takes Gardener model changes and propagates it to UI elements
+	// @params: Object
+	// @res: Void
+	propagateChanges: function (object) {
+		var name, value, $targets;
+
+		for (name in object) {
+			if (object.hasOwnProperty(name)) {
+				value = object[name];
+				$targets = this.$el
+							   .find([
+										".handler",
+										name
+									].join("-"));
+				_.each($targets, _.bind(function (target) {
+					$(target).html(object[name]);
+				}, this));
+			}
+		}
+
+	},
 
 	// @desc: Opens Chat Dialogue When Clicking Contact button
 	// @params: int
@@ -16,10 +37,13 @@ var BaseView = Backbone.View.extend({
 			// for models where user_id is either user_a or
 			// user_b
 			var filtered_value;
-			filtered_value = this.header_view.convo_view.collection.find(_.bind(function (model) {
-				return model.attributes['user_a'] === user_id || 
-					   model.attributes['user_b'] === user_id;
-			}, this));
+			filtered_value = this.header_view
+								 .convo_view
+								 .collection
+								 .find(_.bind(function (model) {
+										return model.attributes['user_a'] === user_id || 
+					  					 model.attributes['user_b'] === user_id;
+								 }, this));
 
 			// If filtered value is not undefined
 			if (filtered_value) {

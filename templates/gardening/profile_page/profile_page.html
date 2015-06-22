@@ -1,6 +1,7 @@
 {% extends "gardening/shared/base.html" %}
 {% load static %}
 {% load compress %}
+{% load template_tags%}
 
 {% block css_styles %}
 	<!-- Slick Image Carousel CSS-->
@@ -20,6 +21,7 @@
 	{% autoescape off %}
 	var PLANTS = {{ plant_objects }};
 	var GARDENER = {{ gardener_object }};
+	var ZIPCODE_API_URL = {{ zipcode_api_url }};
 	{% if isAuthenticated and user.username == gardener.username %}
 		var isEditable = true;
 	{% else %}
@@ -31,11 +33,22 @@
 {% block main_content %}
 	<div class="profile-page">
 		<div class="profile-page-content container">
-			{% include "gardening/shared/profile_header.html" with isAuthenticated=isAuthenticated result=gardener %}
+			{% include "gardening/shared/profile_header.html" with isAuthenticated=isAuthenticated result=gardener editable=False user=user%}
+			{% if isAuthenticated and user.username == gardener.username %}
+			{% include "gardening/shared/profile_header.html" with isAuthenticated=isAuthenticated gardener=gardener editable=True profileform=profileform%} 
+			{% endif %}
+			<div class="about-me panel row">
+			{% if gardener.text_blurb %}
+			<div class="expandable-blurb col-xs-12">
+				<h3><a class="expand-blurb">About Me (click to expand)</a></h3>
+				<span class="handler-text_blurb">{{gardener.text_blurb}}</span>
+			</div>
+			{% endif%}
+			</div>
 		</div>
 		<div class="plant-content container">
 			{% for plant in plants %}
-				{% include "gardening/profile_page/plant_template.html" with plant=plant %}
+				{% include "gardening/profile_page/plant_template.html" with plant=plant user=gardener%}
 			{% endfor %}
 		</div>
 	</div>
