@@ -13,7 +13,7 @@
 			</h5>
 			</div>
 		{% for result in search_results %}
-			{% include "gardening/shared/profile_header.html" with isAuthenticated=isAuthenticated result=result %}
+			{% include "gardening/shared/profile_header.html" with isAuthenticated=isAuthenticated result=result editable=False noEdit=True%}
 		{% empty %}
 			We got nothing. Have you tried GOOOOOOOGLE????!!!
 	{% endfor %}

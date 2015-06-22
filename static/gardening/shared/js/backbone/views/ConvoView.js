@@ -13,7 +13,9 @@ var ConvoView = Backbone.View.extend({
 		"click li.convo-line-item": "openDialogue",
 	},
 
-	// @desc: Gets ID number of the 
+	// @desc: Gets ID number of the Open Conversation
+	// @params: None
+	// @res: Int
 	_getOpenConvo: function () {
 		var $open_window, selector_str, result;
 		$open_window = this.$el.next().children();
@@ -49,7 +51,6 @@ var ConvoView = Backbone.View.extend({
 			this.updateConvos();
 		}, this));
 	},
-
 
 	// @desc: Generate a new Chat View to store in this.dialogues
 	// 	 	  and apply event listeners to its model
@@ -100,8 +101,11 @@ var ConvoView = Backbone.View.extend({
 	// 		  the event's current target OR on a given integer
 	// @params: event (could be an Event object OR an integer)
 	// @res: Void
-	openDialogue: function (event) {
-		var _id, new_convo;
+	openDialogue: function (event, isUserId) {
+		var _id, new_convo, dialogue, user_id;
+
+		isUserId = (isUserId === undefined ? false : isUserId);
+
 		// Determine nature of event
 		if (typeof event !== "number") {
 			// Event is an event object
@@ -112,35 +116,47 @@ var ConvoView = Backbone.View.extend({
 			// event is actually just an id number
 			_id = event;
 		}
+
+		// If the ID is a user ID...
+		if (isUserId) {
+			user_id = _id;
+			// Get and set the dialogue variable to the convo Object that
+			// the user id is a part of
+			dialogue = this.collection.find(_.bind(function (convo) {
+				return convo.attributes["user_a"] === _id || convo.attributes["user_b"] === _id;
+			}, this));
+			if (dialogue) {
+				// If the conversation ID exists (there is an ongoing conversation)
+				// with this user, set _id to the conversation id
+				_id = dialogue.attributes["id"];
+			} else {
+				// if not, keep _id undefined
+				_id = undefined;
+
+			}
+		}
 		
-		// Trigger a "closeOtherChatboxes" event
-		// to turn off event listeners of other models
-		// this.trigger('closeOtherChatboxes');
-
 		// Branching for new or old dialogues (this bases everything on the open views)
-		if (_.has(this.dialogues, _id)) {
-
+		if (_id) {
 			// Old dialogues
 			this.dialogues[_id].trigger('open');
 			// Tell collection that you've seen this convo
 			this.collection.get(_id).set({seen: true});
 		} else {
-
 			// New dialogues
 			// create a new Convo model
-			new_convo = new Convo({"user_targ": _id});
+			_id = 
+			new_convo = new Convo({"user_targ": user_id});
 			// Save this model with the user_targ == _id
 			new_convo.save({}, {silent: true})
 					 .done(_.bind(function (response) {
 					 	new_convo.unset("user_targ", {silent: true});
 					 	new_convo.set({"user": response['user'], "seen":true}, {silent: true});
 					 	this.collection.add(new_convo);
-					 	// this.collection.get(new_convo.attributes['id']).set({seen: true});
 					 	this.openDialogue(new_convo.attributes['id']);
 					 }, this));
 		}
 	},
-
 
 	// @desc: Triggers the closeChatBox event
 	// @params: None
@@ -149,34 +165,40 @@ var ConvoView = Backbone.View.extend({
 		this.trigger('closeChatBox');
 	},
 
-	// @desc: Render the Convo Menu
+	// @desc: Render the Conversation Menu
 	// @params: Boolean object
 	// @res: Void
 	render: function (initial) {
 		var $target_element;
-
+		// Check if initial is 'true'. If initial is defined as anything else,
+		// reset it as 'false'
 		initial && typeof initial ==="boolean" ? initial = true: initial = false;
 
 		if (initial) {
+			// If initial is true, target the "ul" element
 			$target_element = this.$el.find("ul");
 		} else {
+			// If initial is false, target the custom scrollbar container
 			$target_element = this.$el.find(".mCSB_container");
 		}
-		
+		// Detach all list items
 		$target_element.find("li.convo-line-item").detach();
 
-		// Iterate along the collection
+		// While iterating along the collection...
 		this.collection.each(_.bind(function (model) {
 
 			var context, line_item_html, text_items, parsed_time;
-			
+			// Clone the model attributes
 			context = _.clone(model.attributes);
-			// Set context[text] to the last exchange between user_a and user_b
+
+			// Set text_items to the last exchange between user_a and user_b
 			text_items = context['text'].split("{{switch_user}}");
 			text_items = text_items[text_items.length -1];
-			// If the last line is not the spinner icon, set "text"
-			// in context to the last exchange (escaped) (not including the user label)
+			
 			if (text_items !== "<i class='fa fa-spinner fa-spin'></i>") {
+				// If the last line is not the spinner icon, set "text"
+				// in context to the last exchange (escaped) (not including 
+				// the user label)
 				text_items = text_items.split(":");
 				text_items = text_items.slice(1, text_items.length).join(":");
 				text_items = _.escape(text_items);
@@ -184,22 +206,23 @@ var ConvoView = Backbone.View.extend({
 				// We want the waiting icon to spin to its heart's content
 				// so unescape that icon
 				text_items = _.unescape(text_items);
-				// text_items = "Pending...";
 			}
-			// Set profile pic
+
+			// Set msg_profile_pic and reformat the URL with the parent function "setMediaPic"
 			if (_.has(context, "msg_profile_pic") && context["msg_profile_pic"] !== undefined) {
 				context["msg_profile_pic"] = this.view.setMediaPic(context, "msg_profile_pic"); 
 			}
 			
 			// Reduce the "Text" context of the menu to the last line
 			context["text"] = text_items;
+
+			// Set time_initiated value to have the local time of the last message
 			context["time_initiated"] = new Date(context["time_initiated"].replace(/\+(\d){2}:(\d){2}/g, ""));
 			context["time_initiated"]= context["time_initiated"].toLocaleTimeString();
 			context["time_initiated"] = context["time_initiated"].replace(/([\d]+:[\d]{2})(:[\d]{2})(.*)/, "$1$3")
 
 			// Append to the ul the line item conversation
 			$target_element.append(this.template(context));
-		
 
 			// Add a star to the line if the convo is unseen AND
 			// if that current conversation is not open right now
@@ -215,16 +238,17 @@ var ConvoView = Backbone.View.extend({
 											  		].join("")) : undefined;
 
 
-			// Create ChatView instance for each model
+			// Create ChatView instance for each Convo model not yet given one
 			if (!_.has(this.dialogues, model.attributes['id'])) {
 				this._createDialogue(model);
 			}
 		}, this));
 
-		// Once everything is loaded, set the Scrollbar
 		if (initial) {
+			// If initial, once everything is loaded, set the Scrollbar
 			$target_element.mCustomScrollbar({theme: "dark"});
 		} else {
+			// If not initial, just update the scrollbar to handle changes in height
 			$target_element.mCustomScrollbar("update");
 		}
 	},
@@ -242,7 +266,9 @@ var ConvoView = Backbone.View.extend({
 		this.view.adjustCountVar(seen_models.length);
 	},
 
-	// 
+	// @desc: Runs the necessary things for ConvoView
+	// @params: Object, Object
+	// @res: Void
 	initialize: function (attrs, opts) {
 		this.view = attrs["parent"];
 		// Use bootstrapped values to start
@@ -255,9 +281,6 @@ var ConvoView = Backbone.View.extend({
 
 		this.listenTo(this.collection, "add", this.render);
 		this.listenTo(this.collection, "change", this.updateSeenCount);
-
 	},
 	
-
-
 });

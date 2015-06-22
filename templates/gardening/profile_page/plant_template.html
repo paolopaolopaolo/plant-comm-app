@@ -1,20 +1,58 @@
 {% load template_tags %}
 
-<div class="plant-item panel row">
-	<div class="img-carousel-wrapper col-xs-11 col-sm-4">
-		<div class="img-carousel">
+<!-- Individual Plant Panel -->
+<div class="plant-item plant-item-{{plant.id}} panel row">
+	<!-- Image Carousel / with buttons -->
+	<div class="img-carousel-wrapper img-car-wrapper-{{plant.id}} col-xs-11 col-sm-4">
+		<div class="img-carousel img-carousel-{{plant.id}}">
 			{% for img in plant.images %}
 				<div class="carousel-img-wrapper">
-					<img class="carousel-img" src="{{ img.imageURL | normalizeMediaPic }}"/>
+					<img id="p-img-{{img.id}}" class="carousel-img" src="{{ img.imageURL | normalizeMediaPic }}"/>
+				</div>
+				{% empty %}
+				<div class="carousel-img-wrapper img-place-holder">
+					<img class="carousel-img" src="https://plantappstorage.s3.amazonaws.com/static/img/user_blank_image.png"/>
 				</div>
 			{% endfor %}
 		</div>
+		<!-- Plant Img Add and Remove Control Buttons -->
+		{% if user.username == gardener.username and isAuthenticated%}
+		<div class="plant-img-ctl-wrapper">
+			<button class="add-plant-img plant-img-ctl" title="Add plant picture">Add <i class="fa fa-picture-o"></i></button>
+			<button class="rem-plant-img plant-img-ctl" title="Remove plant picture">Remove <i class="fa fa-picture-o"></i></button>
+			<input type="file" name="plant-img"/>
+		</div>
+		{% endif %}
 	</div>
 	<div class="plant-text-wrapper col-xs-12 col-sm-6 col-sm-offset-1">
-		<div class="plant-text">
-			<h4>{{ plant.species | replaceDefaultPlant:"species" }}</h4>
-			<h6>Quantity: {{ plant.quantity | replaceDefaultPlant:"quantity" }}</h6>
-			<p>{{ plant.information | replaceDefaultPlant:"information" }}</p>
+		<!-- Plant Text Information -->
+		<button class="edit-plant">
+			<i class="fa fa-pencil" title="Edit Plant"></i>
+		</button>
+		<button class="delete-plant" title="Delete Plant">
+			<i class="fa fa-trash-o"></i>
+		</button>
+		<div class="plant-text col-xs-8">
+			<!--Built-in Plant ID Data-->
+			<input name="plant-id" type="hidden" value="{{plant.id}}"/>
+			<!--Plant Species (h4 and input)-->
+			<h4 class="id-species-display plant-display"><span class="handler-species-{{plant.id}}">{{ plant.species | replaceDefaultPlant:"species" }}</span></h4>
+			<label for="id-species-edit" class="edit-input">Species</label>
+			<input type="text" class="id-species-edit edit-input" value="{{ plant.species | replaceDefaultPlant:'species' }}"/>
+			<!--Plant Quantity (h6 and input)-->
+			<h6 class="id-quantity-display plant-display">Quantity: <span class="handler-quantity-{{plant.id}}">{{ plant.quantity | replaceDefaultPlant:"quantity" }}</span></h6>
+			<label for="id-quantity-edit" class="edit-input">Quantity</label>
+			<input type="number" class="id-quantity-edit edit-input" value="{{ plant.quantity }}"/>
+			<!-- Edit Plant Quantity Button-->
+			{% if user.username == gardener.username and isAuthenticated%}
+			{% endif %}
+			<!-- Plant Information (p and textarea)-->
+			<p class="id-information-display plant-display"><span class="handler-information-{{plant.id}}">{{ plant.information | replaceDefaultPlant:gardener.first_name }}</span></p>
+			<label for="id-information-edit" class="edit-input">Information</label>
+			<textarea class="id-information-edit edit-input">{{ plant.information }}</textarea>
+			<!-- Edit Plant Information Button -->
+			{% if user.username == gardener.username and isAuthenticated%}
+			{% endif %}
 		</div>
 	</div>
 </div>

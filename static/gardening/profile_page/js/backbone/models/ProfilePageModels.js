@@ -10,9 +10,12 @@ var Gardener = Backbone.Model.extend({
 var Plant = Backbone.Model.extend({
 	urlRoot : "/profile/plant/",
 	url: function () {
-		return  [this.urlRoot, this.attributes.id].join('');
-	}
-	
+		if (this.attributes.id) {
+			return  [this.urlRoot, this.attributes.id].join('');
+		} else {
+			return this.urlRoot;
+		}
+	},
 });
 
 // Extend Backbone model to create PlantImg model class

@@ -40,6 +40,13 @@
 	list-style-image: url(data:0);
 }
 
+.chat-box-hide {
+	padding: 0 !important;
+	border: 0 !important;
+	margin: 0 !important;
+	display: none !important;
+}
+
 .show-hidden {
 	display: inline-block !important;
 	animation-name: appear;
@@ -59,6 +66,7 @@
 
 .menu-hidden {
 	visibility: hidden !important;
+	height: 0px;
 }
 
 // Styling for gardening/shared/base.html
@@ -437,11 +445,10 @@ ul {
 }
 
 @profile-header-height: 135px;
-@profile-header-pic-height: 300px;
+@profile-header-pic-height: 400px;
 
-// .profile-header-wrapper {
-// 	width: 100%;
-.profile-header {
+
+.profile-header-base {
 	position: relative;
 	padding: 10px;
 	border: 1px solid #ddd;
@@ -449,10 +456,17 @@ ul {
 	margin-bottom: 20px;
 	min-height: @profile-header-height;
 	.profile-header-pic {
-		margin: 20px 0;
-		max-width: @profile-header-pic-height;
-	  	max-height: @profile-header-pic-height * (4/3);
-	  	vertical-align: top;
+		@media screen {
+			margin: 20px 0;
+			max-width: @profile-header-pic-height;
+		  	max-height: @profile-header-pic-height;
+		  	vertical-align: top;
+		  	border-radius: 25px;
+		  	position: relative;
+		}
+		@media (max-width: 768px) {
+			top: 0 !important;
+		}
 	}
 	.profile-header-text {
 		position: relative;
@@ -478,24 +492,27 @@ ul {
 				margin-right: 5px;
 			}
 		}
+
 	}
 	.profile-header-buttons {
 		float: left;
 		position: relative;
 		display: inline-block;
-		margin-top: 24px;
+		margin-top: 47px;
 		font-size: 20px;
 		color: #3a9a00;
 		button {
 			display: block;
-			margin-bottom: 20px;
-			border: 0;
-			background-color: #4fcd00;
-			color: #fff;
+  			margin-bottom: 20px;
+  			border: 0;
+  			background-color: #4fcd00;
+  			color: #fff;
+  			min-width: 115px;
+  			text-align: left;
 		}
 	}
-	
 }
+
 // }
 
 // HACKS(1): Set footer at bottom:-75px (height)

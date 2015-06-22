@@ -44,8 +44,8 @@ class PlantImgSerializer(serializers.ModelSerializer):
 
 class PlantSerializer(serializers.ModelSerializer):
 	id = serializers.IntegerField(required = False)
-	information = serializers.CharField(allow_blank = True)
-	species = serializers.CharField(allow_blank = True)
+	information = serializers.CharField(allow_blank = False)
+	species = serializers.CharField(allow_blank = False)
 	quantity = serializers.IntegerField(required = False)
 	
 

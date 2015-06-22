@@ -1,6 +1,7 @@
 {% extends "gardening/shared/base.html" %}
 {% load static %}
 {% load compress %}
+{% load template_tags%}
 
 {% block css_styles %}
 	<!-- Slick Image Carousel CSS-->
@@ -18,12 +19,16 @@
 
 {% block bootstrap_vars %}
 	{% autoescape off %}
+	{% if isAuthenticated and user.username == gardener.username %}
 	var PLANTS = {{ plant_objects }};
 	var GARDENER = {{ gardener_object }};
-	{% if isAuthenticated and user.username == gardener.username %}
-		var isEditable = true;
+	var ZIPCODE_API_URL = {{ zipcode_api_url }};
+	var isEditable = true;
 	{% else %}
-		var isEditable = false;
+	var PLANTS = [];
+	var GARDENER = [];
+	var ZIPCODE_API_URL = "";
+	var isEditable = false;
 	{% endif %}
 	{% endautoescape %}
 {% endblock %}
@@ -31,19 +36,47 @@
 {% block main_content %}
 	<div class="profile-page">
 		<div class="profile-page-content container">
-			{% include "gardening/shared/profile_header.html" with isAuthenticated=isAuthenticated result=gardener %}
+			{% include "gardening/shared/profile_header.html" with isAuthenticated=isAuthenticated result=gardener editable=False user=user%}
+			{% if isAuthenticated and user.username == gardener.username %}
+			{% include "gardening/shared/profile_header.html" with isAuthenticated=isAuthenticated gardener=gardener editable=True profileform=profileform%} 
+			{% endif %}
+			<div class="about-me panel row">
+				<div class="expandable-blurb col-xs-12">
+					<h3><a class="expand-blurb">About Me <span class="ab-desc">(click to expand)</span></a></h3>
+					<div class="text-blurb-wrapper">
+					<span class="handler-text_blurb text-fade">{% if gardener.text_blurb %}{{gardener.text_blurb}}{% else %}{{ gardener.username }} has not yet filled this part in! Check back in a little bit!{% endif%}</span>
+					</div>
+				</div>
+			</div>
 		</div>
-		<div class="plant-content container">
+		<div id="plant-content" class="plant-content container">
+			<div class="plant-header panel row">
+				<h3>
+					<a href="#plant-content">
+						<span class="handler-first_name">
+							{% if gardener.first_name %}{{ gardener.first_name }}{% else %}This gardener{% endif %}</span>'s Plants
+					</a>
+				</h3>
+				{% if isAuthenticated and user.username == gardener.username %}
+					<button class="add-plant"><i class="fa fa-plus" title="Add plant"></i></button>
+				{% endif %}
+			</div>
 			{% for plant in plants %}
-				{% include "gardening/profile_page/plant_template.html" with plant=plant %}
+				{% include "gardening/profile_page/plant_template.html" with plant=plant gardener=gardener user=user isAuthenticated=isAuthenticated%}
 			{% endfor %}
 		</div>
 	</div>
 {% endblock %}
 
+{% block backbone_templates %}
+	{% include "gardening/profile_page/backbone_plant_template.html" %}
+{% endblock %}
+ 
 {% block scripts %}
 	<script src="{% static 'gardening/profile_page/js/backbone/models/ProfilePageModels.js' %}"></script>
 	<script src="{% static 'gardening/profile_page/js/backbone/collections/PlantCollection.js' %}"></script>
 	<script src="{% static 'gardening/profile_page/js/backbone/collections/PlantImgCollection.js' %}"></script>
+	<script src="{% static 'gardening/profile_page/js/backbone/views/PlantImgView.js' %}"></script>
+	<script src="{% static 'gardening/profile_page/js/backbone/views/PlantView.js' %}"></script>
 	<script src="{% static 'gardening/profile_page/js/backbone/views/ProfilePageView.js' %}"></script>
 {% endblock %}

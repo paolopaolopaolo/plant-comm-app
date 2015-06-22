@@ -46,7 +46,9 @@ var ChatView = Backbone.View.extend({
 		}
 	},
 
-	
+	// @desc: Minimize the Chatbox
+	// @params: Event object
+	// @res: Void
 	minimizeChatbox: function (event) {
 		var button_content;
 		button_content = this._toggleChatboxStyle(this.minimized);
@@ -55,18 +57,22 @@ var ChatView = Backbone.View.extend({
 		this.trigger('resetChatTops');
 	},
 
-	// Closes Event Listeners for this ChatView
+	// @desc: Closes Event Listeners for this ChatView
+	// @params: None
+	// @res: Void
 	closeChatbox: function () {
 		this.stopListening(this.model_target, "change:text");
 		this.listenTo(this.model_target, "change:text", this.openChatbox);
-		this.$el.css({"padding": "0", "width": "0", "height": "0"});
+		this.$el.addClass("chat-box-hide");
 		this.$el.children().detach();
 		this.open = false;
 		this.minimized = false;
 		this.trigger('resetChatTops');
 	},
 
-	// Opens Event Listeners for the Chatview
+	// @desc: Opens Event Listeners for the Chatview
+	// @params: None
+	// @res: Void
 	openChatbox: function () {
 		this.stopListening(this.model_target, "change:text");
 		this.listenTo(this.model_target, "change:text", this.textRender);
@@ -76,7 +82,9 @@ var ChatView = Backbone.View.extend({
 		this.trigger('resetChatTops');
 	},
 
-	// Set event listener on target element that triggers 'pressEnter'
+	// @desc: Set event listener on target element that triggers 'pressEnter'
+	// @params: None
+	// @res: Void
 	_setSubmitEvents: function () {
 		// Enables pressing enter to submit
 		this.$el.on("keyup", "input[name='user-chat-line']", _.bind(function (event) {
@@ -87,7 +95,9 @@ var ChatView = Backbone.View.extend({
 		}, this));
 	},
 
-	// Submits a message using Backbone.save()
+	// @desc: Submits a message using Backbone.save()
+	// @params: None
+	// @res: Void
 	_submitMessage: function () {
 		var text_to_save, input_val;
 		input_val = this.$el.find('input[name="user-chat-line"]').val();
@@ -104,11 +114,9 @@ var ChatView = Backbone.View.extend({
 		}
 	},
 
-	_alertTimeChange: function () {
-		alert(this.model_target.attributes['time_initiated']);
-	},
-
-
+	// @desc: Re-formats each line of text
+	// @params: String
+	// @res: String
 	_reformatTextline: function (textline) {
 		var line_components, name, text;
 		line_components = textline.split(':');
@@ -137,7 +145,9 @@ var ChatView = Backbone.View.extend({
 		return result;
 	},
 
-	// Render the text within the Chatboxes
+	// @desc: Render the text within the Chatboxes
+	// @params: Boolean
+	// @res: Void
 	textRender: function (isInitial) {
 		var context, textlines, useFancyScrollbar;
 		context = _.clone(this.model_target.attributes);
@@ -204,7 +214,9 @@ var ChatView = Backbone.View.extend({
 		this.model_target.set({'seen': true }, {'patch': true});
 	},
 
-	// Renders changes to the chat window
+	// @desc: Renders changes to the chat window
+	// @params: None
+	// @res: Void
 	render: function () {
 		var context = _.clone(this.model_target.attributes);
 		this.$el.children().detach();
@@ -213,11 +225,14 @@ var ChatView = Backbone.View.extend({
 		}
 		// Append the template + context
 		this.$el.removeAttr("style");
+		this.$el.removeClass("chat-box-hide")
 		this.$el.append(this.template(context));
 		this.textRender(true);
 	},
 
-	// Called during _createDialogues call in parent View
+	// @desc: Called during _createDialogues call in parent View
+	// @params: Object, Object
+	// @res: Void
 	initialize: function (attrs, opts) {
 		this._id = attrs['id'];
 		this.parent = attrs['parent'];

@@ -20,9 +20,28 @@ from gardening.views import GreenThumbPage
 from rest_framework import mixins
 from rest_framework import generics
 from PIL import Image
-import json, re
+import json, re, requests
 
 from gardening.decorators import *
+
+### ZipCodeApi Wrapper ###
+class ZipCodeAPI(GreenThumbPage):
+	def get(self, request, *args, **kwargs):
+		zca_url = settings.ZIPCODE_API_URL
+		option = request.GET["option"]
+		zipcode = request.GET["zipcode"]
+		if option == "info.json":
+			target = '/'.join([zca_url, option, zipcode, "/degrees"])
+			result = json.dumps(requests.get(target).json())
+		elif option == "city-zips.json":
+			city = request.GET["city"]
+			state = request.GET["state"]
+			target = '/'.join([zca_url, option, city, state])
+			try:
+				result = json.dumps({"zipcode": requests.get(target).json()["zip_codes"][0]})
+			except Exception:
+				result = json.dumps([])
+		return HttpResponse(result, content_type="application/json")
 
 ### Shared Page REST API ###
 

@@ -6,6 +6,28 @@ var BaseView = Backbone.View.extend({
 		"click .p-header-contact-btn": "openDialogue",
 	},
 
+	// @desc: CALLED FROM PROFILE EDITS:: 
+	//        Takes Gardener model changes and propagates it to UI elements
+	// @params: Object, Integer
+	// @res: Void
+	propagateChanges: function (object, number) {
+		var name, selector_name, value, $targets;
+
+		for (name in object) {
+			if (object.hasOwnProperty(name)) {
+				value = object[name];
+				selector_name = (number === undefined ? name : [name, number.toString()].join("-"));
+				$targets = this.$el
+							   .find([
+										".handler",
+										selector_name
+									].join("-"));
+				_.each($targets, _.bind(function (target) {
+					$(target).html(object[name]);
+				}, this));
+			}
+		}
+	},
 
 	// @desc: Opens Chat Dialogue When Clicking Contact button
 	// @params: int
@@ -16,10 +38,13 @@ var BaseView = Backbone.View.extend({
 			// for models where user_id is either user_a or
 			// user_b
 			var filtered_value;
-			filtered_value = this.header_view.convo_view.collection.find(_.bind(function (model) {
-				return model.attributes['user_a'] === user_id || 
-					   model.attributes['user_b'] === user_id;
-			}, this));
+			filtered_value = this.header_view
+								 .convo_view
+								 .collection
+								 .find(_.bind(function (model) {
+										return model.attributes['user_a'] === user_id || 
+					  					 model.attributes['user_b'] === user_id;
+								 }, this));
 
 			// If filtered value is not undefined
 			if (filtered_value) {
@@ -27,12 +52,13 @@ var BaseView = Backbone.View.extend({
 				this.header_view.convo_view.openDialogue(filtered_value.id);
 			} else {
 				// If it is undefined, use the given id directly 
-				this.header_view.convo_view.openDialogue(user_id);
+				this.header_view.convo_view.openDialogue(user_id, true);
 			}
 		}
 	},
 
-	// @desc: Open Dialogue UI wrapper function, calls the previous function
+	// @desc: Open Dialogue UI wrapper function. Gets the id
+	//        from UI hidden input and calls the previous function
 	// @params: Event object
 	// @res: Void
 	openDialogue: function (event) {

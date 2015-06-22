@@ -21,11 +21,19 @@ var HeaderView = Backbone.View.extend({
 	selectors: [
 					'.toggle-menu-wrapper',
 					'.chat-menu-wrapper',
-					'.count'
+					'.count',
+					'.header-profile-pic'
 				],
 
 	// @desc: An object of keys-to-jQuery objects
 	$$vars: {},
+
+	// @desc: Changes header profile pic
+	// @params: String
+	// @res: Void
+	profilePicChange: function (attr_str) {
+		this.$$vars['.header-profile-pic'].attr('src', attr_str);
+	},
 
 	// @desc: Normalize the Media URL
 	// @params: JS Object, String, String
@@ -84,7 +92,6 @@ var HeaderView = Backbone.View.extend({
 		}
 	},
 
-
 	// @desc: Extends anchor-tag UI to the surrounding
 	// 		  li tag
 	// @params: Event object
@@ -142,7 +149,6 @@ var HeaderView = Backbone.View.extend({
 		}, this));
 	},
 
-
 	// @desc: Forces the chat menu wrapper to hide
 	// @params: None
 	// @res: Void
@@ -168,7 +174,9 @@ var HeaderView = Backbone.View.extend({
 		}
 	},
 
-	// @desc: Changes the number
+	// @desc: Changes the number shown in the new message numbers
+	// @params: Int
+	// @res: Void
 	adjustCountVar: function (seen_count) {
 		if (seen_count > 0) {
 			this.$$vars[".count"].show();
@@ -180,7 +188,7 @@ var HeaderView = Backbone.View.extend({
 
 	// @desc: Perform all the tasks needed when loading HeaderView
 	// @params: None
-	// @res: None
+	// @res: Void
 	initialize: function () {
 		this._setJqueryVars();
 		if (!isChatDisabled) {

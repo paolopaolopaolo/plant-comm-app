@@ -1,13 +1,23 @@
 {% load template_tags %}
 {% load static from staticfiles %}
 
-<div class="profile-header panel row">
+{% if not editable %}
+	<div class="profile-header profile-header-base panel row">
 		<input name="contact-id" value="{{result.id}}" type="hidden"/>
 		<img class="profile-header-pic col-xs-12 col-sm-3" src="{{ result.profile_pic|normalizeMediaPic:media_url }}"/>
-		<div class="profile-header-text col-xs-12 col-sm-6">
+		<div class="profile-header-text col-xs-6">
 			<h3>
-				<a href="/profile/{{result.username}}">{{ result.username }}</a>
+				{% if result.username == user.username %}
+				<a href="/profile">
+				{% else %}
+				<a href="/profile/{{result.username}}">
+				{% endif %}
+				<i class="fa fa-user"></i> <span class="handler-username">{{ result.username }}</span></a>
 			</h3>
+			<p> 
+			<span class="handler-first_name">{{ result.first_name }}</span> 
+			<span class="handler-last_name">{{ result.last_name }}</span>
+			</p>
 			<p>
 			{% if result.online %}
 			<img class="online-icon icon" src="{% static 'gardening/shared/img/online.svg' %}"/>Online
@@ -16,18 +26,47 @@
 			{% endif %}
 			</p>
 			{% if result.city and result.state %}
-			<p><img class="map-pointer-icon icon" src="{% static 'gardening/shared/img/map_pointer_icon.svg' %}"/>{{ result.city }}, {{result.state}}</p>
+			<p><img class="map-pointer-icon icon" src="{% static 'gardening/shared/img/map_pointer_icon.svg' %}"/><span class="handler-city">{{ result.city }}</span>,  <span class="handler-state">{{result.state}}</span></p>
 			{% endif %}
-			<p><img class="plant-icon icon" src="{% static 'gardening/shared/img/greenthumb_icon_grey90.svg' %}">{{ result.plants|getLength }} Plants</p>
+			<p><img class="plant-icon icon" src="{% static 'gardening/shared/img/greenthumb_icon_grey90.svg' %}"><span class="handler-plant_num-{{result.id}}">{{ result.plants|getLength }}</span> Plants</p>
+			
 		</div>
-		<div class="profile-header-buttons col-xs-12 col-sm-3">
+		<div class="profile-header-buttons col-xs-3">
 			{% if isAuthenticated and user.username != result.username %}
 				<button class="p-header-follow-btn">Follow</button>
 				<button class="p-header-contact-btn">Contact</button>
 			{% elif isAuthenticated and user.username == result.username %}
-				<button class="p-header-edit-btn">Edit Profile</button>
+				<button class="p-header-edit-btn">
+					{% if not noEdit %}
+						Edit Profile
+					{% else %}
+						<a href="/profile">Edit Profile</a>
+					{% endif %}
+				</button>
 			{% else %}
 				<a href="/uauth?access_type=signup&next=/profile/{{result.username}}">Sign up</a> or <a href="/uauth?access_type=login&next=/profile/{{result.username}}">login</a> to contact or follow this gardener!
 			{% endif %}
 		</div>
-</div>
+	</div>
+{% else %}
+	<div class="edit-profile-header profile-header-base panel row hidden">
+		<input name="contact-id" value="{{gardener.id}}" type="hidden"/>
+		<img id="profile-pic-edit" class="profile-header-pic col-xs-12 col-sm-3" src="{{ gardener.profile_pic|normalizeMediaPic:media_url }}"/>
+		<form class="profile-form col-xs-7 col-sm-5">
+			{% for field in profileform %}
+				{% if field.label == "Profile picture" %}
+				<span id="profile-pic-field" class="gardener-field">
+				{% else %}
+				<span class="gardener-field">
+				{% endif %}
+					<label>{{ field.label | removeColon }}</label>
+					{{ field }}
+					<p id="{{field.id_for_label}}-error" class="field-error"></p>
+				</span>	
+			{% endfor %}
+		</form>
+		<div class="profile-header-buttons col-xs-3">
+			<button class="p-header-edit-btn">Save</button>
+		</div>
+	</div>
+{% endif %}

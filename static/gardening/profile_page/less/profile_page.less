@@ -1,34 +1,237 @@
-.plant-item {
-	border-bottom:  1px solid #ddd;
-	.img-carousel-wrapper {
-		@media (min-width: 400px) {
-			padding-left: 30px;
+.error {
+	border: 1px solid red !important;
+}
+
+.error-msg {
+	color: red;
+	margin: -15px 6px;
+}
+
+.clearfix() {
+	// display: inline-block;
+	&::after {
+		visibility: hidden;
+     	display: block;
+     	font-size: 0;
+     	content: " ";
+     	clear: both;
+     	height: 0;
+	}
+}
+
+.text-fade {
+	background: -webkit-linear-gradient(#333, #eee);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.push-down {
+	top: 75px;
+}
+
+.field-error {
+	color: red;
+}
+
+.profile-form {
+	.gardener-field {
+		float: left;
+		margin-top: 23px;
+		margin-right: 20px;
+		&:nth-child(odd) {
+			clear: both;
 		}
-		.img-carousel {
-			max-width: 359px;
-			// }
-			// @media 
-			margin: 0 auto;
-			.carousel-img-wrapper {
-				width: 100%;
-				.carousel-img {
-					max-width: 100%;
-					margin: 10px auto;
+
+		label {
+			width: 100%;
+		}
+		input, select, textarea {
+			border-radius: 5px;
+  			border: 1px black solid;
+  			padding: 5px 10px;
+  			width: 230px;
+		}
+	}
+
+	#profile-pic-field {
+		@media screen {
+			position: absolute;
+			right: 104%;
+    		top: 0%;
+		}
+		@media (max-width: 1238px) {
+			position: relative !important;
+			right: 0 !important;
+			top: 0 !important;
+		}
+	}	
+}
+
+.expandable-blurb {
+	overflow: hidden;
+	height: 94px;
+	word-wrap: break-word;
+	padding: 5px 0px 20px 25px;
+	.expand-blurb {
+		.ab-desc {
+			font-size: 12px;
+		}
+		text-decoration: none;
+		cursor: pointer;
+	}
+	.text-blurb-wrapper {
+		max-width: 88%;
+		.handler-text_blurb {
+			white-space: pre-line;
+			word-wrap: break-word;
+	    	margin: 25px 0;
+	    	font-size: 16px;
+	    	max-width: 200px;	
+		}
+	}
+}
+
+.plant-content {
+	.plant-header {
+		font-size: 22px;
+  		padding: 5px 27px;
+  		h3 {
+			max-width: 25%;
+			margin-right: 20px;
+			display: inline-block;
+			a {
+				cursor: pointer;
+				text-decoration: none;
+			} 
+		}
+		.add-plant {
+			border: 0;
+			background: transparent;
+			i {
+				cursor: pointer;
+				color: #337ab7;
+				&:hover {
+					color: #4dcf00;
 				}
 			}
 		}
 	}
-	.plant-text {
-		margin: 40px 0;
-		h4 {
-			color: #444
+	.plant-item {
+		border-bottom:  1px solid #ddd;
+		padding: 22px 15px;
+		overflow: hidden;
+		.clearfix();
+		.img-carousel-wrapper {
+			min-height: 250px;
+			@media (min-width: 400px) {
+				padding-left: 30px;
+			}
+			.img-carousel {
+				width: 250px;
+				min-height: 250px;
+				margin: 0 auto;
+				.carousel-img-wrapper {
+					width: 100%;
+					.carousel-img {
+						max-width: 100%;
+						margin: 10px auto;
+					}
+				}
+				.slick-slide {
+					width: 250px;
+				}
+			}
+			.plant-img-ctl-wrapper{
+				position: relative;
+				width: 275px;
+				margin-left: auto;
+				margin-right: auto;
+				padding: 0 33px;
+				input {
+					position: absolute;
+					top: -10000000px;
+				}
+				.plant-img-ctl {
+					width: 100px;
+					border: 0;
+					background-color: #ccc;
+					border-radius: 5px;
+					display: inline-block;
+					&:hover {
+						background-color: #eee;
+					}
+				}
+			}
 		}
-		h6 {
-			color: #555
+		.edit-plant {
+			font-size: 28px;
+			float: right;
+			border: 0;
+			background-color: #4dcf00;
+			border-radius: 5px;
+			width: 50px;
+			margin-top: 15px;
+  			clear: both;
+			&:hover {
+				color: #4dcf00;
+				background-color: transparent;
+				}
 		}
-		p {
-			font-size: 16px
+		.delete-plant {
+			font-size: 28px;
+			float: right;
+			border: 0;
+			background-color: #ea6303;
+			border-radius: 5px;
+			width: 50px;
+			margin-top: 15px;
+  			clear: both;
+  			&:hover {
+				color: #ea6303;
+				background-color: transparent;
+			}
 		}
+		.plant-text {
+			margin: -40px 0 20px 0;
+			float: left;
+			border-right: 1px solid #ccc;
+			word-wrap: break-word;
+			label {
+				display: block;
+			}
+			h4, h6, p, input, textarea {
+				display: inline-block;
+				margin-right: 20px;
+				float: left;
+				clear: left;
+			}
+			h4 {
+				color: #444;
+				margin-top: 3px;
+			}
+			h6 {
+				color: #555;
+				margin-top: 5px;
+			}
+			p, input, textarea {
+				font-size: 16px;
+				margin-bottom: 20px;
+				padding: 5px;
+			}
+			textarea {
+  				height: 173px;
+			}
+			p { 
+				width: 80%;
+				padding: 5px 0px;
+			}
+			.edit-input {
+				display: none;
+				width: 100%;
+			}
+
+		}
+		
 	}
 }
 
