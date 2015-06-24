@@ -21,6 +21,7 @@ DefaultPlantInfo = {
 
 @register.filter(name='replaceDefaultPlant', needs_autoescape=True)
 def replace_default_plant_info(value, param, autoescape=True):
+
 	if param not in DefaultPlantInfo:
 		if value == DefaultPlantInfo["information"]:
 			if param == "":
@@ -38,11 +39,16 @@ def replace_default_plant_info(value, param, autoescape=True):
 									"a little!"
 								])
 			return mark_safe(result)
-	if value == DefaultPlantInfo[param]:
-		if param == "quantity":
-			return "None yet"
-		elif param == "species":
-			return "Unknown"
+
+	else:
+		if value == DefaultPlantInfo[param]:
+			if param == "quantity":
+				return "None yet"
+			elif param == "species":
+				return "Unknown"
+
+
+	return value
 			
 
 @register.filter(name='getLength')

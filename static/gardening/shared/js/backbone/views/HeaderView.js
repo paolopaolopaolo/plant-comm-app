@@ -21,11 +21,19 @@ var HeaderView = Backbone.View.extend({
 	selectors: [
 					'.toggle-menu-wrapper',
 					'.chat-menu-wrapper',
-					'.count'
+					'.count',
+					'.header-profile-pic'
 				],
 
 	// @desc: An object of keys-to-jQuery objects
 	$$vars: {},
+
+	// @desc: Changes header profile pic
+	// @params: String
+	// @res: Void
+	profilePicChange: function (attr_str) {
+		this.$$vars['.header-profile-pic'].attr('src', attr_str);
+	},
 
 	// @desc: Normalize the Media URL
 	// @params: JS Object, String, String

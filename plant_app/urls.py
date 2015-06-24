@@ -7,10 +7,6 @@ from gardening.chat_api import *
 from gardening.rest_apis import *
 
 urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'plant_app.views.home', name='home'),
-    # url(r'^blog/', include('blog.urls')),
-
     url(r'^admin/', include(admin.site.urls)),
     url(r'^$', LandingPage.as_view(), name="landing"),
     url(r'^uauth/', UserAuthenticationPage.as_view(), name="userauth"),
@@ -23,10 +19,9 @@ urlpatterns = patterns('',
     url(r"convo/(?P<id>[0-9]+){0,1}$", ChatAPI.as_view(), name="ChatAPI"),
     url(r"^feed/$", FeedPage.as_view(), name="feed"),
     url(r"^logout/", "gardening.views.log_out", name="logout"),
-    url(r"^search/", SearchAPI.as_view(), name="search"),
-    
+    url(r"^search/", SearchAPI.as_view(), name="search"), 
 )
-
+ 
 if settings.DEBUG:
-	urlpatterns += static(r'media/', document_root=settings.MEDIA_ROOT)
-	urlpatterns += static(r'static/', document_root=settings.STATIC_ROOT)
+	urlpatterns += static(r'media/', document_root = settings.MEDIA_ROOT)
+	urlpatterns += static(r'static/', document_root = settings.STATIC_ROOT)

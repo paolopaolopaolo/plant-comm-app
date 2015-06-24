@@ -38,6 +38,7 @@ var ProfilePageView = Backbone.View.extend({
 		var field_height, field_width; 
 		this.$el.find(".profile-header-pic")
 				.attr("src", model.attributes["profile_pic"]);
+		this.trigger("profilePicChange", model.attributes["profile_pic"]);
 	},
 
 	// @HACK
@@ -250,6 +251,7 @@ var ProfilePageView = Backbone.View.extend({
 		// Set event listeners
 		this.listenTo(this.gardener_model, "change", this._changeAttr);
 		bv.listenTo(this, "changeAttribute", bv.propagateChanges);
+		bv.header_view.listenTo(this, "profilePicChange", bv.header_view.profilePicChange);
 
 	},
 
