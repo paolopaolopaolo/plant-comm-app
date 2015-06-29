@@ -22,10 +22,19 @@ var ProfilePageView = Backbone.View.extend({
 			$(event.currentTarget).html("About Me (click to expand)");
 			$(event.currentTarget).parents(".expandable-blurb")
 								  .removeAttr("style");
+			$(event.currentTarget).parents(".expandable-blurb")
+								  .find(".handler-text_blurb")
+								  .addClass("text-fade");			
 		} else {
 			$(event.currentTarget).html("About Me (click to hide)");
 			$(event.currentTarget).parents(".expandable-blurb")
-							  	  .css({height:"initial", minHeight: "60px"});
+							  	  .css({
+							  	  			height:"initial",
+							  	  			minHeight: "60px"
+							  	  		});
+			$(event.currentTarget).parents(".expandable-blurb")
+								  .find(".handler-text_blurb")
+								  .removeClass("text-fade");
 		}
 		this.isBlurbExpanded = !this.isBlurbExpanded;
 	},

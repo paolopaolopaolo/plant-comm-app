@@ -51,7 +51,7 @@ var BaseView = Backbone.View.extend({
 				this.header_view.convo_view.openDialogue(filtered_value.id);
 			} else {
 				// If it is undefined, use the given id directly 
-				this.header_view.convo_view.openDialogue(user_id);
+				this.header_view.convo_view.openDialogue(user_id, true);
 			}
 		}
 	},
