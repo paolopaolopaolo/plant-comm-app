@@ -56,48 +56,104 @@
 	word-wrap: break-word;
 	padding: 5px 0px 20px 25px;
 	.expand-blurb {
+		.ab-desc {
+			font-size: 12px;
+		}
 		text-decoration: none;
 		cursor: pointer;
 	}
-	.handler-text_blurb {
-		white-space: pre;
-    	margin: 25px 0;
-    	font-size: 16px;	
+	.text-blurb-wrapper {
+		max-width: 88%;
+		.handler-text_blurb {
+			white-space: pre-line;
+			word-wrap: break-word;
+	    	margin: 25px 0;
+	    	font-size: 16px;
+	    	max-width: 200px;	
+		}
 	}
 }
 
-
-.plant-item {
-	border-bottom:  1px solid #ddd;
-	.img-carousel-wrapper {
-		@media (min-width: 400px) {
-			padding-left: 30px;
+.plant-content {
+	.plant-header {
+		font-size: 22px;
+  		padding: 5px 27px;
+  		h3 {
+			max-width: 25%;
+			margin-right: 20px;
+			display: inline-block;
+			a {
+				cursor: pointer;
+				text-decoration: none;
+			} 
 		}
-		.img-carousel {
-			max-width: 359px;
-			// }
-			// @media 
-			margin: 0 auto;
-			.carousel-img-wrapper {
-				width: 100%;
-				.carousel-img {
-					max-width: 100%;
-					margin: 10px auto;
-				}
+		i {
+			cursor: pointer;
+			color: #337ab7;
+			&:hover {
+				color: #4dcf00;
 			}
 		}
 	}
-	.plant-text {
-		margin: 40px 0;
-		h4 {
-			color: #444
+	.plant-item {
+		border-bottom:  1px solid #ddd;
+		.img-carousel-wrapper {
+			@media (min-width: 400px) {
+				padding-left: 30px;
+			}
+			.img-carousel {
+				width: 275px;
+				// }
+				// @media 
+				margin: 0 auto;
+				.carousel-img-wrapper {
+					width: 100%;
+					.carousel-img {
+						max-width: 100%;
+						margin: 10px auto;
+					}
+				}
+				.slick-slide {
+					width: 275px;
+				}
+			}
 		}
-		h6 {
-			color: #555
+		.plant-text {
+			margin: 40px 0;
+			h4, h6, p, input, textarea {
+				display: inline-block;
+				margin-right: 20px;
+				float: left;
+				clear: left;
+			}
+			h4 {
+				color: #444;
+				margin-top: 3px;
+			}
+			h6 {
+				color: #555;
+				margin-top: 5px;
+			}
+			p, input, textarea {
+				font-size: 16px;
+			}
+			textarea {
+				width: 80%;
+  				height: 173px;
+			}
+			p { 
+				width: 80%;
+			}
+			.edit-plant {
+				float: left;
+				border: 0;
+				background-color: transparent;
+				&:hover {
+					color: #4dcf00;
+				}
+			}
 		}
-		p {
-			font-size: 16px
-		}
+		
 	}
 }
 

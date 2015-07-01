@@ -6,7 +6,8 @@ var BaseView = Backbone.View.extend({
 		"click .p-header-contact-btn": "openDialogue",
 	},
 
-	// @desc: Takes Gardener model changes and propagates it to UI elements
+	// @desc: CALLED FROM PROFILE EDITS:: 
+	//        Takes Gardener model changes and propagates it to UI elements
 	// @params: Object
 	// @res: Void
 	propagateChanges: function (object) {
@@ -25,7 +26,6 @@ var BaseView = Backbone.View.extend({
 				}, this));
 			}
 		}
-
 	},
 
 	// @desc: Opens Chat Dialogue When Clicking Contact button
@@ -56,7 +56,8 @@ var BaseView = Backbone.View.extend({
 		}
 	},
 
-	// @desc: Open Dialogue UI wrapper function, calls the previous function
+	// @desc: Open Dialogue UI wrapper function. Gets the id
+	//        from UI hidden input and calls the previous function
 	// @params: Event object
 	// @res: Void
 	openDialogue: function (event) {

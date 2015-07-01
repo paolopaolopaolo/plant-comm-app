@@ -102,7 +102,7 @@ var ConvoView = Backbone.View.extend({
 	// @params: event (could be an Event object OR an integer)
 	// @res: Void
 	openDialogue: function (event, isUserId) {
-		var _id, new_convo, dialogue;
+		var _id, new_convo, dialogue, user_id;
 
 		isUserId = (isUserId === undefined ? false : isUserId);
 
@@ -119,6 +119,7 @@ var ConvoView = Backbone.View.extend({
 
 		// If the ID is a user ID...
 		if (isUserId) {
+			user_id = _id;
 			// Get and set the dialogue variable to the convo Object that
 			// the user id is a part of
 			dialogue = this.collection.find(_.bind(function (convo) {
@@ -131,13 +132,10 @@ var ConvoView = Backbone.View.extend({
 			} else {
 				// if not, keep _id undefined
 				_id = undefined;
+
 			}
 		}
 		
-		// Trigger a "closeOtherChatboxes" event
-		// to turn off event listeners of other models
-		// this.trigger('closeOtherChatboxes');
-
 		// Branching for new or old dialogues (this bases everything on the open views)
 		if (_id) {
 			// Old dialogues
@@ -147,14 +145,14 @@ var ConvoView = Backbone.View.extend({
 		} else {
 			// New dialogues
 			// create a new Convo model
-			new_convo = new Convo({"user_targ": _id});
+			_id = 
+			new_convo = new Convo({"user_targ": user_id});
 			// Save this model with the user_targ == _id
 			new_convo.save({}, {silent: true})
 					 .done(_.bind(function (response) {
 					 	new_convo.unset("user_targ", {silent: true});
 					 	new_convo.set({"user": response['user'], "seen":true}, {silent: true});
 					 	this.collection.add(new_convo);
-					 	// this.collection.get(new_convo.attributes['id']).set({seen: true});
 					 	this.openDialogue(new_convo.attributes['id']);
 					 }, this));
 		}

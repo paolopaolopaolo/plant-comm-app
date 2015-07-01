@@ -40,6 +40,13 @@
 	list-style-image: url(data:0);
 }
 
+.chat-box-hide {
+	padding: 0 !important;
+	border: 0 !important;
+	margin: 0 !important;
+	display: none !important;
+}
+
 .show-hidden {
 	display: inline-block !important;
 	animation-name: appear;
@@ -496,10 +503,12 @@ ul {
 		color: #3a9a00;
 		button {
 			display: block;
-			margin-bottom: 20px;
-			border: 0;
-			background-color: #4fcd00;
-			color: #fff;
+  			margin-bottom: 20px;
+  			border: 0;
+  			background-color: #4fcd00;
+  			color: #fff;
+  			min-width: 115px;
+  			text-align: left;
 		}
 	}
 }

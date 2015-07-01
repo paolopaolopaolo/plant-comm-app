@@ -12,9 +12,32 @@
 	</div>
 	<div class="plant-text-wrapper col-xs-12 col-sm-6 col-sm-offset-1">
 		<div class="plant-text">
-			<h4>{{ plant.species | replaceDefaultPlant:"species" }}</h4>
-			<h6>Quantity: {{ plant.quantity | replaceDefaultPlant:"quantity" }}</h6>
-			<p>{{ plant.information | replaceDefaultPlant:user.first_name }}</p>
+			<input name="plant-id" type="hidden" value="{{plant.id}}"/>
+			<h4 class="id-species-display plant-display"><span class="handler-species">{{ plant.species | replaceDefaultPlant:"species" }}</span></h4>
+			<input type="text" class="id-species-edit edit-input" />
+			{% if user.username == gardener.username and isAuthenticated%}
+			<button class="edit-plant">
+				<input name="param" type="hidden" value="species"/>
+				<i class="fa fa-pencil" title="Edit Species"></i>
+			</button>
+			{% endif %}
+			<h6 class="id-quantity-display plant-display">Quantity: <span class="handler-quantity">{{ plant.quantity | replaceDefaultPlant:"quantity" }}</span></h6>
+			<input type="number" class="id-quantity-edit edit-input"/>
+			{% if user.username == gardener.username and isAuthenticated%}
+			<button class="edit-plant">
+				<input name="param" type="hidden" value="quantity"/>
+				<i class="fa fa-pencil edit-plant" title="Edit Quantity"></i>
+			</button>
+			{% endif %}
+			<p class="id-information-display plant-display"><span class="handler-information">{{ plant.information | replaceDefaultPlant:gardener.first_name }}</span></p>
+			<textarea class="id-information-edit edit-input"></textarea>
+			{% if user.username == gardener.username and isAuthenticated%}
+			<button class="edit-plant">
+				<input name="param" type="hidden" value="information"/>
+				<i class="fa fa-pencil edit-plant" title="Edit Information"></i>
+			</button>
+			{% endif %}
+			
 		</div>
 	</div>
 </div>

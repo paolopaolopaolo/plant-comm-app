@@ -63,7 +63,7 @@ var ChatView = Backbone.View.extend({
 	closeChatbox: function () {
 		this.stopListening(this.model_target, "change:text");
 		this.listenTo(this.model_target, "change:text", this.openChatbox);
-		this.$el.css({"padding": "0", "width": "0", "height": "0"});
+		this.$el.addClass("chat-box-hide");
 		this.$el.children().detach();
 		this.open = false;
 		this.minimized = false;
@@ -225,6 +225,7 @@ var ChatView = Backbone.View.extend({
 		}
 		// Append the template + context
 		this.$el.removeAttr("style");
+		this.$el.removeClass("chat-box-hide")
 		this.$el.append(this.template(context));
 		this.textRender(true);
 	},
