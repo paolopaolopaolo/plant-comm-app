@@ -82,6 +82,8 @@
 			{% if isAuthenticated %}
 				{% include "gardening/shared/backbone_chat_templates.html" %}
 			{% endif %}
+			{% block backbone_templates %}
+			{% endblock %}
 
 			{% compress js %}
 				<script src="{% static 'gardening/shared/js/jquery-1.11.1.min.js' %}">

@@ -58,7 +58,7 @@
 					</a>
 				</h3>
 				{% if isAuthenticated and user.username == gardener.username %}
-					<i class="fa fa-plus" title="Add plant"></i>
+					<button class="add-plant"><i class="fa fa-plus" title="Add plant"></i></button>
 				{% endif %}
 			</div>
 			{% for plant in plants %}
@@ -68,9 +68,15 @@
 	</div>
 {% endblock %}
 
+{% block backbone_templates %}
+	{% include "gardening/profile_page/backbone_plant_template.html" %}
+{% endblock %}
+ 
 {% block scripts %}
 	<script src="{% static 'gardening/profile_page/js/backbone/models/ProfilePageModels.js' %}"></script>
 	<script src="{% static 'gardening/profile_page/js/backbone/collections/PlantCollection.js' %}"></script>
 	<script src="{% static 'gardening/profile_page/js/backbone/collections/PlantImgCollection.js' %}"></script>
+	<script src="{% static 'gardening/profile_page/js/backbone/views/PlantImgView.js' %}"></script>
+	<script src="{% static 'gardening/profile_page/js/backbone/views/PlantView.js' %}"></script>
 	<script src="{% static 'gardening/profile_page/js/backbone/views/ProfilePageView.js' %}"></script>
 {% endblock %}

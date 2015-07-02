@@ -14,7 +14,7 @@
 		<div class="plant-text">
 			<input name="plant-id" type="hidden" value="{{plant.id}}"/>
 			<h4 class="id-species-display plant-display"><span class="handler-species">{{ plant.species | replaceDefaultPlant:"species" }}</span></h4>
-			<input type="text" class="id-species-edit edit-input" />
+			<input type="text" class="id-species-edit edit-input" value="{{ plant.species | replaceDefaultPlant:'species' }}"/>
 			{% if user.username == gardener.username and isAuthenticated%}
 			<button class="edit-plant">
 				<input name="param" type="hidden" value="species"/>
@@ -22,7 +22,7 @@
 			</button>
 			{% endif %}
 			<h6 class="id-quantity-display plant-display">Quantity: <span class="handler-quantity">{{ plant.quantity | replaceDefaultPlant:"quantity" }}</span></h6>
-			<input type="number" class="id-quantity-edit edit-input"/>
+			<input type="number" class="id-quantity-edit edit-input" value="{{ plant.quantity }}"/>
 			{% if user.username == gardener.username and isAuthenticated%}
 			<button class="edit-plant">
 				<input name="param" type="hidden" value="quantity"/>
@@ -30,7 +30,7 @@
 			</button>
 			{% endif %}
 			<p class="id-information-display plant-display"><span class="handler-information">{{ plant.information | replaceDefaultPlant:gardener.first_name }}</span></p>
-			<textarea class="id-information-edit edit-input"></textarea>
+			<textarea class="id-information-edit edit-input">{{ plant.information }}</textarea>
 			{% if user.username == gardener.username and isAuthenticated%}
 			<button class="edit-plant">
 				<input name="param" type="hidden" value="information"/>
