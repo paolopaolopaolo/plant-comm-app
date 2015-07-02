@@ -101,14 +101,13 @@
 	}
 	.plant-item {
 		border-bottom:  1px solid #ddd;
+		padding: 22px 15px;
 		.img-carousel-wrapper {
 			@media (min-width: 400px) {
 				padding-left: 30px;
 			}
 			.img-carousel {
 				width: 275px;
-				// }
-				// @media 
 				margin: 0 auto;
 				.carousel-img-wrapper {
 					width: 100%;
@@ -119,6 +118,23 @@
 				}
 				.slick-slide {
 					width: 275px;
+				}
+			}
+			.plant-img-ctl-wrapper{
+				position: relative;
+				width: 275px;
+				margin-left: auto;
+				margin-right: auto;
+				padding: 0 33px;
+				.plant-img-ctl {
+					width: 100px;
+					border: 0;
+					background-color: #ccc;
+					border-radius: 5px;
+					display: inline-block;
+					&:hover {
+						background-color: #eee;
+					}
 				}
 			}
 		}

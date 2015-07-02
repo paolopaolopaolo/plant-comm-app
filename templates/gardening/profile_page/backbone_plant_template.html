@@ -9,7 +9,11 @@
 <script id="plant-template" type="text/html">
 	<div class="plant-item panel row">
 	<div class="img-carousel-wrapper col-xs-11 col-sm-4">
-		<div class="img-carousel">
+		<div class="img-carousel img-carousel-{{ id }}">
+		</div>
+		<div class="plant-img-ctl-wrapper">
+			<button class="add-plant-img plant-img-ctl" title="Add plant picture">Add <i class="fa fa-picture-o"></i></button>
+			<button class="rem-plant-img plant-img-ctl" title="Remove plant picture">Remove <i class="fa fa-picture-o"></i></button>
 		</div>
 	</div>
 	<div class="plant-text-wrapper col-xs-12 col-sm-6 col-sm-offset-1">

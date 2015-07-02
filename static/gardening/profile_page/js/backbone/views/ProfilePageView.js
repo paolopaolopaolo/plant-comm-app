@@ -4,8 +4,6 @@ var ProfilePageView = Backbone.View.extend({
 
 	isEditMode: false,
 	isBlurbExpanded: false,
-	// // MOVE TO PLANT VIEW
-	// isPlantEditable: {},
 
 	events: {
 		"click .p-header-edit-btn": "_toggleEditMode",
@@ -15,82 +13,6 @@ var ProfilePageView = Backbone.View.extend({
 		"change #id_profile_pic": "_saveProfilePic",
 		"click .expand-blurb": "_expandBlurb",
 	},
-
-	// MOVE TO PLANT VIEW
-	// @desc: Internal: Get the desired jQuery object using a parent, a 
-	// 		  parameter, and a type ("edit" or "display")
-	// @params: jQuery Object, String, String
-	// @res: jQuery Object
-	// _getJQueryElement: function ($parent, param_string, type) {
-	// 	return $parent.find([".id", param_string, type].join("-"));
-	// },
-
-	// MOVE TO PLANT VIEW
-	// @desc: Toggle Plant input, accounting for which plant,
-	// 		  which input, and which state it is currently in
-	// @params: jQuery Object, String, String
-	// @res: Void
-	// _togglePlantMode: function($plant_content, param_string, option) {
-	// 	var value_to_save, $display, $input;
-
-	// 	$input = this._getJQueryElement(
-	// 										$plant_content,
-	// 										param_string,
-	// 										"edit"
-	// 									);
-	// 	$display = this._getJQueryElement(
-	// 										$plant_content,
-	// 										param_string,
-	// 										"display"
-	// 									);
-
-	// 	if (option === "display") {
-	// 		value_to_save = $input.val();
-	// 		$display.show();
-	// 		$input.hide();
-	// 	} else if (option === "edit") {
-	// 		$display.hide();
-	// 		$input.show();
-	// 	}
-	// },
-
-	// MOVE TO PLANT VIEW
-	// @desc: Toggles the Editability of Plant Items
-	// @params: Event object
-	// @res: Void
-	// _togglePlantEdit: function (event) {
-	// 	var $plant_content,
-	// 		_id,
-	// 		target_attr,
-	// 		$icon;
-
-	// 	// Set $plant_content to the plant panel
-	// 	$plant_content = $(event.currentTarget).parents(".plant-text");
-	// 	// Get plant-id from hidden input
-	// 	_id = parseInt($plant_content.children("input[name='plant-id']").val(), 10);
-	// 	// Get target parameter from hidden input
-	// 	target_attr = $(event.currentTarget).children("input[name='param']").val();
-	// 	// Get the icon-to-change
-	// 	$icon = $(event.currentTarget).children(".fa");
-		
-	// 	if (this.isPlantEditable[_id][target_attr]) {
-	// 		// If the plant is already editable, trigger
-	// 		// to non-editable display
-	// 		this._togglePlantMode($plant_content, target_attr, "display");
-	// 		// Change icon from checkmark to pencil
-	// 		$icon.removeClass("fa-check");
-	// 		$icon.addClass("fa-pencil");
-	// 	} else {
-	// 		// If plant is not yet editable, trigger
-	// 		// to input mode
-	// 		this._togglePlantMode($plant_content, target_attr, "edit");
-	// 		// Change icon from pencil to checkmark
-	// 		$icon.addClass("fa-check");
-	// 		$icon.removeClass("fa-pencil");
-	// 	}
-	// 	// Toggle the value from bool(x) to !bool(x).
-	// 	this.isPlantEditable[_id][target_attr] = !this.isPlantEditable[_id][target_attr];
-	// },
 
 	// @desc: Toggle the Text Blurb Expandion
 	// @params: Event Object
@@ -305,18 +227,6 @@ var ProfilePageView = Backbone.View.extend({
 		}
 	},
 
-	// MOVE TO PLANT IMG VIEW
-	// @desc: Initialize a Slick Image Carousel for the plant images
-	// @params: None
-	// @res: Void
-	_initializePlantCarousel: function () {
-		this.$el.find(".img-carousel").slick({
-			accessibility: true,
-			infinite: true,
-			adaptiveHeight: true,
-			variableWidth: true,
-		});
-	},
 
 	// @desc: For each of the changed attributes,
 	// 		  update the appropriate UI (this is like the render function)
@@ -347,19 +257,8 @@ var ProfilePageView = Backbone.View.extend({
 		this.gardener_model = new Gardener(gardener);
 		this.plant_view = new PlantView({parent: this, collection: new Plants(plants)});
 
-		// Initialize isPlantEditable object
-		// this.plants_collection.each(_.bind(function (model) {
-		// 	this.isPlantEditable[model.attributes['id']] = {};
-		// 	this.isPlantEditable[model.attributes['id']]["species"] = false;
-		// 	this.isPlantEditable[model.attributes['id']]["quantity"] = false;
-		// 	this.isPlantEditable[model.attributes['id']]["information"] = false;
-		// }, this));
+		
 
-		this.$el.find(".edit-input")
-				.hide();
-
-		// Initialize the Plant Img Carousel
-		this._initializePlantCarousel();
 		// Set the toggleEditMode method to a debounced version
 		this._throttleToggleEditMode();
 

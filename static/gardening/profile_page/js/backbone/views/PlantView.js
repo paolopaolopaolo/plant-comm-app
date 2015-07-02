@@ -3,8 +3,9 @@ var PlantView = Backbone.View.extend({
 	el: ".plant-content",
 	template: _.template($("#plant-template").html()),
 
-	// MOVE TO PLANT VIEW
+	plant_img_views: {},
 	isPlantEditable: {},
+
 
 	events: {
 		"click .edit-plant": "_togglePlantEdit",
@@ -84,15 +85,38 @@ var PlantView = Backbone.View.extend({
 		this.isPlantEditable[_id][target_attr] = !this.isPlantEditable[_id][target_attr];
 	},
 
+	// @desc: Called while initializing ProfilePageView
+	// @params: Simple JS Object
+	// @res: Void
 	initialize: function (attrs) {
 		this.parent = attrs['parent'];
 		this.collection = attrs['collection'];
+
+		// Hide all the input-versions of the plant objects
+		this.$el.find(".edit-input")
+				.hide();
+
+		// Iterate across the given collection
 		this.collection.each(_.bind(function (model) {
-			this.isPlantEditable[model.attributes['id']] = {};
-			this.isPlantEditable[model.attributes['id']]["species"] = false;
-			this.isPlantEditable[model.attributes['id']]["quantity"] = false;
-			this.isPlantEditable[model.attributes['id']]["information"] = false;
+			var _id = model.attributes['id'];
+			// Initialize isPlantEditable nested object
+			this.isPlantEditable[_id] = {};
+			this.isPlantEditable[_id]["species"] = false;
+			this.isPlantEditable[_id]["quantity"] = false;
+			this.isPlantEditable[_id]["information"] = false;
+			// Initialize PlantImgView
+			this.plant_img_views[_id] = new PlantImgView({
+											parent: this,
+											el: [
+												".img-carousel",
+												_id.toString()
+											].join("-"),
+											collection: new PlantImgs(model.attributes['images'], {plant_id: _id})
+										});
 		}, this));
+
+		// Event Listeners
+		this.listenTo(this.collection, "add", this._addPlantView);
 	},
 
 });
