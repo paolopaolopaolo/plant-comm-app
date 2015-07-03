@@ -1,7 +1,7 @@
 {% load template_tags %}
 
 <!-- Individual Plant Panel -->
-<div class="plant-item panel row">
+<div class="plant-item plant-item-{{plant.id}} panel row">
 	<!-- Image Carousel / with buttons -->
 	<div class="img-carousel-wrapper col-xs-11 col-sm-4">
 		<div class="img-carousel img-carousel-{{plant.id}}">
@@ -25,7 +25,7 @@
 			<!--Built-in Plant ID Data-->
 			<input name="plant-id" type="hidden" value="{{plant.id}}"/>
 			<!--Plant Species (h4 and input)-->
-			<h4 class="id-species-display plant-display"><span class="handler-species">{{ plant.species | replaceDefaultPlant:"species" }}</span></h4>
+			<h4 class="id-species-display plant-display"><span class="handler-species-{{plant.id}}">{{ plant.species | replaceDefaultPlant:"species" }}</span></h4>
 			<input type="text" class="id-species-edit edit-input" value="{{ plant.species | replaceDefaultPlant:'species' }}"/>
 			<!-- Edit Plant Species Button -->
 			{% if user.username == gardener.username and isAuthenticated%}
@@ -35,7 +35,7 @@
 			</button>
 			{% endif %}
 			<!--Plant Quantity (h6 and input)-->
-			<h6 class="id-quantity-display plant-display">Quantity: <span class="handler-quantity">{{ plant.quantity | replaceDefaultPlant:"quantity" }}</span></h6>
+			<h6 class="id-quantity-display plant-display">Quantity: <span class="handler-quantity-{{plant.id}}">{{ plant.quantity | replaceDefaultPlant:"quantity" }}</span></h6>
 			<input type="number" class="id-quantity-edit edit-input" value="{{ plant.quantity }}"/>
 			<!-- Edit Plant Quantity Button-->
 			{% if user.username == gardener.username and isAuthenticated%}
@@ -45,7 +45,7 @@
 			</button>
 			{% endif %}
 			<!-- Plant Information (p and textarea)-->
-			<p class="id-information-display plant-display"><span class="handler-information">{{ plant.information | replaceDefaultPlant:gardener.first_name }}</span></p>
+			<p class="id-information-display plant-display"><span class="handler-information-{{plant.id}}">{{ plant.information | replaceDefaultPlant:gardener.first_name }}</span></p>
 			<textarea class="id-information-edit edit-input">{{ plant.information }}</textarea>
 			<!-- Edit Plant Information Button -->
 			{% if user.username == gardener.username and isAuthenticated%}

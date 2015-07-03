@@ -8,19 +8,22 @@ var BaseView = Backbone.View.extend({
 
 	// @desc: CALLED FROM PROFILE EDITS:: 
 	//        Takes Gardener model changes and propagates it to UI elements
-	// @params: Object
+	// @params: Object, Integer
 	// @res: Void
-	propagateChanges: function (object) {
-		var name, value, $targets;
+	propagateChanges: function (object, number) {
+		var name, selector_name, value, $targets;
 
 		for (name in object) {
 			if (object.hasOwnProperty(name)) {
 				value = object[name];
+				selector_name = (number === undefined ? name : [name, number.toString()].join("-"));
+				console.log(name);
 				$targets = this.$el
 							   .find([
 										".handler",
-										name
+										selector_name
 									].join("-"));
+				console.log($targets);
 				_.each($targets, _.bind(function (target) {
 					$(target).html(object[name]);
 				}, this));
