@@ -20,22 +20,16 @@
 			<div class="plant-text">
 				<input name="plant-id" type="hidden" value="{{ id }}"/>
 				<h4 class="id-species-display plant-display"><span class="handler-species-{{id}}">{{species }}</span></h4>
+				<label for="id-species-edit" class="edit-input">Species</label>
 				<input type="text" class="id-species-edit edit-input" value="{{ species }}"/>
-				<button class="edit-plant">
-					<input name="param" type="hidden" value="species"/>
-					<i class="fa fa-pencil" title="Edit Species"></i>
-				</button>
 				<h6 class="id-quantity-display plant-display">Quantity: <span class="handler-quantity-{{id}}">{{ quantity }}</span></h6>
+				<label for="id-quantity-edit" class="edit-input">Quantity</label>
 				<input type="number" class="id-quantity-edit edit-input" value="{{ quantity }}"/>
-				<button class="edit-plant">
-					<input name="param" type="hidden" value="quantity"/>
-					<i class="fa fa-pencil edit-plant" title="Edit Quantity"></i>
-				</button>
 				<p class="id-information-display plant-display"><span class="handler-information-{{id}}">{{ information }}</span></p>
+				<label for="id-information-edit" class="edit-input">Information</label>
 				<textarea class="id-information-edit edit-input">{{ information }}</textarea>
 				<button class="edit-plant">
-					<input name="param" type="hidden" value="information"/>
-					<i class="fa fa-pencil edit-plant" title="Edit Information"></i>
+					<i class="fa fa-pencil edit-plant" title="Save"></i>
 				</button>
 				
 			</div>

@@ -17,13 +17,11 @@ var BaseView = Backbone.View.extend({
 			if (object.hasOwnProperty(name)) {
 				value = object[name];
 				selector_name = (number === undefined ? name : [name, number.toString()].join("-"));
-				console.log(name);
 				$targets = this.$el
 							   .find([
 										".handler",
 										selector_name
 									].join("-"));
-				console.log($targets);
 				_.each($targets, _.bind(function (target) {
 					$(target).html(object[name]);
 				}, this));

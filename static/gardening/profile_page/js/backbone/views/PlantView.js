@@ -70,46 +70,67 @@ var PlantView = Backbone.View.extend({
 		if (model.isNew()) {
 			context['id'] = temp_id;
 			// Add to isPlantEditable
-			this._initializePlantEditable(context['id']);
+			this._initializePlantEditable(context['id'], true);
 
 			// Add to PlantView
 			this.$el.find(".plant-header")
 					.after(this.template(context));
+			this._togglePlantMode(
+					this.$el.find(".plant-item-" + temp_id),
+					"edit",
+					true);
+		}
+		else {
+			this._initializePlantEditable(model.attributes["id"]);
+			this.$el.find(".plant-header")
+					.after(this.template(model.attributes));
 		}
 	},
 
 	// @desc: Internal: Get the desired jQuery object using a parent, a 
 	// 		  parameter, and a type ("edit" or "display")
-	// @params: jQuery Object, String, String
+	// @params: jQuery Object, String
 	// @res: jQuery Object
-	_getJQueryElement: function ($parent, param_string, type) {
-		return $parent.find([".id", param_string, type].join("-"));
+	_getJQueryElement: function ($parent, type) {
+		return $parent.find("." + type);
+
 	},
 
 	// @desc: Toggles the Plant input, accounting for which plant,
 	// 		  which input, and which state it is currently in
-	// @params: jQuery Object, String, String
+	// @params: jQuery Object, String
 	// @res: Void
-	_togglePlantMode: function($plant_content, param_string, option) {
-		var $display, $input;
+	_togglePlantMode: function($plant_content, option, isForceToggled) {
+		var $display, $input, $icon;
+
+		$icon = $plant_content.find(".edit-plant").children(".fa");
 
 		$input = this._getJQueryElement(
 											$plant_content,
-											param_string,
-											"edit"
+											"edit-input"
 										);
 		$display = this._getJQueryElement(
 											$plant_content,
-											param_string,
-											"display"
+											"plant-display"
 										);
 
 		if (option === "display") {
 			$display.show();
-			$input.hide();
+			$input.removeAttr("style");
+			$icon.removeClass("fa-pencil");
+			$icon.addClass("fa-check");
 		} else if (option === "edit") {
 			$display.hide();
-			$input.show();
+			$input.css({"display": "block", "clear": "both"});
+			// Change icon from checkmark to pencil
+			$icon.removeClass("fa-check");
+			$icon.addClass("fa-pencil");
+		}
+		
+		if (isForceToggled) {
+			this.isPlantEditable[$plant_content.find("input[name='plant-id']").val()] = true;
+			$icon.addClass("fa-check");
+			$icon.removeClass("fa-pencil");
 		}
 	},
 	
@@ -126,48 +147,53 @@ var PlantView = Backbone.View.extend({
 
 		// Set $plant_content to the plant panel
 		$plant_content = $(event.currentTarget).parents(".plant-text");
+
 		// Get plant-id from hidden input
 		_id = $plant_content.children("input[name='plant-id']").val();
 		if (_id.charAt(0) !== "c") {
 			_id = parseInt($plant_content.children("input[name='plant-id']").val(), 10);
 		}
-		// Get target parameter from hidden input
-		target_attr = $(event.currentTarget).children("input[name='param']").val();
-		// Get the icon-to-change
-		$icon = $(event.currentTarget).children(".fa");
 		
-		if (this.isPlantEditable[_id][target_attr]) {
+		if (this.isPlantEditable[_id]) {
 			// If the plant is already editable, trigger
 			// to non-editable display AND SAVE THE PLANT
 			obj_to_save = this._jsonifyPlant(event);
-			this.collection.get(_id)
-						   .save(obj_to_save)
-						   .done(_.bind(function (response) {
-								this._togglePlantMode($plant_content, target_attr, "display");
-								// Change icon from checkmark to pencil
-								$icon.removeClass("fa-check");
-								$icon.addClass("fa-pencil");
-						   }, this));
+			if (this.collection.get(_id).isNew()) {
+				this.collection.get(_id)
+							   .save(obj_to_save)
+							   .done(_.bind(function (response) {
+							   		var model, model_cid;
+							   		model = this.collection.get(_id);
+							   		console.log(model);
+							   		model_cid = model["cid"];
+							   		this.$el.find(".plant-item-" + model_cid).remove();
+							   		this._addPlantView(model, this.collection);
+							   }, this));
+			} else {
+				this.collection.get(_id)
+							   .save(obj_to_save)
+							   .done(_.bind(function (response) {
+									this._togglePlantMode($plant_content, "display");
+								}, this));
+			}
 		} else {
 			// If plant is not yet editable, trigger
 			// to input mode
-			this._togglePlantMode($plant_content, target_attr, "edit");
-			// Change icon from pencil to checkmark
-			$icon.addClass("fa-check");
-			$icon.removeClass("fa-pencil");
+			this._togglePlantMode($plant_content, "edit");
 		}
 		// Toggle the value from bool(x) to !bool(x).
-		this.isPlantEditable[_id][target_attr] = !this.isPlantEditable[_id][target_attr];
+		this.isPlantEditable[_id] = !this.isPlantEditable[_id];
 	},
 
 	// @desc: Sets isPlantEditable to all false
 	// @params: Integer (or String)
 	// @res: Void
 	_initializePlantEditable: function (_id) {
-		this.isPlantEditable[_id] = {};
-		this.isPlantEditable[_id]["species"] = false;
-		this.isPlantEditable[_id]["quantity"] = false;
-		this.isPlantEditable[_id]["information"] = false;
+		this.isPlantEditable[_id] = false;
+		// this.isPlantEditable[_id] = {};
+		// this.isPlantEditable[_id]["species"] = false;
+		// this.isPlantEditable[_id]["quantity"] = false;
+		// this.isPlantEditable[_id]["information"] = false;
 	},
 
 	_changePlant: function (model, collection, opts) {
@@ -203,6 +229,9 @@ var PlantView = Backbone.View.extend({
 											collection: new PlantImgs(model.attributes['images'], {plant_id: _id})
 										});
 		}, this));
+
+		// Debounce the toggle methods
+		this._togglePlantEdit = _.debounce(_.bind(this._togglePlantEdit, this), 1000, true);
 
 		// Event Listeners
 		this.listenTo(this.collection, "add", this._addPlantView);
