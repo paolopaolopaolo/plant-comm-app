@@ -312,7 +312,7 @@ class ProfilePage(GreenThumbPage, APIView):
 
 		# Populate Profile Page with Non-JSON-Encoded user and plant data
 		self.context['gardener'] = self.RETURN_USER_DATA(_id = __user, plants=True)
-		self.context['plants'] = sorted(self.RETURN_PLANT_DATA(_id = __user, img = True), key=self.sortById)		
+		self.context['plants'] = sorted(self.RETURN_PLANT_DATA(_id = __user, img = True), key=self.sortById, reverse=True)		
 		self.context['is_editable'] = editable
 
 

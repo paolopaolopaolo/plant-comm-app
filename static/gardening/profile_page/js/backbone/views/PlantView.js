@@ -76,16 +76,9 @@ var PlantView = Backbone.View.extend({
 	// @res: Void
 	_addPlant: function () {
 		this.collection.add({ 
-							  species : "Use the name most familiar to you.",
+							  species : "",
 							  quantity : 0,
-							  information : [
-												"You've added a new plant.",
-												" Use this section to tell ",
-												"people how they should care",
-												" for your plants (i.e. inst",
-												"ructions for watering, pruni",
-												"ng, fertilizer, etc.)."
-											].join(""),
+							  information : "",
 							});
 	},
 
@@ -103,15 +96,7 @@ var PlantView = Backbone.View.extend({
 	// @params: Backbone Model Object, Backbone Collection Object, JS Object
 	// @res: Void
 	_addPlantView: function (model, collection, opts) {
-		var temp_id, default_info;
-		default_info = [
-							"You've added a new plant.",
-							" Use this section to tell ",
-							"people how they should care",
-							" for your plants (i.e. inst",
-							"ructions for watering, pruni",
-							"ng, fertilizer, etc.)."
-						].join("");
+		var temp_id;
 		temp_id = model.cid;
 		context = _.clone(model.attributes);
 		// If the model is still new
@@ -129,11 +114,31 @@ var PlantView = Backbone.View.extend({
 						.find(".plant-text"),
 					"edit",
 					true);
+			this.$el.find(".plant-item-" + temp_id)
+					.find(".img-carousel-wrapper")
+					.hide();
 		}
 		else {
 			this._initializePlantEditable(model.attributes["id"]);
 			this.$el.find(".plant-header")
 					.after(this.template(model.attributes));
+			// this.$el.find(".plant-item-" + opts["_id"].toString())
+			// 		.find(".img-carousel-wrapper")
+			// 		.removeAttr("style");
+			if (opts.hasOwnProperty("_id")) {
+				// Add to plant_img_views
+				this.plant_img_views[opts["_id"]] = new PlantImgView({
+														parent: this,
+														el: [
+															".img-car-wrapper",
+															opts["_id"].toString()
+														].join("-"),
+														collection: new PlantImgs(
+															model.attributes['images'],
+															{plant_id: opts["_id"]}
+														)
+													}, {"plant_id": opts["_id"]});
+			}
 		}
 		this._updateProfileHeaderPlantCount();
 	},
@@ -185,7 +190,6 @@ var PlantView = Backbone.View.extend({
 		}
 	},
 	
-
 	// @desc: Toggles the Editability of Plant Items
 	// @params: Event object
 	// @res: Void
@@ -219,7 +223,7 @@ var PlantView = Backbone.View.extend({
 							   		model = this.collection.get(_id);
 							   		model_cid = model["cid"];
 							   		this.$el.find(".plant-item-" + model_cid).remove();
-							   		this._addPlantView(model, this.collection);
+							   		this._addPlantView(model, this.collection, {_id: model.attributes['id']});
 							   }, this);
 			} else {
 				callBack = _.bind(function (response) {
@@ -291,8 +295,9 @@ var PlantView = Backbone.View.extend({
 												".img-car-wrapper",
 												_id.toString()
 											].join("-"),
-											collection: new PlantImgs(model.attributes['images'], {plant_id: _id})
-										});
+											collection: new PlantImgs(
+												model.attributes['images'], {plant_id: _id})
+										}, {"plant_id": _id});
 		}, this));
 
 		// Debounce the toggle methods

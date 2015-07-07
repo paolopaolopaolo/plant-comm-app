@@ -2,7 +2,7 @@
 
 <script id="plant-img-template" type="text/html">
 	<div class="carousel-img-wrapper">
-		<img class="carousel-img" src="{{ imageURL }}"/>
+		<img id="p-img-{{id}}" class="carousel-img" src="{{ imageURL }}"/>
 	</div>
 </script>
 
@@ -10,10 +10,14 @@
 	<div class="plant-item plant-item-{{id}} panel row">
 		<div class="img-carousel-wrapper img-car-wrapper-{{id}} col-xs-11 col-sm-4">
 			<div class="img-carousel img-carousel-{{ id }}">
+				<div class="carousel-img-wrapper img-place-holder">
+					<img class="carousel-img" src="https://plantappstorage.s3.amazonaws.com/static/img/user_blank_image.png"/>
+				</div>
 			</div>
 			<div class="plant-img-ctl-wrapper">
 				<button class="add-plant-img plant-img-ctl" title="Add plant picture">Add <i class="fa fa-picture-o"></i></button>
 				<button class="rem-plant-img plant-img-ctl" title="Remove plant picture">Remove <i class="fa fa-picture-o"></i></button>
+				<input type="file" name="plant-img"/>
 			</div>
 		</div>
 		<div class="plant-text-wrapper col-xs-12 col-sm-6 col-sm-offset-1">
@@ -27,13 +31,13 @@
 				<input name="plant-id" type="hidden" value="{{ id }}"/>
 				<h4 class="id-species-display plant-display"><span class="handler-species-{{id}}">{{species }}</span></h4>
 				<label for="id-species-edit" class="edit-input">Species</label>
-				<input type="text" class="id-species-edit edit-input" value="{{ species }}"/>
+				<input type="text" class="id-species-edit edit-input" value="{{ species }}" placeholder="Use a name that you are familiar with."/>
 				<h6 class="id-quantity-display plant-display">Quantity: <span class="handler-quantity-{{id}}">{{ quantity }}</span></h6>
 				<label for="id-quantity-edit" class="edit-input">Quantity</label>
-				<input type="number" class="id-quantity-edit edit-input" value="{{ quantity }}"/>
-				<p class="id-information-display plant-display"><span class="handler-information-{{id}}">{{ information }}</span></p>
+				<input type="number" class="id-quantity-edit edit-input" value="{{ quantity }}" placeholder="How many of this plant do you have?"/>
+				<p class="id-information-display plant-display"><span class="handler-information-{{id}}" >{{ information }}</span></p>
 				<label for="id-information-edit" class="edit-input">Information</label>
-				<textarea class="id-information-edit edit-input">{{ information }}</textarea>
+				<textarea class="id-information-edit edit-input" placeholder="Describe how you take care of this plant.">{{ information }}</textarea>
 			</div>
 		</div>
 	</div>

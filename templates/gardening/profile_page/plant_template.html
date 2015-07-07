@@ -3,14 +3,14 @@
 <!-- Individual Plant Panel -->
 <div class="plant-item plant-item-{{plant.id}} panel row">
 	<!-- Image Carousel / with buttons -->
-	<div class="img-carousel-wrapper col-xs-11 col-sm-4">
+	<div class="img-carousel-wrapper img-car-wrapper-{{plant.id}} col-xs-11 col-sm-4">
 		<div class="img-carousel img-carousel-{{plant.id}}">
 			{% for img in plant.images %}
 				<div class="carousel-img-wrapper">
-					<img class="carousel-img" src="{{ img.imageURL | normalizeMediaPic }}"/>
+					<img id="p-img-{{img.id}}" class="carousel-img" src="{{ img.imageURL | normalizeMediaPic }}"/>
 				</div>
 				{% empty %}
-				<div class="carousel-img-wrapper">
+				<div class="carousel-img-wrapper img-place-holder">
 					<img class="carousel-img" src="https://plantappstorage.s3.amazonaws.com/static/img/user_blank_image.png"/>
 				</div>
 			{% endfor %}
@@ -20,6 +20,7 @@
 		<div class="plant-img-ctl-wrapper">
 			<button class="add-plant-img plant-img-ctl" title="Add plant picture">Add <i class="fa fa-picture-o"></i></button>
 			<button class="rem-plant-img plant-img-ctl" title="Remove plant picture">Remove <i class="fa fa-picture-o"></i></button>
+			<input type="file" name="plant-img"/>
 		</div>
 		{% endif %}
 	</div>

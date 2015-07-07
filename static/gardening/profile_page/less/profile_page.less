@@ -122,11 +122,13 @@
 		overflow: hidden;
 		.clearfix();
 		.img-carousel-wrapper {
+			min-height: 250px;
 			@media (min-width: 400px) {
 				padding-left: 30px;
 			}
 			.img-carousel {
-				width: 275px;
+				width: 250px;
+				min-height: 250px;
 				margin: 0 auto;
 				.carousel-img-wrapper {
 					width: 100%;
@@ -136,7 +138,7 @@
 					}
 				}
 				.slick-slide {
-					width: 275px;
+					width: 250px;
 				}
 			}
 			.plant-img-ctl-wrapper{
@@ -145,6 +147,10 @@
 				margin-left: auto;
 				margin-right: auto;
 				padding: 0 33px;
+				input {
+					position: absolute;
+					top: -10000000px;
+				}
 				.plant-img-ctl {
 					width: 100px;
 					border: 0;
@@ -186,9 +192,10 @@
 			}
 		}
 		.plant-text {
-			margin: -40px 0;
+			margin: -40px 0 20px 0;
 			float: left;
 			border-right: 1px solid #ccc;
+			word-wrap: break-word;
 			label {
 				display: block;
 			}
