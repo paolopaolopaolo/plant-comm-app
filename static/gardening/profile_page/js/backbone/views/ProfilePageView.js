@@ -257,8 +257,6 @@ var ProfilePageView = Backbone.View.extend({
 		this.gardener_model = new Gardener(gardener);
 		this.plant_view = new PlantView({parent: this, collection: new Plants(plants)});
 
-		
-
 		// Set the toggleEditMode method to a debounced version
 		this._throttleToggleEditMode();
 

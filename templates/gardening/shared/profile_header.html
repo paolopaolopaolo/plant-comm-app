@@ -28,7 +28,7 @@
 			{% if result.city and result.state %}
 			<p><img class="map-pointer-icon icon" src="{% static 'gardening/shared/img/map_pointer_icon.svg' %}"/><span class="handler-city">{{ result.city }}</span>,  <span class="handler-state">{{result.state}}</span></p>
 			{% endif %}
-			<p><img class="plant-icon icon" src="{% static 'gardening/shared/img/greenthumb_icon_grey90.svg' %}">{{ result.plants|getLength }} Plants</p>
+			<p><img class="plant-icon icon" src="{% static 'gardening/shared/img/greenthumb_icon_grey90.svg' %}"><span class="handler-plant_num-{{result.id}}">{{ result.plants|getLength }}</span> Plants</p>
 			
 		</div>
 		<div class="profile-header-buttons col-xs-3">

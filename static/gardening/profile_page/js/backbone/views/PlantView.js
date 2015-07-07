@@ -9,6 +9,44 @@ var PlantView = Backbone.View.extend({
 	events: {
 		"click .edit-plant": "_togglePlantEdit",
 		"click .add-plant": "_addPlant",
+		"click .delete-plant": "_deletePlant",
+	},
+
+	// @desc: From UI, deletes a model
+	// @params: Event Object
+	// @res: Void
+	_deletePlant: function (event) {
+		var _id, isDeleteConfirmed, target_model;
+
+		_id = $(event.currentTarget).siblings(".plant-text")
+									.find("input[name='plant-id']")
+									.val();
+		target_model = this.collection.get(_id);
+		if (target_model.isNew()) {
+			isDeleteConfirmed = confirm("Cancel adding this plant?");
+		} else {
+			isDeleteConfirmed = confirm("Delete this plant?");
+		}
+
+		if (isDeleteConfirmed) {
+			target_model.destroy();
+		}
+	},
+
+	// @desc: Function that deletes view/UI elements as a result of "remove" trigger
+	// @params: Backbone Model Object, Backbone Collection Object, Simple JS Object
+	// @res: Void
+	_removePlantView: function (model, collection, options) {
+		var _id = model.attributes["id"],
+			_cid = model.cid,
+			target;
+		if (model.isNew()) {
+			target = _cid;
+		} else {
+			target = _id.toString();
+		}
+		this.$el.find(".plant-item-" + target).remove();
+		this._updateProfileHeaderPlantCount();
 	},
 
 	// @desc: Get a JS object of all the plant's inputs
@@ -25,12 +63,12 @@ var PlantView = Backbone.View.extend({
 									].join("-"))
 							  	  .find(".plant-text");
 		} else {
-			$plant_text = $(event.currentTarget).parents(".plant-text");
+			$plant_text = $(event.currentTarget).siblings(".plant-text");
 		}	
 		result["species"] = $plant_text.find(".id-species-edit").val();
 		result["quantity"] = $plant_text.find(".id-quantity-edit").val();
 		result["information"] = $plant_text.find(".id-information-edit").val();
-		return result
+		return result;
 	},
 
 	// @desc: Direct UI Call after clicking the .add-plant button
@@ -49,6 +87,16 @@ var PlantView = Backbone.View.extend({
 												"ng, fertilizer, etc.)."
 											].join(""),
 							});
+	},
+
+	// @desc: Updates the Profile Header plant count in response to 
+	// 		  changes in Plant number
+	// @params: None
+	// @res: Void
+	_updateProfileHeaderPlantCount: function () {
+		this.trigger("changeAttribute",
+					{plant_num: this.collection.length},
+					this.parent.gardener_model.attributes['id']);
 	},
 
 	// @desc: Adds Plant View UI, and MVC elements
@@ -76,7 +124,9 @@ var PlantView = Backbone.View.extend({
 			this.$el.find(".plant-header")
 					.after(this.template(context));
 			this._togglePlantMode(
-					this.$el.find(".plant-item-" + temp_id),
+					this.$el
+						.find(".plant-item-" + temp_id)
+						.find(".plant-text"),
 					"edit",
 					true);
 		}
@@ -85,6 +135,7 @@ var PlantView = Backbone.View.extend({
 			this.$el.find(".plant-header")
 					.after(this.template(model.attributes));
 		}
+		this._updateProfileHeaderPlantCount();
 	},
 
 	// @desc: Internal: Get the desired jQuery object using a parent, a 
@@ -98,12 +149,12 @@ var PlantView = Backbone.View.extend({
 
 	// @desc: Toggles the Plant input, accounting for which plant,
 	// 		  which input, and which state it is currently in
-	// @params: jQuery Object, String
+	// @params: jQuery Object, String, Boolean
 	// @res: Void
 	_togglePlantMode: function($plant_content, option, isForceToggled) {
 		var $display, $input, $icon;
 
-		$icon = $plant_content.find(".edit-plant").children(".fa");
+		$icon = $plant_content.siblings(".edit-plant").children(".fa");
 
 		$input = this._getJQueryElement(
 											$plant_content,
@@ -117,14 +168,14 @@ var PlantView = Backbone.View.extend({
 		if (option === "display") {
 			$display.show();
 			$input.removeAttr("style");
-			$icon.removeClass("fa-pencil");
-			$icon.addClass("fa-check");
+			$icon.removeClass("fa-check");
+			$icon.addClass("fa-pencil");
 		} else if (option === "edit") {
 			$display.hide();
 			$input.css({"display": "block", "clear": "both"});
 			// Change icon from checkmark to pencil
-			$icon.removeClass("fa-check");
-			$icon.addClass("fa-pencil");
+			$icon.removeClass("fa-pencil");
+			$icon.addClass("fa-check");
 		}
 		
 		if (isForceToggled) {
@@ -143,10 +194,11 @@ var PlantView = Backbone.View.extend({
 			_id,
 			target_attr,
 			$icon,
-			obj_to_save;
+			obj_to_save,
+			callBack;
 
 		// Set $plant_content to the plant panel
-		$plant_content = $(event.currentTarget).parents(".plant-text");
+		$plant_content = $(event.currentTarget).siblings(".plant-text");
 
 		// Get plant-id from hidden input
 		_id = $plant_content.children("input[name='plant-id']").val();
@@ -159,23 +211,40 @@ var PlantView = Backbone.View.extend({
 			// to non-editable display AND SAVE THE PLANT
 			obj_to_save = this._jsonifyPlant(event);
 			if (this.collection.get(_id).isNew()) {
-				this.collection.get(_id)
-							   .save(obj_to_save)
-							   .done(_.bind(function (response) {
+				callBack = _.bind(function (response) {
 							   		var model, model_cid;
+							   		$plant_content.find(".edit-input")
+							   				.removeClass("error");
+							   		$plant_content.find(".error-msg").remove();
 							   		model = this.collection.get(_id);
-							   		console.log(model);
 							   		model_cid = model["cid"];
 							   		this.$el.find(".plant-item-" + model_cid).remove();
 							   		this._addPlantView(model, this.collection);
-							   }, this));
+							   }, this);
 			} else {
-				this.collection.get(_id)
-							   .save(obj_to_save)
-							   .done(_.bind(function (response) {
+				callBack = _.bind(function (response) {
+									$plant_content.find(".edit-input")
+							   				.removeClass("error");
+					   				$plant_content.find(".error-msg").remove();
 									this._togglePlantMode($plant_content, "display");
-								}, this));
+								}, this);
 			}
+			this.collection.get(_id)
+						   .save(obj_to_save)
+						   .done(callBack)
+						   .fail(_.bind(function (response) {
+						   		response = JSON.parse(response.responseText);
+						   		console.log(response);
+						   		var bad_prop;
+						   		for (bad_prop in response) {
+						   			if (response.hasOwnProperty(bad_prop)) {
+						   				$plant_content.find(".id-" + bad_prop + "-edit")
+						   						.addClass("error");
+						   				$plant_content.find(".id-" + bad_prop + "-edit")
+						   						.after("<p class='error-msg'>"+ response[bad_prop][0] +"</p>");
+						   			}
+						   		}
+						   }, this));
 		} else {
 			// If plant is not yet editable, trigger
 			// to input mode
@@ -190,10 +259,6 @@ var PlantView = Backbone.View.extend({
 	// @res: Void
 	_initializePlantEditable: function (_id) {
 		this.isPlantEditable[_id] = false;
-		// this.isPlantEditable[_id] = {};
-		// this.isPlantEditable[_id]["species"] = false;
-		// this.isPlantEditable[_id]["quantity"] = false;
-		// this.isPlantEditable[_id]["information"] = false;
 	},
 
 	_changePlant: function (model, collection, opts) {
@@ -223,7 +288,7 @@ var PlantView = Backbone.View.extend({
 			this.plant_img_views[_id] = new PlantImgView({
 											parent: this,
 											el: [
-												".img-carousel",
+												".img-car-wrapper",
 												_id.toString()
 											].join("-"),
 											collection: new PlantImgs(model.attributes['images'], {plant_id: _id})
@@ -235,6 +300,7 @@ var PlantView = Backbone.View.extend({
 
 		// Event Listeners
 		this.listenTo(this.collection, "add", this._addPlantView);
+		this.listenTo(this.collection, "remove", this._removePlantView);
 		this.listenTo(this.collection, "change", this._changePlant);
 		bv.listenTo(this, "changeAttribute", bv.propagateChanges);
 	},

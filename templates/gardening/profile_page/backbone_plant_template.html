@@ -8,7 +8,7 @@
 
 <script id="plant-template" type="text/html">
 	<div class="plant-item plant-item-{{id}} panel row">
-		<div class="img-carousel-wrapper col-xs-11 col-sm-4">
+		<div class="img-carousel-wrapper img-car-wrapper-{{id}} col-xs-11 col-sm-4">
 			<div class="img-carousel img-carousel-{{ id }}">
 			</div>
 			<div class="plant-img-ctl-wrapper">
@@ -17,7 +17,13 @@
 			</div>
 		</div>
 		<div class="plant-text-wrapper col-xs-12 col-sm-6 col-sm-offset-1">
-			<div class="plant-text">
+			<button class="edit-plant">
+				<i class="fa fa-pencil" title="Edit Plant"></i>
+			</button>
+			<button class="delete-plant" title="Delete Plant">
+				<i class="fa fa-trash-o"></i>
+			</button>
+			<div class="plant-text col-xs-8">
 				<input name="plant-id" type="hidden" value="{{ id }}"/>
 				<h4 class="id-species-display plant-display"><span class="handler-species-{{id}}">{{species }}</span></h4>
 				<label for="id-species-edit" class="edit-input">Species</label>
@@ -28,10 +34,6 @@
 				<p class="id-information-display plant-display"><span class="handler-information-{{id}}">{{ information }}</span></p>
 				<label for="id-information-edit" class="edit-input">Information</label>
 				<textarea class="id-information-edit edit-input">{{ information }}</textarea>
-				<button class="edit-plant">
-					<i class="fa fa-pencil edit-plant" title="Save"></i>
-				</button>
-				
 			</div>
 		</div>
 	</div>
