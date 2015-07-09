@@ -50,10 +50,20 @@ var ProfilePageView = Backbone.View.extend({
 	// @params: Backbone Model Object
 	// @res: Void
 	_reRenderProfilePic: function (model) {
-		var field_height, field_width; 
+		var field_height, field_width, adjusted_URL; 
+		
+		if (!(/media/g).test(model.attributes["profile_pic"])) {
+			adjusted_URL = "/media/" + model.attributes["profile_pic"];
+			adjusted_URL = adjusted_URL.replace(/\/{2,}/g, "/");
+		} else {
+			adjusted_URL = model.attributes["profile_pic"]
+		}
+
 		this.$el.find(".profile-header-pic")
-				.attr("src", model.attributes["profile_pic"]);
-		this.trigger("profilePicChange", model.attributes["profile_pic"]);
+				.attr("src", adjusted_URL);
+		if (isEditable) {
+			this.trigger("profilePicChange", adjusted_URL);
+		}
 	},
 
 	// @HACK
