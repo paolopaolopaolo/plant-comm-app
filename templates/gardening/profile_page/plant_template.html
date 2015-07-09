@@ -18,8 +18,8 @@
 		<!-- Plant Img Add and Remove Control Buttons -->
 		{% if user.username == gardener.username and isAuthenticated %}
 		<div class="plant-img-ctl-wrapper">
-			<button class="add-plant-img plant-img-ctl" title="Add plant picture">Add <i class="fa fa-picture-o"></i></button>
-			<button class="rem-plant-img plant-img-ctl" title="Remove plant picture">Remove <i class="fa fa-picture-o"></i></button>
+			<button class="add-plant-img plant-img-ctl" title="Add plant picture"><i class="fa fa-plus"></i> <i class="fa fa-picture-o"></i></button>
+			<button class="rem-plant-img plant-img-ctl" title="Remove plant picture"><i class="fa fa-minus"></i> <i class="fa fa-picture-o"></i></button>
 			<input type="file" name="plant-img"/>
 		</div>
 		{% endif %}
