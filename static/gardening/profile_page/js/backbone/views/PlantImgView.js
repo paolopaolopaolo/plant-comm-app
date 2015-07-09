@@ -22,18 +22,21 @@ var PlantImgView = Backbone.View.extend({
 	// @params: Backbone Model Object, Backbone Collection Object, JS Object
 	// @res: Void
 	_removeImageUI: function (model, collection, options) {
-	 	var slick_idx, slick_obj;
+	 	var slick_idx, slick_obj, model_num;
 	 	slick_obj = this.$el.find(".img-carousel")
 	 						.slick("getSlick");
+
 	 	if (options["idx"]) {
-	 		this.$el
-	 			.find(".img-carousel")
-				.slick("slickRemove", options["idx"]);
+	 		slick_idx = options["idx"];
 	 	} else {
-		 	this.$el
-		 		.find(".img-carousel")
-		 		.slick("slickRemove", slick_obj.$slides.find("#p-img-" + model.attributes["id"].toString()).index() );
+	 		model_num = model.attributes["id"].toString();
+	 		slick_idx = slick_obj.$slides
+	 							 .filter(".c-i-w-" + model_num)
+	 							 .index() - 1;
 	 	}
+	 	this.$el
+	 		.find(".img-carousel")
+			.slick("slickRemove", slick_idx);
 
 		if (collection.length < 1) {
 			this.$el
@@ -61,8 +64,6 @@ var PlantImgView = Backbone.View.extend({
 			_id = $target_slide.children(".carousel-img")
 					    	   .attr("id")
 							   .replace(/p-img-/g, "");
-
-			alert("_id to delete: " + _id.toString());
 
 			this.collection.get(_id)
 						   .destroy({idx: this.current_slide});
