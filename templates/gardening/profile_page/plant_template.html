@@ -6,7 +6,7 @@
 	<div class="img-carousel-wrapper img-car-wrapper-{{plant.id}} col-xs-11 col-sm-4">
 		<div class="img-carousel img-carousel-{{plant.id}}">
 			{% for img in plant.images %}
-				<div class="carousel-img-wrapper">
+				<div class="carousel-img-wrapper c-i-w-{{img.id}}">
 					<img id="p-img-{{img.id}}" class="carousel-img" src="{{ img.imageURL | normalizeMediaPic }}"/>
 				</div>
 				{% empty %}
@@ -16,22 +16,28 @@
 			{% endfor %}
 		</div>
 		<!-- Plant Img Add and Remove Control Buttons -->
-		{% if user.username == gardener.username and isAuthenticated%}
+		{% if user.username == gardener.username and isAuthenticated %}
 		<div class="plant-img-ctl-wrapper">
-			<button class="add-plant-img plant-img-ctl" title="Add plant picture">Add <i class="fa fa-picture-o"></i></button>
-			<button class="rem-plant-img plant-img-ctl" title="Remove plant picture">Remove <i class="fa fa-picture-o"></i></button>
+			<button class="add-plant-img plant-img-ctl" title="Add plant picture"><i class="fa fa-plus"></i> <i class="fa fa-picture-o"></i></button>
+			<button class="rem-plant-img plant-img-ctl" title="Remove plant picture"><i class="fa fa-minus"></i> <i class="fa fa-picture-o"></i></button>
 			<input type="file" name="plant-img"/>
 		</div>
 		{% endif %}
 	</div>
 	<div class="plant-text-wrapper col-xs-12 col-sm-6 col-sm-offset-1">
 		<!-- Plant Text Information -->
-		<button class="edit-plant">
-			<i class="fa fa-pencil" title="Edit Plant"></i>
-		</button>
-		<button class="delete-plant" title="Delete Plant">
-			<i class="fa fa-trash-o"></i>
-		</button>
+		<!-- Edit Plant Controls -->
+		{% if user.username == gardener.username and isAuthenticated%}
+			<button class="edit-plant">
+				<i class="fa fa-pencil" title="Edit Plant"></i>
+			</button>
+			<button class="delete-plant" title="Delete Plant">
+				<i class="fa fa-trash-o"></i>
+			</button>
+		{% else %}
+			<div class="hacky-solution">a</div>
+			<div class="hacky-solution">a</div>
+		{% endif %}
 		<div class="plant-text col-xs-8">
 			<!--Built-in Plant ID Data-->
 			<input name="plant-id" type="hidden" value="{{plant.id}}"/>
@@ -50,9 +56,6 @@
 			<p class="id-information-display plant-display"><span class="handler-information-{{plant.id}}">{{ plant.information | replaceDefaultPlant:gardener.first_name }}</span></p>
 			<label for="id-information-edit" class="edit-input">Information</label>
 			<textarea class="id-information-edit edit-input">{{ plant.information }}</textarea>
-			<!-- Edit Plant Information Button -->
-			{% if user.username == gardener.username and isAuthenticated%}
-			{% endif %}
 		</div>
 	</div>
 </div>

@@ -145,6 +145,7 @@ class GardenerAPI( mixins.RetrieveModelMixin,
 
 # Handles plant data		
 class PlantAPI( mixins.RetrieveModelMixin,
+				mixins.ListModelMixin,
 				mixins.CreateModelMixin,
 				mixins.UpdateModelMixin,
 				mixins.DestroyModelMixin,
@@ -154,31 +155,32 @@ class PlantAPI( mixins.RetrieveModelMixin,
 	serializer_class = PlantSerializer
 	lookup_field = 'id'
 
-	@method_decorator(login_required)
-	def dispatch(self, *args, **kwargs):
-		return super(PlantAPI, self).dispatch(*args, **kwargs)
-
 	@setApiUser
 	def get(self, request, *args, **kwargs):
 		# If url is /profile/plant/(nothing)
 		# return all of the Plant entries 
 		# of that user
-		if 'id' not in self.data:
+		if 'id' not in kwargs:
 			response = self.queryset.filter(user = self.data['user'])
 			response = json.dumps([model_to_dict(entry) for entry in response])
 			return HttpResponse(response, content_type='application/json')
+
+		self.queryset = self.queryset.filter(user = kwargs['id'])
 		# Else, retrieve the appropriate plant
-		return self.retrieve(self, request, *args, **kwargs)
+		return self.list(self, request, *args, **kwargs)
 
 	@setApiUser
+	@method_decorator(login_required)
 	def post(self, request, *args, **kwargs):
 		return self.create(self, request, *args, **kwargs)
 
 	@setApiUser
+	@method_decorator(login_required)
 	def put(self, request, *args, **kwargs):
 		return self.update(self, request, *args, **kwargs)
 	
 	@setApiUser
+	@method_decorator(login_required)
 	def delete(self, request, *args, **kwargs):
 		return self.destroy(self, request, *args, **kwargs)
 

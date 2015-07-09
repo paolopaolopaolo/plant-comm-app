@@ -19,15 +19,12 @@
 
 {% block bootstrap_vars %}
 	{% autoescape off %}
-	{% if isAuthenticated and user.username == gardener.username %}
 	var PLANTS = {{ plant_objects }};
 	var GARDENER = {{ gardener_object }};
-	var ZIPCODE_API_URL = {{ zipcode_api_url }};
+	var PRELOADER = "{% static "gardening/shared/img/plant-img-preloader.GIF" %}";
+	{% if isAuthenticated and user.username == gardener.username %}
 	var isEditable = true;
 	{% else %}
-	var PLANTS = [];
-	var GARDENER = [];
-	var ZIPCODE_API_URL = "";
 	var isEditable = false;
 	{% endif %}
 	{% endautoescape %}
