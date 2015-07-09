@@ -24,9 +24,9 @@
 
 	if (Backbone){
 		// Set the template settings
-		_.templateSettings = {
-  			interpolate: /\{\{(.+?)\}\}/g,
-		};
+		// _.templateSettings = {
+  // 			interpolate: /\{\{(.+?)\}\}/g,
+		// };
 
 		// Store an original of Backbone.sync
 		originalSync = Backbone.sync;

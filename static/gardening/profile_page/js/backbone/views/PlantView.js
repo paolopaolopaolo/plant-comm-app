@@ -5,11 +5,18 @@ var PlantView = Backbone.View.extend({
 
 	plant_img_views: {},
 	isPlantEditable: {},
+	selfUpdateInterval: undefined,
 
 	events: {
 		"click .edit-plant": "_togglePlantEdit",
 		"click .add-plant": "_addPlant",
 		"click .delete-plant": "_deletePlant",
+	},
+
+	_updatePlants: function () {
+		this.selfUpdateInterval = setInterval(_.bind(function () {
+			this.collection.fetch();
+		}, this), 10000);
 	},
 
 	// @desc: From UI, deletes a model
@@ -44,6 +51,7 @@ var PlantView = Backbone.View.extend({
 			target = _cid;
 		} else {
 			target = _id.toString();
+			delete this.plant_img_views[_id];
 		}
 		this.$el.find(".plant-item-" + target).remove();
 		this._updateProfileHeaderPlantCount();
@@ -96,9 +104,10 @@ var PlantView = Backbone.View.extend({
 	// @params: Backbone Model Object, Backbone Collection Object, JS Object
 	// @res: Void
 	_addPlantView: function (model, collection, opts) {
-		var temp_id;
+		var temp_id, _id;
 		temp_id = model.cid;
 		context = _.clone(model.attributes);
+		context['isEditable'] = isEditable.toString();
 		// If the model is still new
 		if (model.isNew()) {
 			context['id'] = temp_id;
@@ -108,6 +117,7 @@ var PlantView = Backbone.View.extend({
 			// Add to PlantView
 			this.$el.find(".plant-header")
 					.after(this.template(context));
+
 			this._togglePlantMode(
 					this.$el
 						.find(".plant-item-" + temp_id)
@@ -122,23 +132,23 @@ var PlantView = Backbone.View.extend({
 			this._initializePlantEditable(model.attributes["id"]);
 			this.$el.find(".plant-header")
 					.after(this.template(model.attributes));
-			// this.$el.find(".plant-item-" + opts["_id"].toString())
-			// 		.find(".img-carousel-wrapper")
-			// 		.removeAttr("style");
 			if (opts.hasOwnProperty("_id")) {
-				// Add to plant_img_views
-				this.plant_img_views[opts["_id"]] = new PlantImgView({
-														parent: this,
-														el: [
-															".img-car-wrapper",
-															opts["_id"].toString()
-														].join("-"),
-														collection: new PlantImgs(
-															model.attributes['images'],
-															{plant_id: opts["_id"]}
-														)
-													}, {"plant_id": opts["_id"]});
+				_id = opts["_id"]
+			} else {
+				_id = model.attributes['id'];
 			}
+			// Add to plant_img_views
+			this.plant_img_views[_id] = new PlantImgView({
+													parent: this,
+													el: [
+														".img-car-wrapper",
+														_id.toString()
+													].join("-"),
+													collection: new PlantImgs(
+														model.attributes['images'],
+														{plant_id: _id}
+													)
+												}, {"plant_id": _id});
 		}
 		this._updateProfileHeaderPlantCount();
 	},
@@ -175,18 +185,21 @@ var PlantView = Backbone.View.extend({
 			$input.removeAttr("style");
 			$icon.removeClass("fa-check");
 			$icon.addClass("fa-pencil");
+			this._updatePlants();
 		} else if (option === "edit") {
 			$display.hide();
 			$input.css({"display": "block", "clear": "both"});
 			// Change icon from checkmark to pencil
 			$icon.removeClass("fa-pencil");
 			$icon.addClass("fa-check");
+			clearInterval(this.selfUpdateInterval);
 		}
 		
 		if (isForceToggled) {
 			this.isPlantEditable[$plant_content.find("input[name='plant-id']").val()] = true;
 			$icon.addClass("fa-check");
 			$icon.removeClass("fa-pencil");
+			clearInterval(this.selfUpdateInterval);
 		}
 	},
 	
@@ -308,6 +321,8 @@ var PlantView = Backbone.View.extend({
 		this.listenTo(this.collection, "remove", this._removePlantView);
 		this.listenTo(this.collection, "change", this._changePlant);
 		bv.listenTo(this, "changeAttribute", bv.propagateChanges);
+
+		this._updatePlants();
 	},
 
 });

@@ -1,27 +1,42 @@
 var PlantImgView = Backbone.View.extend({
 	
-	current_idx: 0,
 	template: _.template($("#plant-img-template").html()),
 
 	events: {
 		"change input[name='plant-img']": "_addImage",
 		"click .add-plant-img": "_triggerFileInput",
 		"click .rem-plant-img": "_removeImage",
-		"click .slick-prev": "_idxSubtract",
-		"click .slick-next": "_idxAdd",
 	},
 
+	_updatePlantImg: function () {
+		setInterval(_.bind(function () {
+			this.collection.fetch({remove: true});
+		}, this), 10000);
+	},
 
 	// @desc: In response to collection removal, destroys the model
 	// 		  and then removes it from the carousel
+	// @params: Backbone Model Object, Backbone Collection Object, JS Object
+	// @res: Void
 	_removeImageUI: function (model, collection, options) {
-		model.destroy()
-			 .done(_.bind(function () {
-			 	this.$el
-			 		.find(".img-carousel")
-					.slick("slickRemove", options["idx"]);
-				this.current_idx--;
-			 }, this));
+	 	var slick_idx;
+	 	if (options["idx"]) {
+	 		this.$el
+	 			.find(".img-carousel")
+				.slick("slickRemove", options["idx"]);
+	 	} else {
+		 	this.$el
+		 		.find(".img-carousel")
+		 		.slick("slickFilter", ":not(.c-i-w-"+ model.attributes["id"] + ")");
+	 	}
+
+		if (collection.length < 1) {
+			this.$el
+				.find(".img-carousel")
+				.slick("slickAdd", '<div class="carousel-img-wrapper img-place-holder">
+			<img class="carousel-img" src="https://plantappstorage.s3.amazonaws.com/static/img/user_blank_image.png"/>
+		</div>');
+		}
 		
 	},
 
@@ -29,39 +44,20 @@ var PlantImgView = Backbone.View.extend({
 	// @params: None
 	// @res: Void
 	_removeImage: function () {
-		var _id;
-		_id = $(this.$el
-		  	  		.find([
-		  	  			".carousel-img-wrapper",
-		  	  			":not(.img-place-holder)"
-		  	  		].join(""))[this.current_idx + 1]);
-		_id = _id.children(".carousel-img").attr("id");
-		_id = _id.replace(/p-img-/g, "");
-		this.collection.remove(_id, {idx: this.current_idx});
-	},
+		var _id, slick_obj, slide_num, $target_slide;
 
-	// @desc: UI function, subtracts the current_idx, which is used
-	// 		  to identify which picture the carousel is currently on.
-	// @params: None
-	// @res: Void
-	_idxSubtract: function () {
-		if (this.current_idx > 0) {
-			this.current_idx--;
-		} else {
-			this.current_idx = this.collection.length - 1;
-		}
-	},
+		slick_obj = this.$el.find(".img-carousel")
+							.slick("getSlick");
 
-	// @desc: UI function, adds the current_idx, which is used
-	// 		  to identify which picture the carousel is currently on.
-	// @params: None
-	// @res: Void
-	_idxAdd: function () {
-		if (this.current_idx < this.collection.length -1) {
-			this.current_idx++;
-		} else {
-			this.current_idx = 0;
-		}
+		slide_num = slick_obj.currentSlide;
+
+		$target_slide = $(slick_obj.$slides[slide_num]);
+		_id = $target_slide.children(".carousel-img")
+				    	   .attr("id")
+						   .replace(/p-img-/g, "");
+
+		this.collection.get(_id)
+					   .destroy({idx: slide_num});
 	},
 
 	// @desc: UI function, triggers the file input functionality
@@ -76,12 +72,28 @@ var PlantImgView = Backbone.View.extend({
 	// @params: Backbone Model Object, Backbone Collection Object
 	// @res: Void
 	_addImageUI: function (model, collection) {
+		var context;
+		// Remove the place-holder once you have stuff in the collection
+	 	if (this.$el.find(".img-place-holder").length > 0) {
+	 		this.$el.find(".img-carousel")
+	 				.slick("slickRemove", 0);
+	 	}
+
+		context = _.clone(model.attributes);
+		context["preloaded"] = PRELOADER;
 		this.$el.find(".img-carousel")
-				.slick("slickAdd", this.template(model.attributes));
-		this.$el.find(".img-carousel")
-				.slick("slickGoTo", this.collection.length - 1);
-		this.current_idx = this.collection.length - 1;
-	},
+				.slick("slickAdd", this.template(context));
+
+		setTimeout(_.bind(function () {
+			var slick_obj, $target;
+			slick_obj = this.$el.find(".img-carousel")
+								.slick("getSlick");
+			$target = $(slick_obj.$slides[collection.length - 1]);
+			$target = $target.children(".carousel-img");
+			$target.attr("src", $target.data("original"));
+		}, this), 3000);
+
+	},	
 
 	// @desc: UI Function, loads the image file and gets a usable link 
 	// 		  once POST request is answered
@@ -126,11 +138,6 @@ var PlantImgView = Backbone.View.extend({
 		 	}, {silent: true});
 
 		 	this.collection.add(new_image);
-		 	// Remove the place-holder once you have stuff in the collection
-		 	if (this.$el.find(".img-place-holder").length > 0) {
-		 		this.$el.find(".img-carousel")
-		 				.slick("slickRemove", 0);
-		 	}
 		 }, this));
 	},
 
@@ -141,8 +148,9 @@ var PlantImgView = Backbone.View.extend({
 		this.$el.find(".img-carousel").slick({
 			accessibility: true,
 			infinite: true,
-			adaptiveHeight: true,
+			// adaptiveHeight: true,
 			variableWidth: true,
+			dots: true,
 		});
 	},
 
@@ -160,13 +168,13 @@ var PlantImgView = Backbone.View.extend({
 		this.el = attrs['el'];
 		this.plant_id = opts['plant_id'];
 		this.collection = attrs['collection'];
-		// this.render();
 		this._initializePlantCarousel();
 
 		// Event Listeners
 		this.listenTo(this.collection, "add", this._addImageUI);
 		this.listenTo(this.collection, "remove", this._removeImageUI);
 
+		this._updatePlantImg();
 
 	}
 });

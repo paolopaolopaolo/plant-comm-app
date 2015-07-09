@@ -123,12 +123,17 @@
 		.clearfix();
 		.img-carousel-wrapper {
 			min-height: 250px;
+
 			@media (min-width: 400px) {
 				padding-left: 30px;
 			}
+			.slick-dots {
+				position: relative;
+				top: 7px;
+			}
 			.img-carousel {
 				width: 250px;
-				min-height: 250px;
+				// min-height: 250px;
 				margin: 0 auto;
 				.carousel-img-wrapper {
 					width: 100%;
@@ -162,6 +167,15 @@
 					}
 				}
 			}
+		}
+		.hacky-solution {
+			visibility: hidden;
+			clear: both;
+			margin-top: 15px;
+			float: right;
+			width: 50px;
+			font-size: 28px;
+			padding: 1px 6px;
 		}
 		.edit-plant {
 			font-size: 28px;

@@ -14,6 +14,12 @@ var ProfilePageView = Backbone.View.extend({
 		"click .expand-blurb": "_expandBlurb",
 	},
 
+	_updateProfile: function () {
+		setInterval(_.bind(function () {
+			this.gardener_model.fetch();
+		}, this), 10000);
+	},
+
 	// @desc: Toggle the Text Blurb Expandion
 	// @params: Event Object
 	// @res: Void
@@ -255,7 +261,12 @@ var ProfilePageView = Backbone.View.extend({
 	initialize: function (gardener, plants) {
 		// Set Model and Collection and Child Views
 		this.gardener_model = new Gardener(gardener);
-		this.plant_view = new PlantView({parent: this, collection: new Plants(plants)});
+		this.plant_view = new PlantView({
+											parent: this,
+											collection: new Plants(plants, {
+															user: this.gardener_model.attributes["id"]
+														})
+										});
 
 		// Set the toggleEditMode method to a debounced version
 		this._throttleToggleEditMode();
@@ -264,6 +275,8 @@ var ProfilePageView = Backbone.View.extend({
 		this.listenTo(this.gardener_model, "change", this._changeAttr);
 		bv.listenTo(this, "changeAttribute", bv.propagateChanges);
 		bv.header_view.listenTo(this, "profilePicChange", bv.header_view.profilePicChange);
+
+		this._updateProfile();
 	},
 
 });
