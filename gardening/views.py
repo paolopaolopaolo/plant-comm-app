@@ -54,6 +54,11 @@ class GreenThumbPage(View):
 	def sortById(self, arrayItem):
 		return arrayItem["id"]
 
+	def RETURN_FOLLOWER_DATA(self):
+		result = self.gardener.favorites.get_queryset()
+		result = [{"id": gardener.id, "favorite": True} for gardener in result]
+		return result
+
 	# Returns User data as a dictionary/BOOTSTRAPPING  
 	def RETURN_USER_DATA(self, _id = None, plants=False):
 		if _id is None:
@@ -296,6 +301,7 @@ class ProfilePage(GreenThumbPage, APIView):
 	# Bootstrap the data
 	def get(self, request, *args, **kwargs):
 		if request.user.is_authenticated():
+			self.context['followers'] = json.dumps(self.RETURN_FOLLOWER_DATA())
 			self.context["header_profile_pic"] = self.gardener.profile_pic
 			self.context["convos"] = json.dumps(self.convos)
 		self.context["showsFooter"] = True
@@ -342,6 +348,7 @@ class FeedPage(GreenThumbPage, APIView):
 
 	@set_user_and_gardener_and_convos
 	def get(self, request, *args, **kwargs):
+		self.context['followers'] = json.dumps(self.RETURN_FOLLOWER_DATA())
 		self.context['header_profile_pic'] = self.gardener.profile_pic
 		self.context['other_gardeners'] = self.RETURN_OTHER_GARDENERS(2)
 		self.context['convos'] = json.dumps(self.convos)
@@ -349,5 +356,22 @@ class FeedPage(GreenThumbPage, APIView):
 		self.context['showsFooter'] = True
 		self.context['isAuthenticated'] = request.user.is_authenticated()
 		return render(request, 'gardening/feed_page/feed_page.html', self.context)
-	
 
+# Simple Backend API that returns if given 
+# id is in a user's favorites or not. Can also add
+# ids to user's favorites list
+class Following(GreenThumbPage):
+
+	@set_user
+	@method_decorator(login_required)
+	def put(self, request,*args, **kwargs):
+		other_user = Gardener.objects.get(id = kwargs["id"])
+		result = other_user in self.gardener.favorites.get_queryset()
+		if result:
+			self.gardener.favorites.remove(other_user)
+		else:
+			self.gardener.favorites.add(other_user)
+
+		return HttpResponse(json.dumps({"id": kwargs["id"] ,"favorite": not result}), content_type="application/json")
+
+		

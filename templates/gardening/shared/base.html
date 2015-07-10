@@ -56,12 +56,13 @@
 				var USER = "{{ user.username }}";
 				var MEDIA_URL = "{{ media_url }}";
 				{% if not isAuthenticated %}
-					var isChatDisabled = true;
+				var isChatDisabled = true;
 				{% else %}
-					var isChatDisabled = false;
+				var isChatDisabled = false;
+				var FOLLOWERS = {{ followers }};
 				{% endif %}
 				{% if convos and isAuthenticated %}
-					var CONVOS = {{ convos }};
+				var CONVOS = {{ convos }};
 				{% endif %}
 				var DEFAULT_PROFILE_PIC = "https://plantappstorage.s3.amazonaws.com/static/img/user_blank_image.png";
 				{% block bootstrap_vars %}

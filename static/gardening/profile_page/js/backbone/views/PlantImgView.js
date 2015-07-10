@@ -10,7 +10,9 @@ var PlantImgView = Backbone.View.extend({
 		"click .rem-plant-img": "_removeImage",
 	},
 
-
+	// @desc: Sets interval for updating the plant images
+	// @params: None
+	// @res: Void
 	_updatePlantImg: function () {
 		setInterval(_.bind(function () {
 			this.collection.fetch({remove: true});

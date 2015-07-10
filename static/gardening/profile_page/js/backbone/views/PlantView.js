@@ -13,6 +13,9 @@ var PlantView = Backbone.View.extend({
 		"click .delete-plant": "_deletePlant",
 	},
 
+	// @desc: Sets interval for updating the collection
+	// @params: None
+	// @res: Void
 	_updatePlants: function () {
 		this.selfUpdateInterval = setInterval(_.bind(function () {
 			this.collection.fetch();

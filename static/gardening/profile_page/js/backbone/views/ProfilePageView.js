@@ -14,6 +14,9 @@ var ProfilePageView = Backbone.View.extend({
 		"click .expand-blurb": "_expandBlurb",
 	},
 
+	// @desc: Sets interval for updating the profile
+	// @params: None
+	// @res: Void
 	_updateProfile: function () {
 		setInterval(_.bind(function () {
 			this.gardener_model.fetch();

@@ -4,6 +4,21 @@ var BaseView = Backbone.View.extend({
 	events: {
 		"click": "closeDropdown",
 		"click .p-header-contact-btn": "openDialogue",
+		"click .p-header-follow-btn": "_toggleFollow"
+	},
+
+	// @HACK
+	// @desc: Simple UI Function: Tell Backend to add user to the favorites list
+	// @params: Event Object
+	// @res: Void
+	_toggleFollow: function (event) {
+		var _id = this._getID(event);
+		if (!this.collection.get(_id)) {
+			this.collection.add({id: _id, favorite: true});
+		}
+		// Toggling happens on the back-end. This goes directly to a PUT request
+		// since I added a model with an id to the collection. 
+		this.collection.get(_id).save();
 	},
 
 	// @desc: CALLED FROM PROFILE EDITS:: 
@@ -57,14 +72,26 @@ var BaseView = Backbone.View.extend({
 		}
 	},
 
+
+	// @desc: Gets user ID from profile-header button
+	// @params: Event Object
+	// @res: Integer
+	_getID: function (event) {
+		var result = parseInt(
+						$(event.currentTarget).parents(".profile-header")
+											  .find("input[name='contact-id']")
+											  .val(),
+					    10
+					 );
+		return result;
+	},
+
 	// @desc: Open Dialogue UI wrapper function. Gets the id
 	//        from UI hidden input and calls the previous function
 	// @params: Event object
 	// @res: Void
 	openDialogue: function (event) {
-		var _id = parseInt($(event.currentTarget).parents(".profile-header")
-												  .find("input[name='contact-id']")
-												  .val(), 10);
+		var _id = this._getID(event);
 		this.openNewDialogue(_id);
 	},
 
@@ -85,11 +112,34 @@ var BaseView = Backbone.View.extend({
 		}
 	},
 
+	// @desc: Searches page for profile-header corresponding to model
+	// 		  and then changes the style according to the current state
+	// @params: Backbone Model Object
+	// @res: Void
+	_parsePageForFollowedProfiles: function (model) {
+		var follow_id, $button;
+		follow_id = model.attributes["id"];
+		$button = 	this.$el.find(".p-h-" + follow_id.toString())
+						.find(".p-header-follow-btn");
+		if (model.attributes["favorite"]) {
+			$button.css({backgroundColor: "#666"})
+				   .html("Followed");
+		} else {
+			$button.removeAttr("style");
+			$button.html("Follow");
+		}
+	},
+
 	// @desc: Initialize function for Base View
 	// @params: None
 	// @res: Void
 	initialize: function () {
 		this.header_view = new HeaderView();
+		this.collection = new Followers(FOLLOWERS);
+		this.collection.each(_.bind(function (model) {
+			this._parsePageForFollowedProfiles(model);
+		}, this));
+		this.listenTo(this.collection, "change", this._parsePageForFollowedProfiles);
 	},
 
 });

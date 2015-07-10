@@ -43,7 +43,7 @@ class ZipCodeAPI(GreenThumbPage):
 				result = json.dumps([])
 		return HttpResponse(result, content_type="application/json")
 
-### Shared Page REST API ###
+### Shared Page REST APIs ###
 
 class SearchAPI(GreenThumbPage, mixins.ListModelMixin, generics.GenericAPIView):
 	
@@ -77,6 +77,8 @@ class SearchAPI(GreenThumbPage, mixins.ListModelMixin, generics.GenericAPIView):
 		self.queryset = filter(filterFunction, self.queryset)
 		results = [self.serializer_class(query).data for query in self.queryset]
 		context = {
+						"followers": json.dumps(self.RETURN_FOLLOWER_DATA()),
+						"other_gardeners_object": json.dumps(results),
 						"query": request.GET["query"],
 						"media_url": settings.MEDIA_URL,
 						"compress_enabled": settings.COMPRESS_ENABLED,
