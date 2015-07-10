@@ -56,7 +56,7 @@ var ProfilePageView = Backbone.View.extend({
 		var field_height, field_width, adjusted_URL; 
 		
 		if (!(/media/g).test(model.attributes["profile_pic"])) {
-			adjusted_URL = "/media/" + model.attributes["profile_pic"];
+			adjusted_URL = MEDIA_URL + model.attributes["profile_pic"];
 			adjusted_URL = adjusted_URL.replace(/\/{2,}/g, "/");
 		} else {
 			adjusted_URL = model.attributes["profile_pic"]
