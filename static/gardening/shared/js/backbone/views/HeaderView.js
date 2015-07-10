@@ -45,7 +45,7 @@ var HeaderView = Backbone.View.extend({
 
 		domain = MEDIA_URL;
 
-		if (context[context_str].indexOf('http') < 0) {
+		if (!(/media/).test(context[context_str])) {
 			if (context[context_str] === undefined || context[context_str]==="") {
 				return DEFAULT_PROFILE_PIC;
 			}
