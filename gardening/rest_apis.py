@@ -226,7 +226,10 @@ class PlantImgAPI( mixins.CreateModelMixin,
 		# of that plant
 		if 'id' not in self.data:
 			response = self.queryset.filter(plant = kwargs['id'])
-			response = json.dumps([{'id': entry.id, 'imageURL': entry.thumbnail.url } for entry in response])
+			try:
+				response = json.dumps([{'id': entry.id, 'imageURL': entry.thumbnail.url } for entry in response])
+			except Exception, e:
+				response = json.dumps([{'id': entry.id, 'imageURL': entry.thumbnail.name } for entry in response])
 			return HttpResponse(response, content_type='application/json')
 		return self.retrieve(self, request, *args, **kwargs)
 

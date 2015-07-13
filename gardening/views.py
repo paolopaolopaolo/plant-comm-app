@@ -317,9 +317,12 @@ class ProfilePage(GreenThumbPage, APIView):
 		self.context["useBackbone"] = True
 
 		# Populate Profile Page with Non-JSON-Encoded user and plant data
-		self.context['gardener'] = self.RETURN_USER_DATA(_id = __user, plants=True)
-		self.context['plants'] = sorted(self.RETURN_PLANT_DATA(_id = __user, img = True), key=self.sortById, reverse=True)		
-		self.context['is_editable'] = editable
+		try:
+			self.context['gardener'] = self.RETURN_USER_DATA(_id = __user, plants=True)
+			self.context['plants'] = sorted(self.RETURN_PLANT_DATA(_id = __user, img = True), key=self.sortById, reverse=True)		
+			self.context['is_editable'] = editable
+		except Exception:
+			return redirect('logout')
 
 
 		# Populate the template context with user and gardener objects and forms

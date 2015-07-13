@@ -281,6 +281,9 @@ var PlantView = Backbone.View.extend({
 		this.isPlantEditable[_id] = false;
 	},
 
+	// @desc: Goes over changes in model, triggers 'changeAttribute' event for each property
+	// @params: Backbone Model, Backbone Collection, JS Object
+	// @res: Void
 	_changePlant: function (model, collection, opts) {
 		var property, changed, trigger_object = {};
 		changed = model.changed;

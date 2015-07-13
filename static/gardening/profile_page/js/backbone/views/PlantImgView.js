@@ -102,25 +102,31 @@ var PlantImgView = Backbone.View.extend({
 	 				.slick("slickRemove", 0);
 	 	}
 
-
+	 	// Start with a context object cloned from the model
 		context = _.clone(model.attributes);
 		context["preloaded"] = PRELOADER;
+		// Add template to carousel
 		this.$el.find(".img-carousel")
 				.slick("slickAdd", this.template(context));
 	 	
+	 	// Create a replacement image with all the appropriate attrs
 	 	replace_img = document.createElement("img");
 	 	replace_img.setAttribute("id", "p-img-" + context['id'].toString());
 	 	replace_img.setAttribute("src", context["imageURL"]);
 	 	replace_img.className += " carousel-img";
 
+	 	// After 3 second delay...
 		setTimeout(_.bind(function () {
 			var slick_obj, $target;
+			// Target the image and replace the target with the replacement
 			slick_obj = this.$el.find(".img-carousel")
 								.slick("getSlick");
 			$target = $(slick_obj.$slides[collection.length - 1]);
 			$target = $target.children(".carousel-img");
 			$target.replaceWith(replace_img);
+			// Re-set the position
 			this.$el.find(".img-carousel").slick("setPosition");
+			// Re-enable Img Delete Button if there's more than 1 img in collection
 			if (collection.length > 0) {
 				this.$el.find(".rem-plant-img")
 						.removeAttr("style")
@@ -187,12 +193,16 @@ var PlantImgView = Backbone.View.extend({
 			variableWidth: true,
 			dots: true,
 		});
+		// Callback, setting Object's current slide to the currentSlide
 		this.$el.find(".img-carousel")
 				.on("afterChange", _.bind(function (event, slick, currentSlide) {
 					this.current_slide = currentSlide;
 				}, this));
 	},
 
+	// @desc: Initialize function (created whenever new Plant is created)
+	// @params: JS Object, JS Object
+	// @res: Void
 	initialize: function (attrs, opts) {
 		this.parent = attrs['parent'];
 		this.el = attrs['el'];
@@ -200,6 +210,7 @@ var PlantImgView = Backbone.View.extend({
 		this.collection = attrs['collection'];
 		this._initializePlantCarousel();
 
+		// Set default condition of button
 		if (this.collection.length < 1) {
 			this.$el.find(".rem-plant-img")
 					.css("opacity", "0.5")
