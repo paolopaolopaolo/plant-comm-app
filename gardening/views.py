@@ -365,9 +365,28 @@ class FeedPage(GreenThumbPage, APIView):
 # ids to user's favorites list
 class Following(GreenThumbPage):
 
+	@set_user_and_gardener_and_convos
+	@method_decorator(login_required)
+	def get(self, request, *args, **kwargs):
+		def return_gplant_object (_id):
+			gardener = model_to_dict(Gardener.objects.get(id = _id))
+			plants = [model_to_dict(plant) for plant in Plant.objects.filter(user = gardener['id'])]
+			result = gardener
+			result["plants"] = plants
+			return result
+		others = self.gardener.favorites.get_queryset()
+		others = [return_gplant_object(gardener.id) for gardener in others]
+		self.context['followers'] = json.dumps(self.RETURN_FOLLOWER_DATA())
+		self.context['header_profile_pic'] = self.gardener.profile_pic
+		self.context["other_gardeners"] = others
+		self.context["convos"] = json.dumps(self.convos)
+		self.context["isAuthenticated"] = True
+		self.context["user"] = request.user
+		return render(request, "gardening/friend_page/friend_page.html", self.context)
+
 	@set_user
 	@method_decorator(login_required)
-	def put(self, request,*args, **kwargs):
+	def put(self, request, *args, **kwargs):
 		other_user = Gardener.objects.get(id = kwargs["id"])
 		result = other_user in self.gardener.favorites.get_queryset()
 		if result:

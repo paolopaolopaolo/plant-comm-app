@@ -1,0 +1,12 @@
+{% extends "gardening/shared/base.html" %}
+
+{% block main_content %}
+	
+	<div class="container">
+		<h4 class="row">Gardener Buddies</h4>
+		{% for other in other_gardeners %}
+			{% include "gardening/shared/profile_header.html" with isAuthenticated=isAuthenticated result=other editable=False user=user%}
+		{% endfor %}
+	</div>
+
+{% endblock %}
