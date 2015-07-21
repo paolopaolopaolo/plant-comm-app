@@ -79,6 +79,16 @@ PAGES = (
             ('NA', "Unassigned")
         )
 
+
+EVENTS = (
+            ('NP', 'new plant'),
+            ('NI', 'new plant image'),
+            ('CL', 'change location'),
+            ('CU', 'change username'),
+            ('CN', 'change name'),
+            ('CP', 'change profile picture'),
+        )
+
 # Sets filepath for profile pics
 def profile_path(instance, filename):
     return os.path.join(
@@ -212,13 +222,21 @@ class Convo(models.Model):
                                       )
 
 
+
+class Event(models.Model):
+    user = models.ForeignKey(Gardener)
+    plant = models.ForeignKey(Plant, default = None)
+    plant_img = models.ForeignKey(PlantImg, default = None)
+    event = models.CharField(max_length = 3, choices = EVENTS)
+
 # Job Description that will be shown with respect to the User
 class Job(models.Model):
+    user = models.ForeignKey(Gardener)
     text_description = models.CharField(max_length = 700)
-    user = models.OneToOneField(Gardener)
-    periodic = models.BooleanField(default=False)
-    start_date = models.DateField()
-    end_date = models.DateField()
+
+class Comment(models.Model):
+    job = models.ForeignKey(Job)
+    text = models.TextField()
 
 @receiver(post_delete, sender=Gardener)
 def profile_pic_delete(sender, instance, **kwargs):
