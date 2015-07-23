@@ -225,17 +225,20 @@ class Convo(models.Model):
 
 class Event(models.Model):
     user = models.ForeignKey(Gardener)
-    plant = models.ForeignKey(Plant, default = None)
-    plant_img = models.ForeignKey(PlantImg, default = None)
+    time_happened = models.DateTimeField(auto_now = True)
+    plant = models.ForeignKey(Plant, default = None, null=True)
+    plant_img = models.ForeignKey(PlantImg, default = None, null=True)
     event = models.CharField(max_length = 3, choices = EVENTS)
 
 # Job Description that will be shown with respect to the User
 class Job(models.Model):
     user = models.ForeignKey(Gardener)
+    time = models.DateTimeField(auto_now = True)
     text_description = models.CharField(max_length = 700)
 
 class Comment(models.Model):
     job = models.ForeignKey(Job)
+    time = models.DateTimeField(auto_now = True)
     text = models.TextField()
 
 @receiver(post_delete, sender=Gardener)

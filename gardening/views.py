@@ -14,6 +14,7 @@ from rest_framework.views import APIView
 from django.forms.models import model_to_dict
 from django.db import IntegrityError
 from django.core.exceptions import SuspiciousOperation
+from rest_framework.renderers import JSONRenderer
 
 from rest_framework import mixins
 from rest_framework import generics
@@ -53,6 +54,33 @@ class GreenThumbPage(View):
 	# Utility, method for sorting by id
 	def sortById(self, arrayItem):
 		return arrayItem["id"]
+
+	def sortByTime(self, arrayItem):
+		return arrayItem.time_happened
+
+	# Utility, method for sorting by distance from user zipcode
+	def sortByZipcode(self, arrayItem):
+		return abs(int(arrayItem.user.zipcode) - int(self.gardener.zipcode))
+
+	def sortByFollowerList(self, arrayItem):
+		if arrayItem.user in self.gardener.favorites.get_queryset():
+			return 0
+		else:
+			return 1
+
+	# Sorting method for Events
+	def event_sort(self, events):
+		result = events
+		zipcode = int(self.gardener.zipcode)
+		# First, sort by time
+		result = sorted(result, key=self.sortByTime, reverse=True)
+		# Next, by location
+		result = sorted(result, key=self.sortByZipcode)
+		# Lastly, sort by moving people on the followers list to the top
+		result = sorted(result, key=self.sortByFollowerList)
+
+		return result
+
 
 	def RETURN_FOLLOWER_DATA(self):
 		result = self.gardener.favorites.get_queryset()
@@ -351,6 +379,12 @@ class FeedPage(GreenThumbPage, APIView):
 
 	@set_user_and_gardener_and_convos
 	def get(self, request, *args, **kwargs):
+		nonself_events = Event.objects.exclude(user = self.gardener.id)
+		sorted_nonself_events = self.event_sort(nonself_events)
+		first_sorted_nonself_events = self.bootstrapLimit(sorted_nonself_events, 3)
+		serialized_nonself_events = [EventsSerializer(event) for event in first_sorted_nonself_events]
+		json_serialized_nonself_events = [JSONRenderer().render(event.data) for event in serialized_nonself_events]
+		self.context['events'] = json_serialized_nonself_events
 		self.context['followers'] = json.dumps(self.RETURN_FOLLOWER_DATA())
 		self.context['header_profile_pic'] = self.gardener.profile_pic
 		self.context['other_gardeners'] = self.RETURN_OTHER_GARDENERS(2)

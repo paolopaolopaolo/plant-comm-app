@@ -1,0 +1,21 @@
+
+<div class="panel event-panel col-xs-offset-1 col-xs-9 col-sm-8">
+	<img class="event-img" src="<%=user.profile_pic%>"/>
+	<p class="event-text">
+	<% if (event === "CN") { %>
+		<a href="/profile/<%= user.username %>"> 
+			<%= user.username %> 
+		</a>'s name is now <%= user.first_name %> <%= user.last_name %>.
+		<% } else if (event === "CU") { %>
+
+		<%= user.first_name %>'s username was changed to 
+		<a href="/profile/<%= user.username %>">
+			<%= user.username %>
+		</a>.
+		<% } else if (event === "CL") { %>
+		<a href="/profile/<%=user.username%>"><%= user.username %></a> moved to <%=user.city%>, <%= user.state %>.</p class="event-text">
+		<% } else if (event === "CP") { %>
+		<a href="/profile/<%=user.username%>"><%=user.username %></a> changed their profile picture!
+		<% } %>
+	</p>
+</div>

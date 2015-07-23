@@ -1,3 +1,27 @@
+@keyframes event-show {
+	0% {
+		height: 0;
+		opacity: 0;
+	}
+	25% {
+		height: 50px;
+		opacity: 0.25;
+	}
+	50% {
+		height: 100px;
+		opacity: 0.50;
+	}
+	75% {
+		height: 150px;
+		opacity: 0.75;
+	}
+	100% {
+		height: auto;
+		opacity: 1.0;
+	}
+
+}
+
 .feed-header {
 	padding: 0;
 }
@@ -17,5 +41,35 @@
 	margin-left:10px;
 	&:hover {
 		color: #aaa;
+	}
+}
+
+.event-panel {
+	padding: 10px 0px 10px 20px;
+	animation: event-show 1s;
+	.event-text {
+		display: inline-block;
+		float: left;
+		width: 44%;
+		margin: 0 10px;
+		vertical-align: top;
+	}
+	.event-img {
+		float: left;
+		width: 200px;
+		max-height: 200px;
+	}
+}
+
+.more-events {
+	border: 0;
+	background-color: #fff;
+	height: 22px;
+  	box-shadow: 0 0 6px #ddd;
+  	margin-bottom: 15px;
+	border-radius: 5px;
+	cursor: pointer;
+	&:hover {
+		background-color: #eee;
 	}
 }

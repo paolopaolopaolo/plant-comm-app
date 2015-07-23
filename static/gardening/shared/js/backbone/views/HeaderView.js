@@ -35,30 +35,6 @@ var HeaderView = Backbone.View.extend({
 		this.$$vars['.header-profile-pic'].attr('src', attr_str);
 	},
 
-	// @desc: Normalize the Media URL
-	// @params: JS Object, String, String
-	// @res: String
-	setMediaPic: function (context, context_str, cdn_url) {
-		var media_url, domain;
-
-		context_str = (context_str === undefined ? 'profile_pic' : context_str);
-
-		domain = MEDIA_URL;
-
-		if (!(/media/).test(context[context_str])) {
-			if (context[context_str] === undefined || context[context_str]==="") {
-				return DEFAULT_PROFILE_PIC;
-			}
-			media_url = [
-					domain,
-					context[context_str]
-			].join("");
-		} else {
-			media_url = context[context_str];
-		}
-		return media_url;
-	},
-
 	// @HACK
 	// @desc: Counts the number of maximized chat windows
 	// @param: None
@@ -189,8 +165,9 @@ var HeaderView = Backbone.View.extend({
 	// @desc: Perform all the tasks needed when loading HeaderView
 	// @params: None
 	// @res: Void
-	initialize: function () {
+	initialize: function (attrs) {
 		this._setJqueryVars();
+		this.setMediaPic = attrs["setMediaPic"];
 		if (!isChatDisabled) {
 			this.convo_view = new ConvoView({parent: this});
 			this.closeChatBox();

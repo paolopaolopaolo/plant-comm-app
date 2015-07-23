@@ -8,6 +8,8 @@ from django.forms import widgets
 
 import re
 
+
+
 class GardenerSerializer(serializers.ModelSerializer):
 	username = serializers.CharField(allow_blank = True, required = False)
 	profile_pic = serializers.CharField(allow_blank = True, required = False)
@@ -89,3 +91,12 @@ class GardenerPlantSerializer(serializers.Serializer):
 
 class ConvoSerializer(serializers.Serializer):
 	text = serializers.CharField(allow_blank = True, required = True)
+
+class EventsSerializer(serializers.ModelSerializer):
+	user = GardenerSerializer()
+	class Meta:
+		model = Event
+		fields = ('id',
+				  'user',
+				  'time_happened',
+				  'event')

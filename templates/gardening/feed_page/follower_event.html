@@ -1,0 +1,18 @@
+
+
+<!-- Name change! -->
+{% if event.event == "CN"  %}
+
+<p class="event-text"><a href="/profile/{{event.user.username}}">{{event.user.username|capfirst}}</a>'s name is now {{event.user.first_name}} {{event.user.last_name}}.</p>
+
+{% elif event.event == "CU" %}
+<p class="event-text">{{event.user.first_name|capfirst}}'s username was changed to <a href="/profile/{{event.user.username}}">{{event.user.username}}</a>.</p class="event-text">
+
+{% elif event.event == "CL" %}
+
+<p class="event-text"><a href="/profile/{{event.user.username}}">{{event.user.username|capfirst}}</a> moved to {{event.user.city}}, {{event.user.state}}.</p class="event-text">
+
+{% elif event.event == "CP" %}
+<p class="event-text"><a href="/profile/{{event.user.username}}">{{event.user.username|capfirst}}</a> changed their profile picture!</p>
+
+{% endif %}

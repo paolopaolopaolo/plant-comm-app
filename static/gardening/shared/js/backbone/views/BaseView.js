@@ -21,6 +21,30 @@ var BaseView = Backbone.View.extend({
 		this.collection.get(_id).save();
 	},
 
+	// @desc: Normalize the Media URL
+	// @params: JS Object, String
+	// @res: String
+	setMediaPic: function (context, context_str) {
+		var media_url, domain;
+
+		context_str = (context_str === undefined ? 'profile_pic' : context_str);
+
+		domain = MEDIA_URL;
+
+		if (!(/media/).test(context[context_str])) {
+			if (context[context_str] === undefined || context[context_str]==="") {
+				return DEFAULT_PROFILE_PIC;
+			}
+			media_url = [
+					domain,
+					context[context_str]
+			].join("");
+		} else {
+			media_url = context[context_str];
+		}
+		return media_url;
+	},
+
 	// @desc: CALLED FROM PROFILE EDITS:: 
 	//        Takes Gardener model changes and propagates it to UI elements
 	// @params: Object, Integer
@@ -134,7 +158,7 @@ var BaseView = Backbone.View.extend({
 	// @params: None
 	// @res: Void
 	initialize: function () {
-		this.header_view = new HeaderView();
+		this.header_view = new HeaderView({"setMediaPic": this.setMediaPic});
 		this.collection = new Followers(FOLLOWERS);
 		this.collection.each(_.bind(function (model) {
 			this._parsePageForFollowedProfiles(model);

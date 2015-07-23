@@ -14,7 +14,7 @@ from rest_framework.views import APIView
 from django.forms.models import model_to_dict
 from django.db import IntegrityError
 from django.core.exceptions import SuspiciousOperation
-from rest_framework.pagination import PageNumberPagination
+from gardening.pagination_classes import EventsPagination
 from gardening.views import GreenThumbPage
 
 from rest_framework import mixins
@@ -123,6 +123,8 @@ class GardenerAPI( mixins.RetrieveModelMixin,
 			if profile_form.is_valid():
 				self.gardener.profile_pic = profile_form.cleaned_data['profile_pic']
 				self.gardener.save()
+				event = Event(user = self.gardener, event="CP")
+				event.save()
 				url_target = self.gardener.profile_pic.url
 				response = json.dumps({'profile_pic': url_target})
 				return HttpResponse(response, content_type='application/json')
@@ -131,17 +133,47 @@ class GardenerAPI( mixins.RetrieveModelMixin,
 	@set_user
 	def put(self, request, *args, **kwargs):
 		self.data = request.data
+		# Change UAuth User object instance as well
 		if "first_name" in self.data:
 			self.user.first_name = self.data["first_name"]
 		if "last_name" in self.data:
 			self.user.last_name = self.data["last_name"]
 		if "username" in self.data:
+			event = Event(user = self.gardener, event = "CU")
 			self.user.username = self.data["username"]
 		try:
 			self.user.save()
 		except IntegrityError:
 			response = {'username': 'Username already taken.'}
 			return HttpResponseServerError(json.dumps(response), content_type='application/json')
+
+		# Check for differences from past data. If there's a difference, save an Event
+		
+		# Check name
+		namecheck = not (self.gardener.first_name == self.data["first_name"]) 
+		namecheck = namecheck or not (self.gardener.last_name == self.data["last_name"])
+
+		#Check username
+		unamecheck = not(self.gardener.username == self.data["username"])
+
+		#Check Location
+		loccheck = not(self.gardener.city == self.data["city"])
+		loccheck = loccheck or not (self.gardener.state == self.data["state"])
+		loccheck = loccheck or not (self.gardener.zipcode == self.data["zipcode"])
+
+		if namecheck:
+		   	event = Event(user = self.gardener, event = "CN")
+			event.save()
+
+		if unamecheck: 
+			event = Event(user = self.gardener, event = "CU")
+			event.save()
+
+		if loccheck:
+			event = Event(user = self.gardener, event = "CL")
+			event.save()
+
+		# Updates everything
 		return self.update(self, request, *args, **kwargs)
 
 
@@ -267,3 +299,17 @@ class OtherGardenerAPI( mixins.RetrieveModelMixin,
 				self.pagination_class = PageNumberPagination
 			return self.list(self, request, *args, **kwargs)
 		return self.retrieve(self, request, *args, **kwargs)
+
+class EventsAPI(GreenThumbPage, mixins.ListModelMixin, generics.GenericAPIView ):
+
+	serializer_class = EventsSerializer
+	queryset = Event.objects.all()
+	pagination_class = EventsPagination
+
+	@set_user
+	def get(self, request, *args, **kwargs):
+		# Filter out all instances of self in queryset
+		self.queryset = self.queryset.exclude(user = self.user.id)
+		# Special sort
+		self.queryset = self.event_sort(self.queryset)
+		return self.list(self, request, *args, **kwargs)
