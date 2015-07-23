@@ -31,18 +31,23 @@ var BaseView = Backbone.View.extend({
 
 		domain = MEDIA_URL;
 
-		if (!(/media/).test(context[context_str])) {
+		if (!(/http/).test(context[context_str])) {
 			if (context[context_str] === undefined || context[context_str]==="") {
 				return DEFAULT_PROFILE_PIC;
 			}
-			media_url = [
-					domain,
-					context[context_str]
-			].join("");
+			if (domain !== "/media/" && context[context_str].slice(0, 8) !== "/media/") {
+				media_url = [
+						domain,
+						context[context_str]
+				].join("");
+			} else {
+				media_url = context[context_str];
+			}
 		} else {
 			media_url = context[context_str];
 		}
-		return media_url;
+		// #hack
+		return media_url.replace(/\/media\/ *\/media\//g, "/media/");
 	},
 
 	// @desc: CALLED FROM PROFILE EDITS:: 
