@@ -35,14 +35,10 @@ var BaseView = Backbone.View.extend({
 			if (context[context_str] === undefined || context[context_str]==="") {
 				return DEFAULT_PROFILE_PIC;
 			}
-			if (domain !== "/media/" && context[context_str].slice(0, 8) !== "/media/") {
-				media_url = [
-						domain,
-						context[context_str]
-				].join("");
-			} else {
-				media_url = context[context_str];
-			}
+			media_url = [
+					domain,
+					context[context_str]
+			].join("");
 		} else {
 			media_url = context[context_str];
 		}

@@ -15,7 +15,11 @@ var EventsView = Backbone.View.extend({
 	// @res: JS Object (revised context)
 	_fixContext: function (context) {
 		// Reset profile_pic
+		debugger
 		context["user"]["profile_pic"] = this.parent.setMediaPic(context["user"], "profile_pic");
+		if (context["plant_img"]) {
+			context["plant_img"]["image"] = this.parent.setMediaPic(context["plant_img"], "image");
+		}
 		return context;
 	},
 

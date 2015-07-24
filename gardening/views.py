@@ -56,8 +56,11 @@ class GreenThumbPage(View):
 		return arrayItem["id"]
 
 	def sortByTime(self, arrayItem):
-		return arrayItem.time_happened
-
+		try:
+			return arrayItem.time_happened
+		except Exception:
+			return arrayItem.time
+			
 	# Utility, method for sorting by distance from user zipcode
 	def sortByZipcode(self, arrayItem):
 		return abs(int(arrayItem.user.zipcode) - int(self.gardener.zipcode))

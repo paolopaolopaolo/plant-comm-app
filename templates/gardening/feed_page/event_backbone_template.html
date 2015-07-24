@@ -16,6 +16,11 @@
 		<a href="/profile/<%=user.username%>"><%= user.username %></a> moved to <%=user.city%>, <%= user.state %>.</p class="event-text">
 		<% } else if (event === "CP") { %>
 		<a href="/profile/<%=user.username%>"><%=user.username %></a> changed their profile picture!
+		<% } else if (event === "NP") { %>
+		<a href="/profile/<%=user.username%>"><%=user.username %></a> added a plant (species: <%= plant.species %>).
+		<% } else if (event === "NI") { %>
+		<a href="/profile/<%=user.username%>"><%=user.username %></a> added an image of his plant (species: <%= plant.species %>). <img class="image-thumbnail" src="<%=plant_img.image%>"/>
 		<% } %>
+
 	</p>
 </div>

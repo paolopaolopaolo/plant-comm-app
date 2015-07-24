@@ -94,9 +94,13 @@ class ConvoSerializer(serializers.Serializer):
 
 class EventsSerializer(serializers.ModelSerializer):
 	user = GardenerSerializer()
+	plant = PlantSerializer(required = False)
+	plant_img = PlantImgSerializer(required = False)
 	class Meta:
 		model = Event
 		fields = ('id',
 				  'user',
+				  'plant',
+				  'plant_img',
 				  'time_happened',
 				  'event')

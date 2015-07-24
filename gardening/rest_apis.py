@@ -20,7 +20,7 @@ from gardening.views import GreenThumbPage
 from rest_framework import mixins
 from rest_framework import generics
 from PIL import Image
-import json, re, requests
+import json, re, requests, pdb
 
 from gardening.decorators import *
 
@@ -189,6 +189,24 @@ class PlantAPI( mixins.RetrieveModelMixin,
 	serializer_class = PlantSerializer
 	lookup_field = 'id'
 
+
+	def create(self, request, *args, **kwargs):
+		newplantserial = PlantSerializer(data = self.data)
+		if newplantserial.is_valid():
+			newplant = Plant(
+				user = kwargs['gardener'],
+				species = newplantserial.validated_data['species'],
+				quantity = newplantserial.validated_data['quantity'],
+				information = newplantserial.validated_data['information']
+			)
+			try:
+				newplant.save()
+			except Exception, e:
+				return HttpResponseServerError(str(e), content_type='text/plain')
+			response = HttpResponse(json.dumps(model_to_dict(newplant)), content_type='application/json')
+			return response
+		return HttpResponseServerError(json.dumps(newplantserial.errors), content_type='application/json')
+
 	@setApiUser
 	def get(self, request, *args, **kwargs):
 		# If url is /profile/plant/(nothing)
@@ -206,6 +224,8 @@ class PlantAPI( mixins.RetrieveModelMixin,
 	@setApiUser
 	@method_decorator(login_required)
 	def post(self, request, *args, **kwargs):
+		gardener = Gardener.objects.get(id=self.data['user'])
+		kwargs['gardener'] = gardener
 		return self.create(self, request, *args, **kwargs)
 
 	@setApiUser
@@ -244,7 +264,8 @@ class PlantImgAPI( mixins.CreateModelMixin,
 				'id': newplantimg.id,
 				'imageURL': newplantimg.thumbnail.url
 			})
-
+		event = Event(user=newplantimg.plant.user, plant=newplantimg.plant, plant_img=newplantimg, event="NI")
+		event.save()
 		return HttpResponse(response, status = 201, content_type='application/json')
 
 	@method_decorator(login_required)

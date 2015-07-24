@@ -244,7 +244,7 @@ var PlantView = Backbone.View.extend({
 			} else {
 				callBack = _.bind(function (response) {
 									$plant_content.find(".edit-input")
-							   				.removeClass("error");
+							   					  .removeClass("error");
 					   				$plant_content.find(".error-msg").remove();
 									this._togglePlantMode($plant_content, "display");
 								}, this);
@@ -254,7 +254,8 @@ var PlantView = Backbone.View.extend({
 						   .done(callBack)
 						   .fail(_.bind(function (response) {
 						   		response = JSON.parse(response.responseText);
-						   		console.log(response);
+						   		$plant_content.find(".error-msg").remove();
+						   		$plant_content.find(".edit-input").removeClass("error");
 						   		var bad_prop;
 						   		for (bad_prop in response) {
 						   			if (response.hasOwnProperty(bad_prop)) {
