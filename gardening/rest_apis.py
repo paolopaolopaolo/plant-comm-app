@@ -344,5 +344,4 @@ class JobsAPI(GreenThumbPage, mixins.ListModelMixin, generics.GenericAPIView):
 	@set_user
 	def get(self, request, *args, **kwargs):
 		self.queryset = [json.loads(job) for job in self.RETURN_JOB_DATA()]
-		print self.queryset
 		return self.list(self, request, *args, **kwargs)

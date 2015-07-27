@@ -1,8 +1,10 @@
-var JobsView = Backbone.View.extend({
+var JobsView = EventsView.extend({
 	el: ".jobs-feed",
+	template: _.template($('#job-template').html()),
 	initialize: function (attrs) {
-		JOBS = _.map(JOBS, function (job) { JSON.parse(job); });
+		JOBS = _.map(JOBS, function (job) { return JSON.parse(job); });
 		this.collection = new Jobs(JOBS);
 		this.parent = attrs['parent'];
+		this.render();
 	},
 });
