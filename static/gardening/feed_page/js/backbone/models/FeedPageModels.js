@@ -12,3 +12,5 @@ var OtherGardener = Backbone.Model.extend({
 
 
 var Event = new Backbone.Model;
+
+var Job = new Backbone.Model;

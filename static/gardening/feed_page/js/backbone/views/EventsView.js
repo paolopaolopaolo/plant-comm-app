@@ -6,22 +6,19 @@ var EventsView = Backbone.View.extend({
 		"click .more-events": "_fetchMoreEvents",
 	},
 
-	_fetchMoreEvents: function () {
-		this.collection.fetch({remove: false});
+	// @desc: Method that fetches more events
+	// @params: Event Object
+	// @res: Void
+	_fetchMoreEvents: function (event) {
+		var $icon;
+		$icon = $(event.currentTarget).find('.fa');
+		$icon.addClass('fa-spin');
+		this.collection.fetch({remove: false})
+					   .always(function () {
+					   		$icon.removeClass('fa-spin');
+					   });
 	},
 
-	// @desc: Controller Logic (revise the context)
-	// @params: JS Object (context)
-	// @res: JS Object (revised context)
-	_fixContext: function (context) {
-		// Reset profile_pic
-		debugger
-		context["user"]["profile_pic"] = this.parent.setMediaPic(context["user"], "profile_pic");
-		if (context["plant_img"]) {
-			context["plant_img"]["image"] = this.parent.setMediaPic(context["plant_img"], "image");
-		}
-		return context;
-	},
 
 	// @desc: Helper function that renders a template off a model
 	// @params: Backbone Model Object, Boolean
@@ -29,7 +26,7 @@ var EventsView = Backbone.View.extend({
 	_render: function (model, belongsBefore) {
 		var context, $after_target;
 		context = _.clone(model.attributes);
-		context = this._fixContext(context);
+		context = this.parent._fixContext(context);
 
 		$after_target = (this.$el
 							 .find(".event-panel").length < 1  || belongsBefore ? 
@@ -46,7 +43,6 @@ var EventsView = Backbone.View.extend({
 	// @res: Void
 	render: function (model, collection) {
 		var context, latest_model;
-		console.log(model);
 		if (model === undefined || collection === undefined) {
 			this.collection.each(_.bind(function (model) {
 				this._render(model);
@@ -54,6 +50,7 @@ var EventsView = Backbone.View.extend({
 		} else {
 			this._render(model);
 		}
+		this.$el.find(".no-event").remove();
 	},
 
 	// @desc: Initialize EventsView 
@@ -71,6 +68,3 @@ var EventsView = Backbone.View.extend({
 	},
 
 });
-
-// Have event_view report directly to the BaseView
-bv.event_view = new EventsView({parent: bv});

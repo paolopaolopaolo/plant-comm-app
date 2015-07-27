@@ -92,6 +92,18 @@ class GardenerPlantSerializer(serializers.Serializer):
 class ConvoSerializer(serializers.Serializer):
 	text = serializers.CharField(allow_blank = True, required = True)
 
+
+class CommentSerializer(serializers.Serializer):
+	user = GardenerSerializer()
+	time = serializers.CharField()
+	text = serializers.CharField(allow_blank = False, required = True) 
+
+class JobsSerializer(serializers.Serializer):
+	user = GardenerSerializer()
+	comment = CommentSerializer(many=True, required = False)
+	time = serializers.CharField()
+	text_description = serializers.CharField(allow_blank = False, required = True) 
+
 class EventsSerializer(serializers.ModelSerializer):
 	user = GardenerSerializer()
 	plant = PlantSerializer(required = False)

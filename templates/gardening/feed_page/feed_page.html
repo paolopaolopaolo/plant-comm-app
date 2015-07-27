@@ -31,6 +31,7 @@
 	DOMAIN = "{{ domain }}";
 	OTHER_GARDENERS = {{ other_gardeners }};
 	EVENTS = {{ events }};
+	JOBS = {{ jobs }};
 {% endblock %}
 
 {% block backbone_templates %}
@@ -45,18 +46,25 @@
 	<div class="row">
 		<h3 class="feed-header col-xs-offset-1 col-xs-9 col-sm-8">Does your garden need help? Ask the neighborhood!</h3>
 	</div>
-	<div class="row">
+	<div class="row feed-section">
 		<textarea class="job-post col-xs-offset-1 col-xs-9 col-sm-8" placeholder="Post a question or job listing to the community wall."></textarea>
 		<button class="job-post-submit">
 			<i class="fa fa-paper-plane"></i>
 		</button>
 	</div>
-	<div class="row events-feed">
-		<h3 class="feed-header col-xs-offset-1 col-xs-9 col-sm-8">Garden Activity</h3> 
-		{% if not events %} 
-		<p> Nothing is going on right now! </p>
+	<div class="row jobs-feed feed-section">
+	<h3 class="feed-header col-xs-offset-1 col-xs-9 col-sm-8">Community Wall</h3>
+		{% if not jobs %} 
+			<p class="no-event col-xs-offset-1 col-xs-9 col-sm-8">No postings yet!</p>
 		{% endif %}
-		<button class="more-events col-xs-offset-1 col-xs-9 col-sm-8"><i class="fa fa-chevron-circle-down"></i></button>
+		<button class="more-jobs more-button" title="Refresh Jobs"><i class="fa fa-ellipsis-h"></i></button>
+	</div>
+	<div class="row events-feed feed-section">
+		<h3 class="feed-header col-xs-offset-1 col-xs-9 col-sm-8">Gardener Activity</h3>
+		{% if not events %} 
+			<p class="no-event col-xs-offset-1 col-xs-9 col-sm-8">Nothing is going on right now!</p>
+		{% endif %}
+		<button class="more-events more-button" title="Refresh Events"><i class="fa fa-ellipsis-h"></i></button>
 	</div>
 </div>
 {% endblock %}
@@ -65,5 +73,8 @@
 {% block scripts %}
 <script src="{% static 'gardening/feed_page/js/backbone/models/FeedPageModels.js' %}"/>
 <script src="{% static 'gardening/feed_page/js/backbone/collections/Events.js' %}"/>
+<script src="{% static 'gardening/feed_page/js/backbone/collections/Jobs.js' %}"/>
 <script src="{% static 'gardening/feed_page/js/backbone/views/EventsView.js' %}"/>
+<script src="{% static 'gardening/feed_page/js/backbone/views/JobsView.js' %}"/>
+<script src="{% static 'gardening/feed_page/js/backbone/views/FeedPageView.js' %}"/>
 {% endblock %}

@@ -84,6 +84,37 @@ class GreenThumbPage(View):
 
 		return result
 
+	def _modify_comment(self, obj, comment):
+		obj['user'] = model_to_dict(Gardener.objects.get(id=obj['user']))
+		obj['time'] = comment.time
+		return obj
+
+	def RETURN_JOB_DATA(self):
+		jobs = self.event_sort(Job.objects.all())
+		result = []
+		for job in jobs:
+			j_obj = {}
+			j_obj = model_to_dict(job)
+			j_obj['time'] = job.time
+			j_obj['user'] = model_to_dict(Gardener.objects.get(id = j_obj['user']))
+			j_obj['comment'] = [
+				self._modify_comment(model_to_dict(comment), comment) for comment in Comment.objects.filter(job = job)
+								]
+			j_obj = JobsSerializer(data = j_obj)
+			if j_obj.is_valid():
+				j_obj = JSONRenderer().render(j_obj.data)
+			else:
+				j_obj = json.dumps(j_obj.errors)
+			result.append(j_obj)
+		return result
+
+	def RETURN_EVENT_DATA(self):
+		nonself_events = Event.objects.exclude(user = self.gardener.id)
+		sorted_nonself_events = self.event_sort(nonself_events)
+		first_sorted_nonself_events = self.bootstrapLimit(sorted_nonself_events, 3)
+		serialized_nonself_events = [EventsSerializer(event) for event in first_sorted_nonself_events]
+		json_serialized_nonself_events = [JSONRenderer().render(event.data) for event in serialized_nonself_events]
+		return json_serialized_nonself_events
 
 	def RETURN_FOLLOWER_DATA(self):
 		result = self.gardener.favorites.get_queryset()
@@ -382,12 +413,8 @@ class FeedPage(GreenThumbPage, APIView):
 
 	@set_user_and_gardener_and_convos
 	def get(self, request, *args, **kwargs):
-		nonself_events = Event.objects.exclude(user = self.gardener.id)
-		sorted_nonself_events = self.event_sort(nonself_events)
-		first_sorted_nonself_events = self.bootstrapLimit(sorted_nonself_events, 3)
-		serialized_nonself_events = [EventsSerializer(event) for event in first_sorted_nonself_events]
-		json_serialized_nonself_events = [JSONRenderer().render(event.data) for event in serialized_nonself_events]
-		self.context['events'] = json_serialized_nonself_events
+		self.context['jobs'] = self.RETURN_JOB_DATA()
+		self.context['events'] = self.RETURN_EVENT_DATA()
 		self.context['followers'] = json.dumps(self.RETURN_FOLLOWER_DATA())
 		self.context['header_profile_pic'] = self.gardener.profile_pic
 		self.context['other_gardeners'] = self.RETURN_OTHER_GARDENERS(2)

@@ -22,6 +22,16 @@
 
 }
 
+// button {
+// 	font-size: 20px;
+// 	background-color: transparent;
+// 	border: 0;
+// 	box-shadow: none;
+// }
+.feed-section {
+	border-bottom: 1px solid #ddd; 
+}
+
 .feed-header {
 	padding: 0;
 }
@@ -30,6 +40,7 @@
 	height: 100px;
 	padding: 10px;
 	border-radius: 5px;
+	margin-bottom: 20px;
 }
 
 .job-post-submit {
@@ -50,26 +61,34 @@
 	.event-text {
 		display: inline-block;
 		float: left;
-		width: 44%;
-		margin: 0 10px;
 		vertical-align: top;
+		.image-thumbnail {
+			float: left;
+    		max-width: 100px;
+    		clear: both;
+    		margin-top: 35px;
+		}
 	}
 	.event-img {
 		float: left;
-		width: 200px;
 		max-height: 200px;
 	}
 }
 
-.more-events {
+.more-button {
 	border: 0;
-	background-color: #fff;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	font-size: 25px;
 	height: 22px;
-  	box-shadow: 0 0 6px #ddd;
   	margin-bottom: 15px;
 	border-radius: 5px;
+	background-color: transparent;
 	cursor: pointer;
+	clear: both;
 	&:hover {
 		background-color: #eee;
 	}
 }
+

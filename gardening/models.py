@@ -237,6 +237,7 @@ class Job(models.Model):
     text_description = models.CharField(max_length = 700)
 
 class Comment(models.Model):
+    user = models.ForeignKey(Gardener)
     job = models.ForeignKey(Job)
     time = models.DateTimeField(auto_now = True)
     text = models.TextField()

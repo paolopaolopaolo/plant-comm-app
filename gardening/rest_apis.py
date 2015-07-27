@@ -20,7 +20,7 @@ from gardening.views import GreenThumbPage
 from rest_framework import mixins
 from rest_framework import generics
 from PIL import Image
-import json, re, requests, pdb
+import json, re, requests, pdb, datetime
 
 from gardening.decorators import *
 
@@ -203,6 +203,8 @@ class PlantAPI( mixins.RetrieveModelMixin,
 				newplant.save()
 			except Exception, e:
 				return HttpResponseServerError(str(e), content_type='text/plain')
+			event = Event(user = kwargs['gardener'], plant = newplant, event = "NP")
+			event.save()
 			response = HttpResponse(json.dumps(model_to_dict(newplant)), content_type='application/json')
 			return response
 		return HttpResponseServerError(json.dumps(newplantserial.errors), content_type='application/json')
@@ -333,4 +335,14 @@ class EventsAPI(GreenThumbPage, mixins.ListModelMixin, generics.GenericAPIView )
 		self.queryset = self.queryset.exclude(user = self.user.id)
 		# Special sort
 		self.queryset = self.event_sort(self.queryset)
+		return self.list(self, request, *args, **kwargs)
+
+class JobsAPI(GreenThumbPage, mixins.ListModelMixin, generics.GenericAPIView):
+	serializer_class = JobsSerializer
+	pagination_class = EventsPagination
+
+	@set_user
+	def get(self, request, *args, **kwargs):
+		self.queryset = [json.loads(job) for job in self.RETURN_JOB_DATA()]
+		print self.queryset
 		return self.list(self, request, *args, **kwargs)
