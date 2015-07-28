@@ -89,6 +89,11 @@ class GreenThumbPage(View):
 		obj['time'] = comment.time
 		return obj
 
+	def RETURN_GARDENER_DATA(self):
+		result = model_to_dict(self.gardener).copy()
+		result['profile_pic'] = result['profile_pic'].name
+		return result
+
 	def RETURN_JOB_DATA(self):
 		jobs = self.event_sort(Job.objects.all())
 		result = []
@@ -109,11 +114,21 @@ class GreenThumbPage(View):
 		return result
 
 	def RETURN_EVENT_DATA(self):
-		nonself_events = Event.objects.exclude(user = self.gardener.id)
+		nonself_events = Event.objects.exclude(user = self.gardener)
+		print "nonself events:\t",
+		print nonself_events
 		sorted_nonself_events = self.event_sort(nonself_events)
+		print "sorted nonself events:\t",
+		print sorted_nonself_events
 		first_sorted_nonself_events = self.bootstrapLimit(sorted_nonself_events, 3)
+		print "first sorted nonself events:\t",
+		print first_sorted_nonself_events
 		serialized_nonself_events = [EventsSerializer(event) for event in first_sorted_nonself_events]
+		print "serialized nonself events:\t",
+		print serialized_nonself_events
 		json_serialized_nonself_events = [JSONRenderer().render(event.data) for event in serialized_nonself_events]
+		print "json serialized nonself events:\t",
+		print json_serialized_nonself_events
 		return json_serialized_nonself_events
 
 	def RETURN_FOLLOWER_DATA(self):
@@ -413,6 +428,7 @@ class FeedPage(GreenThumbPage, APIView):
 
 	@set_user_and_gardener_and_convos
 	def get(self, request, *args, **kwargs):
+		print self.RETURN_EVENT_DATA()
 		self.context['jobs'] = self.RETURN_JOB_DATA()
 		self.context['events'] = self.RETURN_EVENT_DATA()
 		self.context['followers'] = json.dumps(self.RETURN_FOLLOWER_DATA())

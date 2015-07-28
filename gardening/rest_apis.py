@@ -329,19 +329,40 @@ class EventsAPI(GreenThumbPage, mixins.ListModelMixin, generics.GenericAPIView )
 	queryset = Event.objects.all()
 	pagination_class = EventsPagination
 
+	@method_decorator(login_required)
+	def dispatch(self, *args, **kwargs):
+		return super(EventsAPI, self).dispatch(*args, **kwargs)
+
 	@set_user
 	def get(self, request, *args, **kwargs):
 		# Filter out all instances of self in queryset
-		self.queryset = self.queryset.exclude(user = self.user.id)
+		self.queryset = self.queryset.exclude(user = self.gardener.id)
 		# Special sort
 		self.queryset = self.event_sort(self.queryset)
 		return self.list(self, request, *args, **kwargs)
 
-class JobsAPI(GreenThumbPage, mixins.ListModelMixin, generics.GenericAPIView):
+class JobsAPI(GreenThumbPage,
+			  mixins.ListModelMixin,
+			  mixins.CreateModelMixin,
+			  generics.GenericAPIView):
 	serializer_class = JobsSerializer
 	pagination_class = EventsPagination
+
+	@method_decorator(login_required)
+	def dispatch(self, *args, **kwargs):
+		return super(JobsAPI, self).dispatch(*args, **kwargs)
 
 	@set_user
 	def get(self, request, *args, **kwargs):
 		self.queryset = [json.loads(job) for job in self.RETURN_JOB_DATA()]
 		return self.list(self, request, *args, **kwargs)
+
+	@setApiUser
+	def post(self, request, *args, **kwargs):
+		# pdb.set_trace()
+		self.data['user'] = model_to_dict(Gardener.objects.get(id = self.data['user']))
+		# pdb.set_trace()
+		self.data['time'] = datetime.datetime.now().isoformat()
+		return self.create(self, request, *args, **kwargs)
+
+

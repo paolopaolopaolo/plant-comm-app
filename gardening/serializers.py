@@ -98,11 +98,28 @@ class CommentSerializer(serializers.Serializer):
 	time = serializers.CharField()
 	text = serializers.CharField(allow_blank = False, required = True) 
 
-class JobsSerializer(serializers.Serializer):
-	user = GardenerSerializer()
+class GardenerField(serializers.Field):
+	
+	def to_internal_value(self, data):
+		return Gardener.objects.get(pk=data.get('id'))
+
+  	def to_representation(self, obj):
+		return GardenerSerializer(obj).data
+
+class JobsSerializer(serializers.ModelSerializer):
+	user = GardenerField()
 	comment = CommentSerializer(many=True, required = False)
 	time = serializers.CharField()
-	text_description = serializers.CharField(allow_blank = False, required = True) 
+	text_description = serializers.CharField(allow_blank = False, required = True)
+	class Meta:
+		model = Job
+		fields = ( 'user',
+				   'time',
+				   'text_description',
+				   'comment') 
+	
+	def create(self, validated_data):
+		return Job(**validated_data)
 
 class EventsSerializer(serializers.ModelSerializer):
 	user = GardenerSerializer()

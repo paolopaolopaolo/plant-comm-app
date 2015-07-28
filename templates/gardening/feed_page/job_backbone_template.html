@@ -1,13 +1,21 @@
 <div class="panel event-panel col-xs-offset-1 col-xs-9 col-sm-8">
 	<img class="event-img col-xs-2" src="<%=user.profile_pic%>"/>
-	<div class="text-portion col-xs-10">
+	<div class="text-portion col-xs-8">
 		<h4 class="feed-header"><%= user.username %> posted:</h4>
 		<p><%= text_description %></p>
 	</div>
-	<div class="comment-portion col-xs-10">
+	<div class="comment-portion col-xs-offset-1 col-xs-10">
 		<% _.each(comment, function (comm) {%> 
-			<h5><%= comm.user.username %>: </h5>
-			<p><%= comm.text %></p>
+			<img class="comment-image-thumbnail col-xs-offset-1"
+				 src="<%= comm.user.profile_pic %>"/>
+			<div class="comment-text col-xs-9">
+				<h5><%= comm.user.username %>: </h5>
+				<p><%= comm.text %></p>
+			</div>
 		<% }); %>
+	</div>
+	<div class="comment-post-portion col-xs-offset-1 col-xs-10">
+		<textarea class="comment-post" placeholder="Comment on this posting!"></textarea>
+		<button><i class="fa fa-paper-plane"></i></button>
 	</div>
 </div>
