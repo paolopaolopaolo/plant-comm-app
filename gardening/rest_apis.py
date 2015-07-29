@@ -17,8 +17,8 @@ from django.core.exceptions import SuspiciousOperation
 from gardening.pagination_classes import EventsPagination
 from gardening.views import GreenThumbPage
 
-from rest_framework import mixins
-from rest_framework import generics
+from rest_framework import mixins, generics
+from rest_framework.renderers import JSONRenderer
 from PIL import Image
 import json, re, requests, pdb, datetime
 
@@ -344,7 +344,10 @@ class EventsAPI(GreenThumbPage, mixins.ListModelMixin, generics.GenericAPIView )
 class JobsAPI(GreenThumbPage,
 			  mixins.ListModelMixin,
 			  mixins.CreateModelMixin,
+			  mixins.UpdateModelMixin,
 			  generics.GenericAPIView):
+
+	lookup_field = 'id'
 	serializer_class = JobsSerializer
 	pagination_class = EventsPagination
 
@@ -365,4 +368,29 @@ class JobsAPI(GreenThumbPage,
 		self.data['time'] = datetime.datetime.now().isoformat()
 		return self.create(self, request, *args, **kwargs)
 
+	def update(self, request, *args, **kwargs):
+		serial_comment = CommentSerializer(data = kwargs['data'])
+		if serial_comment.is_valid():
+			response = model_to_dict(serial_comment.validated_data['job'])
+			response['user'] = model_to_dict(Gardener.objects.get(id = response['user']))
+			response['comment'] = list(Comment.objects.filter(job = response['id']))
+			pdb.set_trace()
+			# JobsSerializer(data = response)
+			return HttpResponse(json.dumps(response), content_type="application/json")
+		return HttpResponse(json.dumps(serial_comment.error), content_type="application/json")
 
+	@setApiUser
+	def put(self, request, *args, **kwargs):
+		target_data = {}
+		target_data['job'] = kwargs['id']
+		target_data['user'] = model_to_dict(Gardener.objects.get(id = self.data['user']))
+		target_data['time'] = datetime.datetime.now().isoformat()
+		target_data['text'] = request.data['comment'][-1]['text']
+		kwargs['data'] = target_data
+		return self.update(self, request, *args, **kwargs)
+
+class CommentsAPI(GreenThumbPage,
+			  	  mixins.ListModelMixin,
+			  	  mixins.CreateModelMixin,
+			  	  generics.GenericAPIView):
+	pass

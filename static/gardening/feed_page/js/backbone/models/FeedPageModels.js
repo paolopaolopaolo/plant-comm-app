@@ -16,5 +16,16 @@ var Event = Backbone.Model.extend({
 });
 
 var Job = Backbone.Model.extend({
-	url: 'jobs/'
+	save: function (arguments) {
+		this.url = this.setURL();
+		Backbone.Model.prototype.save.apply(this, arguments);
+	},
+	setURL: function () {
+		return 'jobs/' + this.attributes['id'];
+	} 
 });
+
+var Comment = Backbone.Model.extend({
+	url: 'comments/'
+});
+

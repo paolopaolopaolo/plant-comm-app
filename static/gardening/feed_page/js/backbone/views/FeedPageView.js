@@ -36,6 +36,10 @@ var FeedPageView = Backbone.View.extend({
 		}
 		if (!context["comment"]) {
 			context["comment"] = [];
+		} else {
+			_.each(context["comment"], _.bind(function (comment) {
+				comment["user"]["profile_pic"] = this.parent.setMediaPic(comment["user"], "profile_pic");
+			}, this));
 		}
 		return context;
 	},

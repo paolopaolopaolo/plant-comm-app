@@ -1,5 +1,6 @@
 var Jobs = Backbone.Collection.extend({
-	url: "/jobs/?page=1",
+	url:"/jobs/?page=1",
+	model: Job,
 	parse: function (result) {
 		if (result.next) {
 			this.url = result.next;

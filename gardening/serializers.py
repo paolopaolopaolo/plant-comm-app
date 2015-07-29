@@ -92,11 +92,13 @@ class GardenerPlantSerializer(serializers.Serializer):
 class ConvoSerializer(serializers.Serializer):
 	text = serializers.CharField(allow_blank = True, required = True)
 
+class CommentField(serializers.Field):
 
-class CommentSerializer(serializers.Serializer):
-	user = GardenerSerializer()
-	time = serializers.CharField()
-	text = serializers.CharField(allow_blank = False, required = True) 
+	def to_internal_value(self, data):
+		return Comment.objects.filter(pk=data)
+
+	def to_representation(self, obj):
+		return CommentSerializer(obj).data
 
 class GardenerField(serializers.Field):
 	
@@ -106,20 +108,55 @@ class GardenerField(serializers.Field):
   	def to_representation(self, obj):
 		return GardenerSerializer(obj).data
 
-class JobsSerializer(serializers.ModelSerializer):
+class JobField(serializers.Field):
+	def to_internal_value(self, data):
+		return Job.objects.get(pk=data)
+
+  	def to_representation(self, obj):
+		return JobsSerializer(obj).data
+
+class CommentSerializer(serializers.ModelSerializer):
+	id = serializers.IntegerField(required = False)
 	user = GardenerField()
-	comment = CommentSerializer(many=True, required = False)
+	job = JobField()
+	time = serializers.CharField()
+	text = serializers.CharField(allow_blank = False, required = True) 
+	class Meta:
+		model = Comment
+		fields = ( 'id',
+				   'user',
+				   'time',
+				   'text',
+				   'job'
+				  )
+	
+	def create(self, validated_data):
+		newcomment = Comment(**validated_data)
+		newcomment.save()
+
+class JobsSerializer(serializers.ModelSerializer):
+	id = serializers.IntegerField(required = False)
+	user = GardenerField()
+	comment = CommentField(many = True, required = False)
 	time = serializers.CharField()
 	text_description = serializers.CharField(allow_blank = False, required = True)
 	class Meta:
 		model = Job
-		fields = ( 'user',
+		fields = ( 'id',
+				   'user',
 				   'time',
 				   'text_description',
 				   'comment') 
 	
 	def create(self, validated_data):
-		return Job(**validated_data)
+		newjob = Job(**validated_data)
+		newjob.save()
+		return newjob
+
+	def update(self, instance, validated_data):
+		pdb.set_trace()
+		validated_data.get("comment");
+		pass
 
 class EventsSerializer(serializers.ModelSerializer):
 	user = GardenerSerializer()

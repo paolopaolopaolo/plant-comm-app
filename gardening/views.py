@@ -22,7 +22,7 @@ from PIL import Image
 
 from gardening.decorators import *
 
-import json, os, StringIO, re
+import json, os, StringIO, re, pdb
 
 ## Function based views ##
 
@@ -100,6 +100,7 @@ class GreenThumbPage(View):
 		for job in jobs:
 			j_obj = {}
 			j_obj = model_to_dict(job)
+			j_obj['id'] = job.id
 			j_obj['time'] = job.time
 			j_obj['user'] = model_to_dict(Gardener.objects.get(id = j_obj['user']))
 			j_obj['comment'] = [
