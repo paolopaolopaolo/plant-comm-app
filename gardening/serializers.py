@@ -12,7 +12,7 @@ import re
 
 class GardenerSerializer(serializers.ModelSerializer):
 	username = serializers.CharField(allow_blank = True, required = False)
-	profile_pic = serializers.CharField(allow_blank = True, required = False)
+	profile_pic = serializers.ImageField(allow_empty_file = True, required = False, use_url = True)
 	first_name = serializers.CharField(allow_blank = True, required = False)
 	last_name = serializers.CharField(allow_blank = True, required = False)
 	city = serializers.CharField(allow_blank = True, required = False)
@@ -94,17 +94,22 @@ class ConvoSerializer(serializers.Serializer):
 
 class CommentField(serializers.Field):
 
+	def __init__(self, *args, **kwargs):
+		return super(GardenerField, self).__init__(*args, **kwargs)
+
 	def to_internal_value(self, data):
-		return Comment.objects.filter(pk=data)
+		return Comment.objects.get(pk=data)
 
 	def to_representation(self, obj):
 		return CommentSerializer(obj).data
 
 class GardenerField(serializers.Field):
-	
-	def to_internal_value(self, data):
-		return Gardener.objects.get(pk=data.get('id'))
 
+	def to_internal_value(self, data):
+		try:
+			return Gardener.objects.get(pk=data.get('id'))
+		except Exception:
+			return Gardener.objects.get(pk=data)
   	def to_representation(self, obj):
 		return GardenerSerializer(obj).data
 
@@ -137,7 +142,7 @@ class CommentSerializer(serializers.ModelSerializer):
 class JobsSerializer(serializers.ModelSerializer):
 	id = serializers.IntegerField(required = False)
 	user = GardenerField()
-	comment = CommentField(many = True, required = False)
+	comment = CommentSerializer(many = True, required = False)
 	time = serializers.CharField()
 	text_description = serializers.CharField(allow_blank = False, required = True)
 	class Meta:
@@ -152,11 +157,6 @@ class JobsSerializer(serializers.ModelSerializer):
 		newjob = Job(**validated_data)
 		newjob.save()
 		return newjob
-
-	def update(self, instance, validated_data):
-		pdb.set_trace()
-		validated_data.get("comment");
-		pass
 
 class EventsSerializer(serializers.ModelSerializer):
 	user = GardenerSerializer()

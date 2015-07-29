@@ -371,12 +371,20 @@ class JobsAPI(GreenThumbPage,
 	def update(self, request, *args, **kwargs):
 		serial_comment = CommentSerializer(data = kwargs['data'])
 		if serial_comment.is_valid():
+			serial_comment.create(serial_comment.validated_data)
+			# Return the job, Backbone doesn't know any better
 			response = model_to_dict(serial_comment.validated_data['job'])
 			response['user'] = model_to_dict(Gardener.objects.get(id = response['user']))
-			response['comment'] = list(Comment.objects.filter(job = response['id']))
-			pdb.set_trace()
-			# JobsSerializer(data = response)
-			return HttpResponse(json.dumps(response), content_type="application/json")
+			response['time'] = serial_comment.validated_data['job'].time.isoformat()
+			response['comment'] = []
+			for comment in Comment.objects.filter(job = response['id']):
+				model_dict = model_to_dict(comment)
+				model_dict['time'] = comment.time.isoformat()
+				response['comment'].append(model_dict)
+			# pdb.set_trace()
+			serialized_job = JobsSerializer(data = response)
+			if serialized_job.is_valid():
+				return HttpResponse(json.dumps(serialized_job.data), content_type="application/json")
 		return HttpResponse(json.dumps(serial_comment.error), content_type="application/json")
 
 	@setApiUser

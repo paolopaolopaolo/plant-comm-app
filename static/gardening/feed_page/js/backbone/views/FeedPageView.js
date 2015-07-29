@@ -18,6 +18,7 @@ var FeedPageView = Backbone.View.extend({
 			 	 .done(_.bind(function (response) {
 			 	 	model_job["comment"] = [];
 					this.jobs_view.collection.add(model_job);
+					$text_input.val("");
 			 	 }, this))
 			 	 .fail(_.bind(function (response) {
 			 		console.log(response);

@@ -31,8 +31,16 @@ var JobsView = EventsView.extend({
 	},
 
 	// @desc: Controller Logic 
+	// @params: Backbone Model object, Backbone Collection object
+	// @res: Void
 	_commentRender: function (model, collection) {
-		alert("new comment!");
+		var context = _.clone(model.attributes), $target;
+		$target = this.$el.find(".c-p"+context['id'])
+						  .find("input[name='job-id']");
+						  
+		context = this.parent._fixContext(context);
+		context = context['comment'][context['comment'].length - 1];
+		$target.after(this.comment_template(context));
 	},
 
 	initialize: function (attrs) {
