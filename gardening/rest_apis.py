@@ -375,13 +375,17 @@ class JobsAPI(GreenThumbPage,
 			# Return the job, Backbone doesn't know any better
 			response = model_to_dict(serial_comment.validated_data['job'])
 			response['user'] = model_to_dict(Gardener.objects.get(id = response['user']))
+			if response['user']['profile_pic'] is not None:
+				response['user']['profile_pic'] = response['user']['profile_pic'].name
 			response['time'] = serial_comment.validated_data['job'].time.isoformat()
 			response['comment'] = []
 			for comment in Comment.objects.filter(job = response['id']):
 				model_dict = model_to_dict(comment)
 				model_dict['time'] = comment.time.isoformat()
+				model_dict['user'] = model_to_dict(Gardener.objects.get(id=model_dict['user']))
+				if model_dict['user']['profile_pic'] is not None:
+					model_dict['user']['profile_pic'] = model_dict['user']['profile_pic'].name
 				response['comment'].append(model_dict)
-			# pdb.set_trace()
 			serialized_job = JobsSerializer(data = response)
 			if serialized_job.is_valid():
 				return HttpResponse(json.dumps(serialized_job.data), content_type="application/json")
@@ -392,6 +396,8 @@ class JobsAPI(GreenThumbPage,
 		target_data = {}
 		target_data['job'] = kwargs['id']
 		target_data['user'] = model_to_dict(Gardener.objects.get(id = self.data['user']))
+		if target_data['user']['profile_pic'] is not None:
+			target_data['user']['profile_pic'] = target_data['user']['profile_pic'].name
 		target_data['time'] = datetime.datetime.now().isoformat()
 		target_data['text'] = request.data['comment'][-1]['text']
 		kwargs['data'] = target_data

@@ -12,7 +12,7 @@ import re
 
 class GardenerSerializer(serializers.ModelSerializer):
 	username = serializers.CharField(allow_blank = True, required = False)
-	profile_pic = serializers.ImageField(allow_empty_file = True, required = False, use_url = True)
+	profile_pic = serializers.CharField(allow_blank = True, required = False)
 	first_name = serializers.CharField(allow_blank = True, required = False)
 	last_name = serializers.CharField(allow_blank = True, required = False)
 	city = serializers.CharField(allow_blank = True, required = False)

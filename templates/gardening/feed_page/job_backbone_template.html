@@ -1,21 +1,21 @@
 <div class="panel event-panel col-xs-offset-1 col-xs-9 col-sm-8">
-	<img class="event-img col-xs-2" src="<%=user.profile_pic%>"/>
+	<img class="event-img col-xs-4 col-sm-2" src="<%=user.profile_pic%>"/>
 	<div class="text-portion col-xs-8">
 		<h4 class="feed-header"><%= user.username %> posted:</h4>
 		<p><%= text_description %></p>
 	</div>
-	<div class="c-p<%= id %> comment-portion col-xs-offset-1 col-xs-10">
+	<div class="c-p<%= id %> comment-portion col-xs-offset-0 col-sm-offset-1 col-xs-10">
 		<input name="job-id" type="hidden" value="<%= id %>"/>
 		<% _.each(comment, function (comm) {  %>
-		<img class="comment-image-thumbnail col-xs-offset-1" src="<%= comm.user.profile_pic %>"/>
-		<div class="comment-text col-xs-6 col-sm-8">
+		<img class="comment-image-thumbnail col-xs-offset-0 col-sm-offset-1 hidden-xs col-sm-2" src="<%= comm.user.profile_pic %>"/>
+		<div class="comment-text col-xs-12 col-sm-8">
 			<h5><%= comm.user.username %>: </h5>
 			<p><%= comm.text %></p>
 		</div>
 		<% }); %>
 	</div>
-	<div class="comment-post-portion col-xs-offset-1 col-xs-10">
-		<textarea class="comment-post col-xs-offset-1 col-xs-6 col-sm-9" placeholder="Comment on this posting!"></textarea>
+	<div class="comment-post-portion col-xs-offset-0 col-sm-offset-1 col-xs-10">
+		<textarea class="comment-post col-xs-offset-0 col-sm-offset-1 col-xs-11 col-sm-9" placeholder="Comment on this posting!"></textarea>
 		<button class="comment-post-submit col-xs-1"><i class="fa fa-paper-plane"></i></button>
 	</div>
 </div>

@@ -18,10 +18,13 @@ var Event = Backbone.Model.extend({
 var Job = Backbone.Model.extend({
 	save: function (arguments) {
 		this.url = this.setURL();
-		Backbone.Model.prototype.save.apply(this, arguments);
+		return Backbone.Model.prototype.save.apply(this, arguments);
 	},
 	setURL: function () {
-		return 'jobs/' + this.attributes['id'];
+		if (this.attributes['id']){
+			return 'jobs/' + this.attributes['id'];
+		}
+		return 'jobs/'
 	} 
 });
 

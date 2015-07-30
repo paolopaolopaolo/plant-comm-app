@@ -13,16 +13,12 @@ var FeedPageView = Backbone.View.extend({
 		model_job = new Job({
 			text_description: $text_input.val(),
 		});
-
 		model_job.save(model_job.attributes)
-			 	 .done(_.bind(function (response) {
-			 	 	model_job["comment"] = [];
+				 .done(_.bind(function () {
+ 	 				model_job["comment"] = [];
 					this.jobs_view.collection.add(model_job);
 					$text_input.val("");
-			 	 }, this))
-			 	 .fail(_.bind(function (response) {
-			 		console.log(response);
-			 	 }, this));
+				 }, this)); 
 	},
 
 	// @desc: Controller Logic (revise the context)
