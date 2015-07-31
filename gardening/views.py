@@ -82,14 +82,16 @@ class GreenThumbPage(View):
 	# Sorting method for Events
 	def event_sort(self, events):
 		result = events
-		zipcode = int(self.gardener.zipcode)
+		try:
+			zipcode = int(self.gardener.zipcode)
+		except ValueError:
+			zipcode = 0
 		# First, sort by time
 		result = sorted(result, key=self.sortByTime, reverse=True)
 		# Next, by location
 		result = sorted(result, key=self.sortByZipcode)
 		# Lastly, sort by moving people on the followers list to the top
 		result = sorted(result, key=self.sortByFollowerList)
-
 		return result
 
 	def _modify_comment(self, obj, comment):
@@ -317,7 +319,11 @@ class UserAuthenticationPage(GreenThumbPage):
 							last_name = form_data.get('last_name'), 
 							password = form_data.get('password') 
 						)
-				garden_user = Gardener(user = user, username = user.username)
+				garden_user = Gardener(
+							user = user,
+							username = user.username,
+							first_name = user.first_name,
+							last_name = user.last_name)
 				garden_user.save()
 				# Authenticate and login this new user
 				auth_user = authenticate(
