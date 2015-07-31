@@ -63,7 +63,15 @@ class GreenThumbPage(View):
 			
 	# Utility, method for sorting by distance from user zipcode
 	def sortByZipcode(self, arrayItem):
-		return abs(int(arrayItem.user.zipcode) - int(self.gardener.zipcode))
+		try:
+			userzip = int(arrayItem.user.zipcode)
+		except ValueError:
+			userzip = 0
+		try:
+			selfzip = int(self.gardener.zipcode)
+		except ValueError:
+			selfzip = 0
+		return abs(userzip - selfzip)
 
 	def sortByFollowerList(self, arrayItem):
 		if arrayItem.user in self.gardener.favorites.get_queryset():
@@ -116,20 +124,10 @@ class GreenThumbPage(View):
 
 	def RETURN_EVENT_DATA(self):
 		nonself_events = Event.objects.exclude(user = self.gardener)
-		print "nonself events:\t",
-		print nonself_events
 		sorted_nonself_events = self.event_sort(nonself_events)
-		print "sorted nonself events:\t",
-		print sorted_nonself_events
 		first_sorted_nonself_events = self.bootstrapLimit(sorted_nonself_events, 3)
-		print "first sorted nonself events:\t",
-		print first_sorted_nonself_events
 		serialized_nonself_events = [EventsSerializer(event) for event in first_sorted_nonself_events]
-		print "serialized nonself events:\t",
-		print serialized_nonself_events
 		json_serialized_nonself_events = [JSONRenderer().render(event.data) for event in serialized_nonself_events]
-		print "json serialized nonself events:\t",
-		print json_serialized_nonself_events
 		return json_serialized_nonself_events
 
 	def RETURN_FOLLOWER_DATA(self):
@@ -429,7 +427,7 @@ class FeedPage(GreenThumbPage, APIView):
 
 	@set_user_and_gardener_and_convos
 	def get(self, request, *args, **kwargs):
-		print self.RETURN_EVENT_DATA()
+		# try:
 		self.context['jobs'] = self.RETURN_JOB_DATA()
 		self.context['events'] = self.RETURN_EVENT_DATA()
 		self.context['followers'] = json.dumps(self.RETURN_FOLLOWER_DATA())
@@ -440,7 +438,9 @@ class FeedPage(GreenThumbPage, APIView):
 		self.context['showsFooter'] = True
 		self.context['isAuthenticated'] = request.user.is_authenticated()
 		return render(request, 'gardening/feed_page/feed_page.html', self.context)
-
+		# except Exception, e:
+		# 	dir(e)
+		# 	return HttpResponseServerError(str(e), content_type="text/plain")
 # Simple Backend API that returns if given 
 # id is in a user's favorites or not. Can also add
 # ids to user's favorites list
