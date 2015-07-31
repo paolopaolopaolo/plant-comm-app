@@ -431,6 +431,7 @@ class FeedPage(GreenThumbPage, APIView):
 			self.context['isAuthenticated'] = request.user.is_authenticated()
 			return render(request, 'gardening/feed_page/feed_page.html', self.context)
 		except Exception, e:
+			dir(e)
 			return HttpResponseServerError(str(e), content_type="text/plain")
 # Simple Backend API that returns if given 
 # id is in a user's favorites or not. Can also add
