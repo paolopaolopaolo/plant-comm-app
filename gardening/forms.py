@@ -101,8 +101,6 @@ class LogInForm(forms.Form):
 
 	def auth_user(self):
 		username = None
-		print "login_is_email: %s" % self.login_is_email
-		print "email: %s" % self.email
 		if self.login_is_email:
 			try:
 				user = User.objects.get(email = self.email.lower())
