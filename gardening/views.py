@@ -63,7 +63,15 @@ class GreenThumbPage(View):
 			
 	# Utility, method for sorting by distance from user zipcode
 	def sortByZipcode(self, arrayItem):
-		return abs(int(arrayItem.user.zipcode) - int(self.gardener.zipcode))
+		try:
+			userzip = int(arrayItem.user.zipcode)
+		except ValueError:
+			userzip = 0
+		try:
+			selfzip = int(self.gardener.zipcode)
+		except ValueError:
+			selfzip = 0
+		return abs(userzip - selfzip)
 
 	def sortByFollowerList(self, arrayItem):
 		if arrayItem.user in self.gardener.favorites.get_queryset():
@@ -419,20 +427,20 @@ class FeedPage(GreenThumbPage, APIView):
 
 	@set_user_and_gardener_and_convos
 	def get(self, request, *args, **kwargs):
-		try:
-			self.context['jobs'] = self.RETURN_JOB_DATA()
-			self.context['events'] = self.RETURN_EVENT_DATA()
-			self.context['followers'] = json.dumps(self.RETURN_FOLLOWER_DATA())
-			self.context['header_profile_pic'] = self.gardener.profile_pic
-			self.context['other_gardeners'] = self.RETURN_OTHER_GARDENERS(2)
-			self.context['convos'] = json.dumps(self.convos)
-			self.context['user'] = request.user
-			self.context['showsFooter'] = True
-			self.context['isAuthenticated'] = request.user.is_authenticated()
-			return render(request, 'gardening/feed_page/feed_page.html', self.context)
-		except Exception, e:
-			dir(e)
-			return HttpResponseServerError(str(e), content_type="text/plain")
+		# try:
+		self.context['jobs'] = self.RETURN_JOB_DATA()
+		self.context['events'] = self.RETURN_EVENT_DATA()
+		self.context['followers'] = json.dumps(self.RETURN_FOLLOWER_DATA())
+		self.context['header_profile_pic'] = self.gardener.profile_pic
+		self.context['other_gardeners'] = self.RETURN_OTHER_GARDENERS(2)
+		self.context['convos'] = json.dumps(self.convos)
+		self.context['user'] = request.user
+		self.context['showsFooter'] = True
+		self.context['isAuthenticated'] = request.user.is_authenticated()
+		return render(request, 'gardening/feed_page/feed_page.html', self.context)
+		# except Exception, e:
+		# 	dir(e)
+		# 	return HttpResponseServerError(str(e), content_type="text/plain")
 # Simple Backend API that returns if given 
 # id is in a user's favorites or not. Can also add
 # ids to user's favorites list
