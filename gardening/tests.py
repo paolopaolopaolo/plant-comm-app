@@ -179,6 +179,7 @@ class RenderTesting(SiteTest):
 		response = self.client.get('/search/', {'query': 'a'})
 		self.assertEquals(response.status_code, 200)
 
+# Testing that certain interactions work
 class InteractionsTesting(SiteTest):
 	test_name = "Interactions"
 
@@ -219,28 +220,28 @@ class InteractionsTesting(SiteTest):
 			is_in_favs = other_in_fav(rand_user2)
 			self.assertTrue(not is_in_favs)
 
-	@label_test(test="Starting messages test:")
-	def test_001_message_post_test(self):
-		past_users = []
-		rand_user1 = choice(User.objects.all())
-		gardener = Gardener.objects.get(user = rand_user1)
+	# @label_test(test="Starting messages test:")
+	# def test_001_message_post_test(self):
+	# 	past_users = []
+	# 	rand_user1 = choice(User.objects.all())
+	# 	gardener = Gardener.objects.get(user = rand_user1)
 
-		def message_started(other_user):
-			gardener2 = Gardener.objects.get(user = other_user)
-			request = self.factory.post("".join(("/convo/", str(gardener2.id),"/")))
-			request.user = rand_user1
-			view = ChatAPI.as_view()
-			view.user = rand_user1
-			view.gardener = gardener
-			response = view(request, gardener2.id)
-			convos = Convo.objects.filter(user_a = gardener, user_b=gardener2)
-			return {'started': len(convos) > 0}
+	# 	def message_started(other_user):
+	# 		gardener2 = Gardener.objects.get(user = other_user)
+	# 		request = self.factory.post("".join(("/convo/", str(gardener2.id),"/")))
+	# 		request.user = rand_user1
+	# 		view = ChatAPI.as_view()
+	# 		view.user = rand_user1
+	# 		view.gardener = gardener
+	# 		response = view(request, gardener2.id)
+	# 		convos = Convo.objects.filter(user_a = gardener, user_b=gardener2)
+	# 		return {'started': len(convos) > 0}
 
-		for i in range(0, 10):
-			user_pool = User.objects.exclude(username = rand_user1.username)
-			user_pool = filter(lambda x: not (x in past_users), user_pool)
-			rand_user2 = choice(user_pool)
-			started_message = message_started(rand_user2)['started']
-			past_users.append(rand_user2)
-			self.assertTrue(started_message)
+	# 	for i in range(0, 10):
+	# 		user_pool = User.objects.exclude(username = rand_user1.username)
+	# 		user_pool = filter(lambda x: not (x in past_users), user_pool)
+	# 		rand_user2 = choice(user_pool)
+	# 		started_message = message_started(rand_user2)['started']
+	# 		past_users.append(rand_user2)
+	# 		self.assertTrue(started_message)
 
