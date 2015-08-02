@@ -13,12 +13,14 @@ var BaseView = Backbone.View.extend({
 	// @res: Void
 	_toggleFollow: function (event) {
 		var _id = this._getID(event);
-		if (!this.collection.get(_id)) {
-			this.collection.add({id: _id, favorite: true});
+		if (Followers) {
+			if (!this.collection.get(_id)) {
+				this.collection.add({id: _id, favorite: true});
+			}
+			// Toggling happens on the back-end. This goes directly to a PUT request
+			// since I added a model with an id to the collection. 
+			this.collection.get(_id).save();
 		}
-		// Toggling happens on the back-end. This goes directly to a PUT request
-		// since I added a model with an id to the collection. 
-		this.collection.get(_id).save();
 	},
 
 	// @desc: Normalize the Media URL
@@ -143,15 +145,17 @@ var BaseView = Backbone.View.extend({
 	// @res: Void
 	_parsePageForFollowedProfiles: function (model) {
 		var follow_id, $button;
-		follow_id = model.attributes["id"];
-		$button = 	this.$el.find(".p-h-" + follow_id.toString())
-						.find(".p-header-follow-btn");
-		if (model.attributes["favorite"]) {
-			$button.css({backgroundColor: "#666"})
-				   .html("Followed");
-		} else {
-			$button.removeAttr("style");
-			$button.html("Follow");
+		if (Followers) {
+			follow_id = model.attributes["id"];
+			$button = 	this.$el.find(".p-h-" + follow_id.toString())
+							.find(".p-header-follow-btn");
+			if (model.attributes["favorite"]) {
+				$button.css({backgroundColor: "#666"})
+					   .html("Followed");
+			} else {
+				$button.removeAttr("style");
+				$button.html("Follow");
+			}
 		}
 	},
 
@@ -160,11 +164,13 @@ var BaseView = Backbone.View.extend({
 	// @res: Void
 	initialize: function () {
 		this.header_view = new HeaderView({"setMediaPic": this.setMediaPic});
-		this.collection = new Followers(FOLLOWERS);
-		this.collection.each(_.bind(function (model) {
-			this._parsePageForFollowedProfiles(model);
-		}, this));
-		this.listenTo(this.collection, "change", this._parsePageForFollowedProfiles);
+		if (FOLLOWERS) {
+			this.collection = new Followers(FOLLOWERS);
+			this.collection.each(_.bind(function (model) {
+				this._parsePageForFollowedProfiles(model);
+			}, this));
+			this.listenTo(this.collection, "change", this._parsePageForFollowedProfiles);
+		}
 	},
 
 });

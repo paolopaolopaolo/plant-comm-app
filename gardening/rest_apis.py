@@ -76,6 +76,7 @@ class SearchAPI(GreenThumbPage, mixins.ListModelMixin, generics.GenericAPIView):
 
 		self.queryset = filter(filterFunction, self.queryset)
 		results = [self.serializer_class(query).data for query in self.queryset]
+		
 		context = {
 						"followers": json.dumps(self.RETURN_FOLLOWER_DATA()),
 						"other_gardeners_object": json.dumps(results),

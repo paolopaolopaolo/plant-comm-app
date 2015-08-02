@@ -57,6 +57,7 @@
 				var MEDIA_URL = "{{ media_url }}";
 				{% if not isAuthenticated %}
 				var isChatDisabled = true;
+				var FOLLOWERS;
 				{% else %}
 				var isChatDisabled = false;
 				var FOLLOWERS = {{ followers }};

@@ -133,9 +133,11 @@ class GreenThumbPage(View):
 		return json_serialized_nonself_events
 
 	def RETURN_FOLLOWER_DATA(self):
-		result = self.gardener.favorites.get_queryset()
-		result = [{"id": gardener.id, "favorite": True} for gardener in result]
-		return result
+		if self.gardener is not None:
+			result = self.gardener.favorites.get_queryset()
+			result = [{"id": gardener.id, "favorite": True} for gardener in result]
+			return result
+		return []
 
 	# Returns User data as a dictionary/BOOTSTRAPPING  
 	def RETURN_USER_DATA(self, _id = None, plants=False):

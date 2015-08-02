@@ -102,23 +102,23 @@ var PlantImgView = Backbone.View.extend({
 	 				.slick("slickRemove", 0);
 	 	}
 
-	 	// Start with a context object cloned from the model
+	 // 	// Start with a context object cloned from the model
 		context = _.clone(model.attributes);
-		context["preloaded"] = PRELOADER;
-		// Add template to carousel
-		this.$el.find(".img-carousel")
-				.slick("slickAdd", this.template(context));
+		// context["preloaded"] = PRELOADER;
+		// // Add template to carousel
+		// this.$el.find(".img-carousel")
+		// 		.slick("slickAdd", this.template(context));
 	 	
 	 	// Create a replacement image with all the appropriate attrs
 	 	replace_img = document.createElement("img");
 	 	replace_img.setAttribute("id", "p-img-" + context['id'].toString());
-	 	replace_img.setAttribute("src", context["imageURL"]);
 	 	replace_img.className += " carousel-img";
 
-	 	// After 3 second delay...
-		setTimeout(_.bind(function () {
+	 	// After image is loaded...
+		$(replace_img).on("load", _.bind(function (event) {
 			var slick_obj, $target;
-			// Target the image and replace the target with the replacement
+			setTimeout(_.bind(function () {
+				// Target the image and replace the target with the replacement
 			slick_obj = this.$el.find(".img-carousel")
 								.slick("getSlick");
 			$target = $(slick_obj.$slides[collection.length - 1]);
@@ -132,7 +132,11 @@ var PlantImgView = Backbone.View.extend({
 						.removeAttr("style")
 						.removeAttr("disabled");
 			}
-		}, this), 3000);
+			}, this), 3000);
+
+		}, this));
+	 	
+	 	replace_img.setAttribute("src", context["imageURL"]);
 
 	},	
 
@@ -141,7 +145,7 @@ var PlantImgView = Backbone.View.extend({
 	// @params: Event object
 	// @res: Void
 	_addImage: function (event) {
-		var new_image, addImage, fake_form;
+		var new_image, addImage, fake_form, context;
 		// Create a new plant img object
 		new_image = new PlantImg({
 						pk: this.plant_id,
@@ -168,6 +172,12 @@ var PlantImgView = Backbone.View.extend({
 			'id', new_image.attributes['pk']
 			)
 
+	 	context = {
+	 		'preloaded': PRELOADER
+	 	};
+	 	this.$el
+	 		.find(".img-carousel")
+			.slick("slickAdd", this.template(context));
 		// Send, and then reset the new_image to 
 		// make it fit to add to collection
 		$.ajax(addImage)
@@ -177,7 +187,17 @@ var PlantImgView = Backbone.View.extend({
 		 		id: response['id'],
 		 		imageURL: response['imageURL'],
 		 	}, {silent: true});
-
+		 	this.$el
+	 			.find(".img-carousel")
+	 			.find(".carousel-img-wrapper")
+	 			.last()
+	 			.addClass('c-i-w-' + response['id'].toString());
+	 		this.$el
+	 			.find(".img-carousel")
+	 			.find(".carousel-img-wrapper")
+	 			.last()
+	 			.find('.carousel-img')
+	 			.attr('id', 'p-img-' + response['id'].toString());
 		 	this.collection.add(new_image);
 		 }, this));
 	},
