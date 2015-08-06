@@ -14,7 +14,7 @@ from rest_framework.views import APIView
 from django.forms.models import model_to_dict
 from django.db import IntegrityError
 from django.core.exceptions import SuspiciousOperation
-from gardening.pagination_classes import EventsPagination
+from gardening.pagination_classes import *
 from gardening.views import GreenThumbPage
 
 from rest_framework import mixins, generics
@@ -404,8 +404,5 @@ class JobsAPI(GreenThumbPage,
 		kwargs['data'] = target_data
 		return self.update(self, request, *args, **kwargs)
 
-class CommentsAPI(GreenThumbPage,
-			  	  mixins.ListModelMixin,
-			  	  mixins.CreateModelMixin,
-			  	  generics.GenericAPIView):
-	pass
+class TestAPI(JobsAPI):
+	pagination_class = JobsPagination

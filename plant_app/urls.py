@@ -20,10 +20,11 @@ urlpatterns = patterns('',
     url(r"convo/(?P<id>[0-9]+){0,1}$", ChatAPI.as_view(), name="ChatAPI"),
     url(r"events/", EventsAPI.as_view(), name="EventsAPI"),
     url(r"jobs(/\?page\=\d+){0,1}/+(?P<id>[0-9]+){0,1}$", JobsAPI.as_view(), name="JobsAPI"),
-    url(r"comments/", CommentsAPI.as_view(), name="CommentsAPI"),
+    # url(r"comments/", CommentsAPI.as_view(), name="CommentsAPI"),
     url(r"^feed/$", FeedPage.as_view(), name="feed"),
     url(r"^logout/", "gardening.views.log_out", name="logout"),
-    url(r"^search/", SearchAPI.as_view(), name="search"), 
+    url(r"^search/", SearchAPI.as_view(), name="search"),
+    url(r"test(/\?cursor\=\d+){0,1}/+(?P<id>[0-9]+){0,1}$", TestAPI.as_view(), name="TestAPI") 
 )
  
 if settings.DEBUG:

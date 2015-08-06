@@ -40,9 +40,6 @@ var JobsView = EventsView.extend({
 	_commentRender: function (model, collection) {
 		var context = _.clone(model.attributes), $target;
 
-		console.log('comments:');
-		console.log(model.attributes['comment']);
-
 		if (this.comment_counts[model.attributes.id] === undefined) {
 			this.comment_counts[model.attributes.id] = model.attributes.comment.length;
 		}
@@ -64,15 +61,26 @@ var JobsView = EventsView.extend({
 		}
 	},
 
+	_jobsRender: function (model, collection) {
+		this.render_opts['initial'] = false;
+		this.render(model, collection, this.render_opts);
+	},
+
+	render_opts: {
+		'header': '.wall-header',
+		'initial': true,
+	},
+
 	initialize: function (attrs) {
+		var opts;
 		JOBS = _.map(JOBS, function (job) { return JSON.parse(job); });
 		this.collection = new Jobs(JOBS);
 		this.parent = attrs['parent'];
-		this.render();
+		this.render(undefined, undefined, this.render_opts);
 		this._fetchNewComments();
 		this.events['click .comment-post-submit'] = this._addComment;
 
-		this.listenTo(this.collection, 'add', this.render);
+		this.listenTo(this.collection, 'add', this._jobsRender);
 		this.listenTo(this.collection, 'change:comment', this._commentRender);
 	},
 });
