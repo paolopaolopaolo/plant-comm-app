@@ -1,5 +1,7 @@
-<img class="comment-image-thumbnail col-xs-offset-0 col-sm-offset-1 hidden-xs col-sm-2" src="<%= user.profile_pic %>"/>
-<div class="comment-text col-xs-12 col-sm-8">
-	<h5><%= user.username %>: </h5>
+<div class="feed-thumbnail-crop-sm col-xs-offset-0 col-sm-offset-1">
+	<img class="comment-image-thumbnail" src="<%= user.profile_pic %>"/>
+</div>
+<div class="comment-text col-xs-8">
+	<h5><a hred="profile/<%= user.username %>"><%= user.username %></a>: </h5>
 	<p><%= text %></p>
 </div>

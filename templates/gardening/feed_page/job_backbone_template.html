@@ -1,15 +1,17 @@
 <div class="panel event-panel col-xs-offset-1 col-xs-9 col-sm-8">
-	<img class="event-img col-xs-4 col-sm-2" src="<%=user.profile_pic%>"/>
-	<div class="text-portion col-xs-8">
-		<h4 class="feed-header"><%= user.username %> posted:</h4>
+	<div class="feed-thumbnail-crop "><img class="event-img" src="<%=user.profile_pic%>"/></div>
+	<div class="text-portion col-xs-10 col-sm-8">
+		<h4 class="feed-header"><a href="profile/<%= user.username %>"><%= user.username %></a> posted:</h4>
 		<p><%= text_description %></p>
 	</div>
 	<div class="c-p<%= id %> comment-portion col-xs-offset-0 col-sm-offset-1 col-xs-10">
 		<input name="job-id" type="hidden" value="<%= id %>"/>
 		<% _.each(comment, function (comm) {  %>
-		<img class="comment-image-thumbnail col-xs-offset-0 col-sm-offset-1 hidden-xs col-sm-2" src="<%= comm.user.profile_pic %>"/>
-		<div class="comment-text col-xs-12 col-sm-8">
-			<h5><%= comm.user.username %>: </h5>
+		<div class="feed-thumbnail-crop-sm col-xs-offset-0 col-sm-offset-1">
+		<img class="comment-image-thumbnail" src="<%= comm.user.profile_pic %>"/>
+		</div>
+		<div class="comment-text col-xs-10 col-sm-8">
+			<h5><a href="comm.user.username"><%= comm.user.username %></a>: </h5>
 			<p><%= comm.text %></p>
 		</div>
 		<% }); %>
