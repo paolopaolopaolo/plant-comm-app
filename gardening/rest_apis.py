@@ -358,8 +358,15 @@ class JobsAPI(GreenThumbPage,
 
 	@set_user
 	def get(self, request, *args, **kwargs):
-		self.queryset = [json.loads(job) for job in self.RETURN_JOB_DATA()]
-		return self.list(self, request, *args, **kwargs)
+		if kwargs['id'] is None:
+			self.queryset = [json.loads(job) for job in self.RETURN_JOB_DATA()]
+			return self.list(self, request, *args, **kwargs)
+		job = Job.objects.get(id=kwargs['id'])
+		comments = Comment.objects.filter(job = job)
+		job_dict = model_to_dict(job)
+		job_dict['user'] = {'username': job.user.username, 'id': job.user.id, 'profile_pic': job.user.profile_pic.name}
+		job_dict['comment'] = [self._modify_comment(model_to_dict(comment), comment) for comment in comments]
+		return HttpResponse(json.dumps(job_dict), content_type='application/json')
 
 	@setApiUser
 	def post(self, request, *args, **kwargs):

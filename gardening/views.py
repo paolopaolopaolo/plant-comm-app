@@ -95,8 +95,9 @@ class GreenThumbPage(View):
 		return result
 
 	def _modify_comment(self, obj, comment):
-		obj['user'] = model_to_dict(Gardener.objects.get(id=obj['user']))
-		obj['time'] = comment.time
+		gardener = Gardener.objects.get(id=obj['user'])
+		obj['user'] = {'username': gardener.username,'id': gardener.id,'profile_pic':gardener.profile_pic.name}
+		obj['time'] = comment.time.isoformat()
 		return obj
 
 	def RETURN_GARDENER_DATA(self):

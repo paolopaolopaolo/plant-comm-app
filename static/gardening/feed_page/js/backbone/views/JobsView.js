@@ -4,13 +4,6 @@ var JobsView = EventsView.extend({
 	comment_template: _.template($('#comment-template').html()),
 	comment_counts: {},
 
-	_fetchNewComments: function () {
-		this.commentInterval = setInterval(_.bind(function () {
-			this.collection.fetch({isSamePage: true});
-						   // .done(function (resp) {console.log(resp);});
-		}, this), 10000);
-	},
-
 	// @desc: UI response; save the Job model
 	// @params: Event object
 	// @res: Void
@@ -77,7 +70,6 @@ var JobsView = EventsView.extend({
 		this.collection = new Jobs(JOBS);
 		this.parent = attrs['parent'];
 		this.render(undefined, undefined, this.render_opts);
-		this._fetchNewComments();
 		this.events['click .comment-post-submit'] = this._addComment;
 
 		this.listenTo(this.collection, 'add', this._jobsRender);
