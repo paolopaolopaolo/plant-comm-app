@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 """
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-import os
+import os, logging
 
 try:
     from plant_app.local_settings import *
@@ -45,7 +45,6 @@ INSTALLED_APPS = (
     'corsheaders',
     'compressor',
     'rest_framework',
-    'mod_wsgi.server',
     'storages',
     'gardening',
 )
@@ -80,20 +79,25 @@ USE_L10N = True
 USE_TZ = True
 
 
-STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'), )
+STATICFILES_DIRS = (os.path.abspath(os.path.join(BASE_DIR, 'static')), )
 CORS_ORIGIN_REGEX_WHITELIST = ('^(https?://)?(\w+\.)?zipcodeapi\.com$', 
                                 'localhost:8000',
                               )
 CORS_REPLACE_HTTPS_REFERER = True
 
 if DEBUG:
-    with open(os.path.join(BASE_DIR, "ZIP_CODE_API.txt"), "rb") as zipcode:
+    print "DEBUG MODE BITCHES"
+    with open(os.path.join(BASE_DIR, "config", "ZIP_CODE_API.txt"), "rb") as zipcode:
         ZIPCODE_API_KEY = zipcode.read()
-    with open(os.path.join(BASE_DIR, "SECRET_KEY.txt") ,'rb') as secret_key:
+    with open(os.path.join(BASE_DIR, "config", "SECRET_KEY.txt") ,'rb') as secret_key:
         SECRET_KEY = secret_key.read()
 
     STATIC_URL = '/static/'
-    STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static')
+    print STATICFILES_DIRS
+    print BASE_DIR
+    STATIC_ROOT = os.path.join(os.path.dirname(os.path.abspath(BASE_DIR)), 'static')
+    print STATIC_ROOT
+    print STATIC_ROOT in STATICFILES_DIRS
     MEDIA_ROOT = os.path.join(STATIC_ROOT, "media")
     MEDIA_URL = '/media/'
     COMPRESS_ROOT = os.path.join(STATIC_ROOT, "COMPRESS")
@@ -107,8 +111,10 @@ if DEBUG:
         }
     }
 
-else:
 
+
+else:
+    print "NOT DEBUG MODE BITCHES"
     ZIPCODE_API_KEY = os.environ['ZAP']
     SECRET_KEY = os.environ['SK']
 

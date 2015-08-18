@@ -1,5 +1,5 @@
 var Convo = Backbone.Model.extend({
-	urlRoot: '/convo',
+	urlRoot: '/editconvo',
 	options: {
 		'sendTime': false,
 	},

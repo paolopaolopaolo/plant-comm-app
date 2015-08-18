@@ -1,12 +1,12 @@
 Author: Dean (Paolo) Mercado
 Email: dpaolomercado@gmail.com
-Rev.: 2015 July 23
+Rev.: 2015 August 20
 
 About:
 =====
 This repository consists of a Full-Stack Web Application that implements
-Django/Python on the backend, Backbone.js/jQuery on the frontend, and 
-Apache + mod_wsgi for deployment.
+Django/Python and Tornado on the backend, Backbone.js/jQuery on the 
+frontend, and Nginx/Supervisor for deployment.
 
 About this ReadMe:
 =================
@@ -27,9 +27,6 @@ may or may not have something before it (e.g. $>, (env-name)>, etc.). The
 exception to this is double greater-than symbol (>>) which indicates a block
 of text that must be inserted in a file somewhere. 
 
-Configuration of the Apache Daemon all happens in one of the last steps,
-and involves knowing what values to choose for processes and threads, as well
-as the Linux user. 
 
 Instructions for Setting Up A New Server:
 ========================================
@@ -41,12 +38,11 @@ Instructions for Setting Up A New Server:
 01: Download the following programs using apt-get or yum
 - gcc
 - git
-- apache2, apache2-dev, apache-mpm-prefork, 
-  apache-mpm-worker, apache-mpm-event (look up pip modwsgi repository)
 - mysql, mysql-dev
 - libjpeg-dev
 - python2.7, python-dev, pip, virtualenv
 - nodejs
+- nginx
 
 02: Download LESS with NPM
 
@@ -56,14 +52,32 @@ Instructions for Setting Up A New Server:
 
 > git clone https://github.com/paolopaolopaolo/plant-comm-app.git
 
-04: navigate to the parent directory of the cloned repository
+04: add the path of the new local repository to ~/.bash_profile
+
+> sudo nano ~/.bash_profile
+>> (INPUT THE FOLLOWING with the appropriate replacements)
+
+export PLANT_APP_PATH={{path/to/local/repo}}
+
+>> (THEN SAVE)
+
+05: navigate to the parent directory of the cloned repository
 
 > cd /PATH/TO/PARENT/OF/plant-comm-app
 
-05: set up virtualenv 
+06: set up virtualenv 
 
 > pip install virtualenv
 > virtualenv env_name
+
+07: add the path of virtualenv settings folder to ~/.bash_profile
+
+> sudo nano ~/.bash_profile
+>> (INPUT THE FOLLOWING with the appropriate replacements)
+
+export PLANT_ENV_PATH={{path/to/env/dir}}
+
+>> (THEN SAVE)
 
 06: activate env (can put this/nav-to-directory in .sh script)
 
@@ -81,7 +95,7 @@ Instructions for Setting Up A New Server:
   a) Make sure you have a database called 'gardening'
   b) Also you have a user that has all privileges granted on 'gardening'.'*'
 
-10: setup os.environ
+10: setup os.environ by editing ~/.bash_profile. IMPORTANT: source it after
 
 > sudo nano ~/.bash_profile
 >> (INPUT THE FOLLOWING with the appropriate replacements)
@@ -112,13 +126,36 @@ export DB_PORT='3306'
 
 > python manage.py seed.json
 
-13: Setup the Apache-Daemon
+13: Edit /etc/nginx/nginx.conf, changing the user to the desired 
+    (non-root) user
 
-> python manage.py runmodwsgi --setup-only --user (non-root-user) / 
-                              --group www-data  --port=80 --processes=1 /
-			      --threads=15 --server-root=modwsgi/
+14: Go to the /config directory in local repo
 
-14: Run Apache-Daemon
+> cd /path/to/plant-comm-app/config
 
-> sudo pkill apache2
-> sudo modwsgi/apachectl start
+15: Copy default plantapp_nginx config
+
+> cp plantapp_nginx.conf.default plantapp_nginx.conf
+
+15: Edit the plantapp_nginx.conf file (uncomment 'Listen 80' and a few other things)
+
+16: Symlink plantapp_nginx.conf to /etc/nginx/sites-enabled
+
+> sudo ln -s /absolute/path/to/this/plantapp_nginx.conf /etc/nginx/sites-enabled
+
+17: Restart nginx
+
+> sudo /etc/init.d/nginx restart
+
+18: Run fix_conf_files.sh (this replaces the supervisor program config with
+the right path-related environment variables) VITAL: Run ". ~/.bash_profile"
+if you havent already and check to make sure the paths loaded correctly
+with the commands "echo $PLANT_APP_PATH" and "echo $PLANT_ENV_PATH".
+
+> ./fix_conf_files.sh
+
+19: Run supervisord using the supervisord.conf config file
+
+> supervisord -c ./supervisord.conf
+
+20: Site should be up and running!
