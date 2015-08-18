@@ -1,4 +1,6 @@
 # A View handling server-side Chat operations
+from tornado import gen, web
+from gardening.tornado_handlers import TornadoHandler
 
 # Use Django-REST framework
 from rest_framework.views import APIView
@@ -15,7 +17,9 @@ from django.http import HttpResponse, HttpResponseServerError
 
 import json, copy, datetime, time, re
 
-
+class ChatHandler(TornadoHandler):
+	def get(self):
+		self.write('convo called');
 
 class ChatAPI(APIView):
 
