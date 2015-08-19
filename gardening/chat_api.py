@@ -48,29 +48,31 @@ class ChatHandler(TornadoHandler):
 				convos.append(convo_to_add)
 		self.convos = convos
 
+	@gen.coroutine
 	def _checkServerTimes(self, convos, clientTime, isNew = True):
-
 		all_convo_times = [convo['time_initiated'] for convo in convos]
 		if isNew:
-			filtered_convos = filter(lambda x: clientTime < x, all_convo_times)
+			self.filtered_convos = filter(lambda x: clientTime < x, all_convo_times)
 		else:
-			filtered_convos = filter(lambda x: clientTime > x, all_convo_times)
-		return filtered_convos
+			self.filtered_convos = filter(lambda x: clientTime > x, all_convo_times)
 
 	@gen.coroutine
 	def get(self, *args, **kwargs):
+		timeout = 0
 		username = self.get_argument("user")
 		self.gardener = Gardener.objects.get(username=username)
 		request_time = self.get_argument("clientTime")
 		while True:
 			self._refreshConvos()
-			newerServerTimes = self._checkServerTimes(self.convos, request_time)
+			self._checkServerTimes(self.convos, request_time)
+			newerServerTimes = self.filtered_convos
 			# So I want client time to be checked across all conversations
-			if len(newerServerTimes) > 0:
+			if len(newerServerTimes) > 0 or timeout > 59:
 				self.write({'convos': self.convos})
 				raise web.Finish()
+			timeout += 0.25
 			# Check every 1/4 second
-			gen.sleep(0.25)
+			yield gen.sleep(0.25)
 
 class ChatAPI(APIView):
 
