@@ -276,8 +276,8 @@ var ConvoView = Backbone.View.extend({
 		// Render the conversations
 		this.render(true);
 
-		// this.updateConvos();
-		// this.updateSeenCount();
+		this.updateConvos();
+		this.updateSeenCount();
 
 		this.listenTo(this.collection, "add", this.render);
 		this.listenTo(this.collection, "change", this.updateSeenCount);

@@ -1,5 +1,5 @@
 var Convos = Backbone.Collection.extend({
-	urlRoot: "/convo",
+	urlRoot: "http://" + window.location.hostname + ":8002/convo",
 	options: {},
 	url: function () {
 		var base;
@@ -7,17 +7,23 @@ var Convos = Backbone.Collection.extend({
 		if (_.has(this.options, 'timestamp')) {
 			base = [
 				base,
-				"clientTime=" + this.options['timestamp']
-			].join("/?");
+				"?clientTime=",
+				this.options['timestamp'],
+				"&user=",
+				USER
+			].join("");
 			delete this.options['timestamp'];
 		}
 		return base;
 	},
-	fetch: function(options) {
+	fetch: function (options) {
 		if (options['timestamp']) {
 			this.options['timestamp'] = options['timestamp']; 
 		}
 		return Backbone.Collection.prototype.fetch.apply(this, options);
+	},
+	parse: function (JSONres) {
+		return JSONres['convos'];
 	},
 	model: Convo
 });

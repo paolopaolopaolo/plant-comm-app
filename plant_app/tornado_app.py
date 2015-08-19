@@ -15,8 +15,8 @@ from gardening.models import *
 def main():  
   options.parse_command_line()
   tornado_app = web.Application([
-    web.url('/helloworld', HelloWorldHandler),
-    web.url(r'/convo/(?P<id>[0-9]+){0,1}$', ChatHandler)
+    web.url(r'/helloworld', HelloWorldHandler),
+    web.url(r'/convo(/[0-9]+){0,1}', ChatHandler),
   ])
   server = httpserver.HTTPServer(tornado_app)
   server.listen(8002)

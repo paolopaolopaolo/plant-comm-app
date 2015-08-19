@@ -10,11 +10,6 @@ class TornadoHandler(CorsMixin, tornado.web.RequestHandler):
     # Default: None (no header).
     CORS_HEADERS = 'Content-Type'
 
-    # Value for the Access-Control-Allow-Methods header.
-    # Default: Methods defined in handler class.
-    # None means no header.
-    CORS_METHODS = 'POST'
-
     # Value for the Access-Control-Allow-Credentials header.
     # Default: None (no header).
     # None means no header.

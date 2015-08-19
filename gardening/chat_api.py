@@ -15,27 +15,9 @@ from django.utils.html import escape
 from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseServerError
 
-import json, copy, datetime, time, re
+import json, copy, datetime, time, re, pdb
 
 class ChatHandler(TornadoHandler):
-	def get(self):
-		self.write('convo called');
-
-class ChatAPI(APIView):
-
-	@method_decorator(login_required)
-	def dispatch(self, *args, **kwargs):
-		return super(ChatAPI, self).dispatch(*args, **kwargs)
-
-	# Brings up the right conversation,
-	# A stringified light copy,
-	# and the time initiated in isoformat
-	def _getLastLine(self, _id, split_str="{{switch_user}}"):
-		convo_to_stringify = Convo.objects.get(id=int(_id))
-		stringified_convo = copy.copy(model_to_dict(convo_to_stringify))
-		lastline = re.sub(r"\+", " ", convo_to_stringify.time_initiated
-														.isoformat())
-		return convo_to_stringify, stringified_convo, lastline
 
 	def _refreshConvos(self):
 		get_convos = (
@@ -78,31 +60,26 @@ class ChatAPI(APIView):
 			filtered_convos = filter(__clientTimeCheck2__, all_convo_times)
 		return filtered_convos
 
+	@gen.coroutine
+	def get(self, *args, **kwargs):
+		username = self.get_argument("user")
+		self.gardener = Gardener.objects.get(username=username)
+		request_time = self.get_argument("clientTime")
+		while True:
+			self._refreshConvos()
+			newerServerTimes = self._checkServerTimes(self.convos, request_time)
+			# So I want client time to be checked across all conversations
+			if len(newerServerTimes) > 0:
+				self.write({'convos': self.convos})
+				raise web.Finish()
+			# Check every 1/4 second
+			gen.sleep(0.25)
 
-	# Listing Conversations and Retrieving text messages
-	@set_user_and_gardener_and_convos
-	def get(self, request, *args, **kwargs):
+class ChatAPI(APIView):
 
-		# List all the conversations User is involved with
-		# in the absence of a specific convo id
-		try:
-			clientTime = request.GET['clientTime']
-			while True:
-				self._refreshConvos()
-				newerServerTimes = self._checkServerTimes(self.convos, clientTime)
-
-				# So I want client time to be checked across all conversations
-				if len(newerServerTimes) > 0:
-					return HttpResponse(json.dumps(self.convos), content_type='application/json')
-
-				
-				# Check every 1/4 second
-				time.sleep(0.25)
-
-			return HttpResponse(json.dumps(self.convos), content_type='application/json')
-		
-		except Exception, e:
-			return HttpResponseServerError(json.dumps({'Error' : str(e)}), content_type='application/json')
+	@method_decorator(login_required)
+	def dispatch(self, *args, **kwargs):
+		return super(ChatAPI, self).dispatch(*args, **kwargs)
 
 	# Creating a new conversation!
 	@set_user_and_gardener_and_convos

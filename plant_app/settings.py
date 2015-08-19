@@ -45,7 +45,6 @@ INSTALLED_APPS = (
     'corsheaders',
     'compressor',
     'rest_framework',
-    'mod_wsgi.server',
     'storages',
     'gardening',
 )
@@ -96,7 +95,7 @@ if DEBUG:
     STATIC_URL = '/static/'
     print STATICFILES_DIRS
     print BASE_DIR
-    STATIC_ROOT = os.path.join(os.path.dirname(os.path.abspath(os.path.dirname(BASE_DIR))), 'static')
+    STATIC_ROOT = os.path.join(os.path.dirname(os.path.abspath(BASE_DIR)), 'static')
     print STATIC_ROOT
     print STATIC_ROOT in STATICFILES_DIRS
     MEDIA_ROOT = os.path.join(STATIC_ROOT, "media")
