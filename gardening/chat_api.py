@@ -19,6 +19,7 @@ import json, copy, datetime, time, re, pdb
 
 class ChatHandler(TornadoHandler):
 
+	@gen.coroutine
 	def _refreshConvos(self):
 		get_convos = (
 						Convo.objects.filter(user_a = self.gardener) |
@@ -48,16 +49,12 @@ class ChatHandler(TornadoHandler):
 		self.convos = convos
 
 	def _checkServerTimes(self, convos, clientTime, isNew = True):
-		def __clientTimeCheck__(convo_time):
-			return clientTime < convo_time
-		def __clientTimeCheck2__(convo_time):
-			return clientTime > convo_time
 
 		all_convo_times = [convo['time_initiated'] for convo in convos]
 		if isNew:
-			filtered_convos = filter(__clientTimeCheck__, all_convo_times)
+			filtered_convos = filter(lambda x: clientTime < x, all_convo_times)
 		else:
-			filtered_convos = filter(__clientTimeCheck2__, all_convo_times)
+			filtered_convos = filter(lambda x: clientTime > x, all_convo_times)
 		return filtered_convos
 
 	@gen.coroutine
