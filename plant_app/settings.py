@@ -86,18 +86,13 @@ CORS_ORIGIN_REGEX_WHITELIST = ('^(https?://)?(\w+\.)?zipcodeapi\.com$',
 CORS_REPLACE_HTTPS_REFERER = True
 
 if DEBUG:
-    print "DEBUG MODE BITCHES"
     with open(os.path.join(BASE_DIR, "config", "ZIP_CODE_API.txt"), "rb") as zipcode:
         ZIPCODE_API_KEY = zipcode.read()
     with open(os.path.join(BASE_DIR, "config", "SECRET_KEY.txt") ,'rb') as secret_key:
         SECRET_KEY = secret_key.read()
 
     STATIC_URL = '/static/'
-    print STATICFILES_DIRS
-    print BASE_DIR
     STATIC_ROOT = os.path.join(os.path.dirname(os.path.abspath(BASE_DIR)), 'static')
-    print STATIC_ROOT
-    print STATIC_ROOT in STATICFILES_DIRS
     MEDIA_ROOT = os.path.join(STATIC_ROOT, "media")
     MEDIA_URL = '/media/'
     COMPRESS_ROOT = os.path.join(STATIC_ROOT, "COMPRESS")
@@ -114,7 +109,6 @@ if DEBUG:
 
 
 else:
-    print "NOT DEBUG MODE BITCHES"
     ZIPCODE_API_KEY = os.environ['ZAP']
     SECRET_KEY = os.environ['SK']
 
