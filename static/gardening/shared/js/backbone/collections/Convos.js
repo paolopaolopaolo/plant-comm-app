@@ -1,5 +1,5 @@
 var Convos = Backbone.Collection.extend({
-	urlRoot: "http://" + window.location.hostname + ":8002/convo",
+	urlRoot: "/convo",
 	options: {},
 	url: function () {
 		var base;
