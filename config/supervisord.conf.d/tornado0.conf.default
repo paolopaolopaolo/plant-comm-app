@@ -1,0 +1,7 @@
+[program:tornado0]
+command=$PLANT_APP_PATH/config/tornado8001_init.sh
+autostart=true
+autorestart=true
+stdout_logfile=$PLANT_APP_PATH/config/supervisord.conf.d/log/tornado.out.log
+stderr_logfile=$PLANT_APP_PATH/config/supervisord.conf.d/log/tornado.err.log
+

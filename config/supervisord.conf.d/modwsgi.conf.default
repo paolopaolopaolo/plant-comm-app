@@ -1,0 +1,6 @@
+[program:modwsgi]
+command=$PLANT_APP_PATH/config/modwsgi_init.sh
+autostart=true
+autorestart=true
+stdout_logfile=$PLANT_APP_PATH/config/supervisord.conf.d/log/modwsgi.out.log
+stderr_logfile=$PLANT_APP_PATH/config/supervisord.conf.d/log/modwsgi.err.log
