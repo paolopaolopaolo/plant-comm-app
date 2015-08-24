@@ -23,7 +23,6 @@ def main(port):
   ioloop.IOLoop.instance().start()
 
 if __name__ == '__main__':
-  if len(sys.argv) > 0:  
+  print sys.argv
+  if len(sys.argv) > 1:  
   	main(sys.argv[1])
-  else:
-  	main(8001)
