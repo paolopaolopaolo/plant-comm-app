@@ -12,15 +12,18 @@ from gardening.tornado_chat import HelloWorldHandler
 from gardening.chat_api import ChatHandler
 from gardening.models import *
 
-def main():  
+def main(port):  
   options.parse_command_line()
   tornado_app = web.Application([
     web.url(r'/helloworld', HelloWorldHandler),
     web.url(r'/convo(/[0-9]+){0,1}', ChatHandler),
   ])
   server = httpserver.HTTPServer(tornado_app)
-  server.listen(8002)
+  server.listen(port)
   ioloop.IOLoop.instance().start()
 
-if __name__ == '__main__':  
-  main()
+if __name__ == '__main__':
+  if len(sys.argv) > 0:  
+  	main(sys.argv[1])
+  else:
+  	main(8001)

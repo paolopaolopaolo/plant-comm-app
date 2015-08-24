@@ -1,6 +1,0 @@
-[program:uwsgi]
-command=$PLANT_APP_PATH/config/uwsgi_init.sh
-autostart=true
-autorestart=true
-stdout_logfile=$PLANT_APP_PATH/config/supervisord.conf.d/log/uwsgi.out.log
-stderr_logfile=$PLANT_APP_PATH/config/supervisord.conf.d/log/uwsgi.err.log
