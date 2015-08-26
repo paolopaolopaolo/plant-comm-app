@@ -14,6 +14,7 @@ from gardening.serializers import ConvoSerializer
 from django.utils.html import escape
 from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseServerError
+import django.db
 
 import json, copy, datetime, time, re, pdb
 
@@ -63,6 +64,7 @@ class ChatHandler(TornadoHandler):
 		self.gardener = Gardener.objects.get(username=username)
 		request_time = self.get_argument("clientTime")
 		while True:
+			django.db.connection.close()
 			self._refreshConvos()
 			self._checkServerTimes(self.convos, request_time)
 			newerServerTimes = self.filtered_convos
