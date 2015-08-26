@@ -121,7 +121,7 @@ else:
             'PASSWORD': os.environ['DB_PW'],
             'HOST': os.environ['DB_HOST'],
             'PORT': os.environ['DB_PORT'],
-            'CONN_MAX_AGE': None,
+            'CONN_MAX_AGE': 300,
         }
     }
     # AWS Access Keys and Bucket Name

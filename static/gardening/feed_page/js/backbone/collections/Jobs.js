@@ -1,6 +1,14 @@
 var Jobs = Backbone.Collection.extend({
 	url:"/jobs/?page=1",
 	model: Job,
+
+	_intervalFetch: function () {
+		this.fetch({isSamePage: true})
+			.done(setTimeout(_.bind(function () {
+				this._intervalFetch();
+			}, this), 10000));
+	},
+
 	fetch: function (opts) {
 		if (opts.isSamePage) {
 			this.url = (this.prevURL ? this.prevURL: this.url);
@@ -16,5 +24,8 @@ var Jobs = Backbone.Collection.extend({
 		}
 		this.prevURL = result.prev
 		return result.results;
+	},
+	initialize: function () {
+		this._intervalFetch();	
 	},
 });
