@@ -1,6 +1,6 @@
 Author: Dean (Paolo) Mercado
 Email: dpaolomercado@gmail.com
-Rev.: 2015 August 20
+Rev.: 2015 August 26
 
 About:
 =====
@@ -43,6 +43,7 @@ Instructions for Setting Up A New Server:
 - python2.7, python-dev, pip, virtualenv
 - nodejs
 - nginx
+- apache2, apache2-mpm-worker, apache2-threaded-dev (or httpd)
 
 02: Download LESS with NPM
 
@@ -154,8 +155,22 @@ with the commands "echo $PLANT_APP_PATH" and "echo $PLANT_ENV_PATH".
 
 > ./fix_conf_files.sh
 
-19: Run supervisord using the supervisord.conf config file
+19: Edit ./modwsgi_init.sh to call python manage.py runmodwsgi... with
+the non-root server user and group. Use groupadd to create a group, if not done already
+
+> groupadd www-data
+> sudo nano ./modwsgi_init.sh
+>> (EDIT THE FILE TO INCLUDE THE FOLLOWING)
+python manage.py runmodwsgi --user {{user here}} --group www-data \
+		--processes=2 --threads=15 --root=8000
+...
+>>(END EDITS)
+
+20: Run supervisord using the supervisord.conf config file
 
 > supervisord -c ./supervisord.conf
 
-20: Site should be up and running!
+21: Site should be up and running!
+
+22: If you get 502 Bad Gateway Error:
+	- Go to ./config/supervisord.conf.d/log and look at the error and output files for clues! You might be missing a dependency.

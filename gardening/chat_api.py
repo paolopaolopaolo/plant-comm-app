@@ -20,7 +20,7 @@ import json, copy, datetime, time, re, pdb
 
 class ChatHandler(TornadoHandler):
 
-	@gen.coroutine
+	# Refreshes the conversations in the cache
 	def _refreshConvos(self):
 		get_convos = (
 						Convo.objects.filter(user_a = self.gardener) |
@@ -47,15 +47,42 @@ class ChatHandler(TornadoHandler):
 				gardener = Gardener.objects.get(user = gardener)
 				convo_to_add['msg_profile_pic'] = gardener.profile_pic.name
 				convos.append(convo_to_add)
-		self.convos = convos
+		return convos
 
-	@gen.coroutine
+	# Checks all the user's conversations for
+	# any messages that have times greater than
+	# the latest time for this user
 	def _checkServerTimes(self, convos, clientTime, isNew = True):
 		all_convo_times = [convo['time_initiated'] for convo in convos]
 		if isNew:
-			self.filtered_convos = filter(lambda x: clientTime < x, all_convo_times)
+			return filter(lambda x: clientTime < x, all_convo_times)
 		else:
-			self.filtered_convos = filter(lambda x: clientTime > x, all_convo_times)
+			return filter(lambda x: clientTime > x, all_convo_times)
+
+	# Refreshes conversations, in syncronous style
+	def _fetchIfDifferent_sync(self, request_time):
+		while True:
+			django.db.connection.close()
+			convos = self._refreshConvos()
+			newerServerTimes = self._checkServerTimes(convos, request_time)
+			# So I want client time to be checked across all conversations
+			if len(newerServerTimes) > 0:
+				return {'convos': self.convos}
+			# Check every 1/4 second
+			time.sleep(0.25)
+
+	# Refreshes conversations, in asyncronous style
+	@gen.coroutine 
+	def _fetchIfDifferent(self, request_time):
+		while True:
+			django.db.connection.close()
+			convos = yield gen.maybe_future(self._refreshConvos())
+			newerServerTimes = yield gen.maybe_future(self._checkServerTimes(convos, request_time))
+			# So I want client time to be checked across all conversations
+			if len(newerServerTimes) > 0:
+				raise gen.Return({'convos': convos})
+			# Check every 1/4 second
+			yield gen.sleep(0.25)
 
 	@gen.coroutine
 	def get(self, *args, **kwargs):
@@ -63,26 +90,13 @@ class ChatHandler(TornadoHandler):
 		username = self.get_argument("user")
 		self.gardener = Gardener.objects.get(username=username)
 		request_time = self.get_argument("clientTime")
-		while True:
-			django.db.connection.close()
-			self._refreshConvos()
-			self._checkServerTimes(self.convos, request_time)
-			newerServerTimes = self.filtered_convos
-			# So I want client time to be checked across all conversations
-			if len(newerServerTimes) > 0 or timeout > 59:
-				self.write({'convos': self.convos})
-				raise web.Finish()
-			timeout += 0.25
-			# Check every 1/4 second
-			yield gen.sleep(0.25)
-
+		convos = yield self._fetchIfDifferent(request_time)
+		self.write(convos)
+		
 class ChatAPI(APIView):
 
-	@method_decorator(login_required)
-	def dispatch(self, *args, **kwargs):
-		return super(ChatAPI, self).dispatch(*args, **kwargs)
-
 	# Creating a new conversation!
+	@method_decorator(login_required)
 	@set_user_and_gardener_and_convos
 	def post(self, request, *args, **kwargs):
 		response = HttpResponse()
@@ -137,6 +151,7 @@ class ChatAPI(APIView):
 			return False
 		return True
 
+	@method_decorator(login_required)
 	def put(self, request, *args, **kwargs):
 		response = HttpResponse()
 		# clean the text
@@ -163,7 +178,7 @@ class ChatAPI(APIView):
 		response.reason_phrase = "DERPAGE HAPPENED"
 		return response
 
-
+	@method_decorator(login_required)
 	@set_user_and_gardener_and_convos
 	def patch(self, request, *args, **kwargs):
 		convo = Convo.objects.get(id = kwargs['id'])
